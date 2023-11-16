@@ -1,0 +1,34 @@
+{
+  "name": "@linttrap/web-state-charts",
+  "author": "@linttrapmedia",
+  "title": "OEM Core",
+  "version": "1.0.3",
+  "description": "A Web Component Implementation Of State Charts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "scripts": {
+    "build": "mkdir -p ./dist && cp ./assets/* ./dist && esbuild ./src/* --minify --sourcemap --outdir=dist --format=iife",
+    "dev": "esbuild ./src/* --outdir=dist --watch --format=iife",
+    "clean": "rm -rf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linttrapmedia/oem-core.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/linttrapmedia/oem-core/issues"
+  },
+  "homepage": "https://github.com/linttrapmedia/oem-core#readme",
+  "devDependencies": {
+    "esbuild": "^0.14.27",
+    "jsdom": "^21.1.0",
+    "prettier": "2.7.1"
+  }
+}
