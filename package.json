@@ -13,9 +13,8 @@
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "scripts": {
-    "build": "mkdir -p ./dist && cp ./assets/* ./dist && esbuild ./src/* --minify --sourcemap --outdir=dist --format=iife",
-    "dev": "esbuild ./src/* --outdir=dist --watch --format=iife",
-    "clean": "rm -rf dist"
+    "build": "sh ./cmd/build.sh",
+    "dev": "sh ./cmd/dev.sh"
   },
   "repository": {
     "type": "git",
@@ -28,7 +27,6 @@
   "homepage": "https://github.com/linttrapmedia/oem-core#readme",
   "devDependencies": {
     "esbuild": "^0.14.27",
-    "jsdom": "^21.1.0",
     "prettier": "2.7.1"
   }
 }

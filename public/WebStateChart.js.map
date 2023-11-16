@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/WebStateChart.ts"],
+  "sourcesContent": ["// generate custom element web component\nexport class WebStateChart extends HTMLElement {\n  constructor() {\n    super();\n  }\n  connectedCallback() {\n    const src = this.getAttribute(\"src\");\n    if (!src) return;\n    // load chart from src\n    fetch(src)\n      .then((resp) => resp.text())\n      .then((xml) => {\n        const xmldoc = new DOMParser().parseFromString(xml, \"text/xml\");\n        const scxml = xmldoc.children[0];\n        for (let i = 0; i < scxml.children.length; i++) {\n          console.log(i, scxml.children[i]);\n        }\n        // console.log(scxml);\n      });\n  }\n}\n\ncustomElements.define(\"web-state-chart\", WebStateChart);\n"],
+  "mappings": "MACO,IAAMA,EAAN,cAA4B,WAAY,CAC7C,aAAc,CACZ,MAAM,CACR,CACA,mBAAoB,CAClB,IAAMC,EAAM,KAAK,aAAa,KAAK,EAC/B,CAACA,GAEL,MAAMA,CAAG,EACN,KAAMC,GAASA,EAAK,KAAK,CAAC,EAC1B,KAAMC,GAAQ,CAEb,IAAMC,EADS,IAAI,UAAU,EAAE,gBAAgBD,EAAK,UAAU,EACzC,SAAS,GAC9B,QAASE,EAAI,EAAGA,EAAID,EAAM,SAAS,OAAQC,IACzC,QAAQ,IAAIA,EAAGD,EAAM,SAASC,EAAE,CAGpC,CAAC,CACL,CACF,EAEA,eAAe,OAAO,kBAAmBL,CAAa",
+  "names": ["WebStateChart", "src", "resp", "xml", "scxml", "i"]
+}
