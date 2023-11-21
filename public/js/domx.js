@@ -1,44 +1,42 @@
 (() => {
-  class DomX {
-    constructor(el, config) {
-      this.el = el;
-      this.config = config;
-      this.parse = this.parse.bind(this);
+  class Domx extends HTMLElement {
+    constructor() {
+      super();
+      this.init = this.init.bind(this);
+      this.handleEvent = this.handleEvent.bind(this);
       this.transform = this.transform.bind(this);
-      this.parse();
+      this.transformClick = this.transformClick.bind(this);
     }
-    parse() {
-      const { events } = this.config;
-      const eventNames = Object.keys(events);
-      for (let i = 0; i < eventNames.length; i++) {
-        const eventName = eventNames[i];
-        this.el.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          const event = events[eventName];
-          for (let j = 0; j < event.length; j++) {
-            const action = event[j];
-            if (action[0] === "GET" || action[0] === "POST") {
-              console.log(action);
-            } else {
-              this.transform(action);
-            }
-          }
-        });
+    connectedCallback() {
+      const src = this.getAttribute("src");
+      if (!src)
+        return;
+      fetch(src).then((r) => r.json().then(this.init));
+    }
+    handleEvent(event) {
+      console.log(event);
+    }
+    init(config) {
+      this.config = config;
+      const initState = config.states[config.initialState];
+      if (initState.entry)
+        this.transform(initState.entry);
+    }
+    transform(transformations) {
+      for (let i = 0; i < transformations.length; i++) {
+        const [trait] = transformations[i];
+        switch (trait) {
+          case "click":
+            this.transformClick(transformations[i]);
+            break;
+        }
       }
     }
-    transform([selector, method, ...args]) {
+    transformClick(transformation) {
+      const [, selector, event] = transformation;
       const el = document.querySelector(selector);
-      console.log(selector);
-      if (el) {
-        el[method](...args);
-      }
+      console.log(selector, el, event);
     }
   }
-  document.addEventListener("DOMContentLoaded", () => {
-    const dxs = document.querySelectorAll("[dx]");
-    for (let i = 0; i < dxs.length; i++) {
-      const dx = dxs[i].getAttribute("dx");
-      fetch(dx).then((response) => response.text()).then((config) => new DomX(dxs[i], JSON.parse(config)));
-    }
-  });
+  customElements.define("dom-x", Domx);
 })();
