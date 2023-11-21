@@ -1,0 +1,25 @@
+{
+  "$schema": "domx.json",
+  "initialState": "init",
+  "states": {
+    "init": {
+      "entry": [
+        ["click", "#todo__btn", "submit"],
+        ["trigger", "#todo__input", "focus"],
+        ["state", "ready"]
+      ]
+    },
+    "ready": {
+      "submit": [
+        ["attr", "#input", "disabled", "true"],
+        ["attr", "#btn", "disabled", "true"],
+        ["post", "/api", ["todo", "#todo__input", "value"]],
+        ["state", "processing"]
+      ]
+    },
+    "processing": {
+      "success": "server",
+      "error": "server"
+    }
+  }
+}

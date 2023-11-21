@@ -14,7 +14,8 @@
   "module": "./src/index.ts",
   "scripts": {
     "build": "sh ./cmd/build.sh",
-    "dev": "sh ./cmd/dev.sh"
+    "dev": "sh ./cmd/dev.sh",
+    "clean": "sh ./cmd/clean.sh"
   },
   "repository": {
     "type": "git",

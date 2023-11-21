@@ -16,5 +16,5 @@
       });
     }
   }
-  customElements.define("web-state-chart", WebStateChart);
+  customElements.define("wsc-visualizer", WebStateChart);
 })();

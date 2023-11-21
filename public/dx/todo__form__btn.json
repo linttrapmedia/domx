@@ -1,0 +1,16 @@
+{
+  "events": {
+    "click": [
+      ["#todo__input", "setAttribute", "disabled", "true"],
+      ["#todo__btn", "setAttribute", "disabled", "true"],
+      [
+        "GET",
+        "/api/todo/create",
+        {
+          "guid": ["#todo__guid", "value"],
+          "todo": ["#todo__input", "value"]
+        }
+      ]
+    ]
+  }
+}

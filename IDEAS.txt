@@ -1,0 +1,27 @@
+Procedure:
+  - on some event
+  - frontend performs dom transformations
+  - frontend selects data and sends it to backend
+  - backend processes data and sends data and/or html back to frontend
+  - frontend performs dom transformations
+
+Psuedo-Code:
+
+ready
+  add
+    ON_CLICK #todo__btn
+    SELECT_DATA formData #todo__form
+    POST_DATA /todo
+    SET_STATE processing
+processing
+  enter
+    SET_ATTR disabled true #todo__btn
+    SET_ATTR disabled true #todo__input
+  success
+    SET_STATE success
+success
+  enter
+    SET_ATTR disabled false #todo__btn
+    SET_ATTR disabled false #todo__input
+    SET_STATE ready
+

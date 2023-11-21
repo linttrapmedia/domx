@@ -1,1 +1,1 @@
-esbuild ./src/* --outdir=public --format=iife --minify --sourcemap --bundle
+esbuild ./src/* --outdir=public/js --format=iife --minify --sourcemap --bundle

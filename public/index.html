@@ -1,8 +1,18 @@
 <html>
   <head>
-    <script src="WebStateChart.js"></script>
+    <script src="/js/domx.js"></script>
   </head>
   <body>
-    <web-state-chart src="test.xml" />
+    <dom-x src="/dx/todo.json">
+      <form id="todo__form">
+        <input id="todo__guid" type="hidden" value="135566" />
+        <input id="todo__input" autofocus type="text" />
+        <button id="todo__btn">Add</button>
+      </form>
+    </dom-x>
+    <ul>
+      <li>Go shopping</li>
+      <li>Buy flowers</li>
+    </ul>
   </body>
 </html>
