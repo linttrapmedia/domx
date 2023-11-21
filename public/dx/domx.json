@@ -59,7 +59,7 @@
             {
               "enum": ["click"],
               "type": "string",
-              "description": "Register an action on click"
+              "description": "Register an event on click"
             },
             {
               "type": "string",
@@ -67,7 +67,7 @@
             },
             {
               "type": "string",
-              "description": "Action name"
+              "description": "Event name"
             }
           ]
         },

@@ -11,8 +11,8 @@
     },
     "ready": {
       "submit": [
-        ["attr", "#input", "disabled", "true"],
-        ["attr", "#btn", "disabled", "true"],
+        ["attr", "#input", "disabled", true],
+        ["attr", "#btn", "disabled", true],
         ["post", "/api", ["todo", "#todo__input", "value"]],
         ["state", "processing"]
       ]
