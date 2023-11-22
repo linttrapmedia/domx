@@ -2,18 +2,21 @@
   class DomContext extends HTMLElement {
     constructor() {
       super();
-      this.init = this.init.bind(this);
-      this.handleClientEvent = this.handleClientEvent.bind(this);
+      this.autoBind = this.autoBind.bind(this);
       this.transform = this.transform.bind(this);
       this.applyAppend = this.applyAppend.bind(this);
       this.applyAttr = this.applyAttr.bind(this);
       this.applyCall = this.applyCall.bind(this);
       this.applyClick = this.applyClick.bind(this);
+      this.applyGet = this.applyGet.bind(this);
       this.applyJs = this.applyJs.bind(this);
       this.applyPost = this.applyPost.bind(this);
+      this.applyReplace = this.applyReplace.bind(this);
       this.applyState = this.applyState.bind(this);
       this.applyWait = this.applyWait.bind(this);
+      this.handleClientEvent = this.handleClientEvent.bind(this);
       this.handleServerEvent = this.handleServerEvent.bind(this);
+      this.init = this.init.bind(this);
     }
     connectedCallback() {
       const src = this.getAttribute("src");
@@ -21,15 +24,32 @@
         return;
       fetch(src).then((r) => r.json().then(this.init));
     }
+    autoBind() {
+      const bindMap = [["click", this.querySelectorAll("[dx\\:click]")]];
+      for (let i = 0; i < bindMap.length; i++) {
+        const [event, els] = bindMap[i];
+        for (let j = 0; j < els.length; j++) {
+          const el = els[j];
+          const dx = el.getAttribute(`dx:${event}`);
+          if (!dx)
+            continue;
+          el.addEventListener(event, (e) => {
+            e.preventDefault();
+            this.handleClientEvent(dx);
+          });
+        }
+      }
+    }
     handleClientEvent(event) {
       this.transform(this.config.states[this.state][event]);
     }
     handleServerEvent(se) {
-      const { event, dx } = se;
+      const { event } = se;
       const transformations = this.config.states[this.state][event].reduce(
         (acc, t) => {
-          if (t[0] === "server")
-            return [...acc, ...dx];
+          const [dx, key] = t;
+          if (dx === "server")
+            return [...acc, ...se[key]];
           return [...acc, t];
         },
         []
@@ -39,39 +59,28 @@
     init(config) {
       this.config = config;
       const initState = config.states[config.initialState];
+      this.state = config.initialState;
       if (initState.entry)
         this.transform(initState.entry);
+      this.autoBind();
     }
     transform(transformations) {
       for (let i = 0; i < transformations.length; i++) {
         const transformation2 = transformations[i];
         const [trait] = transformation2;
-        switch (trait) {
-          case "append":
-            this.applyAppend(transformation2);
-            break;
-          case "attr":
-            this.applyAttr(transformation2);
-            break;
-          case "click":
-            this.applyClick(transformation2);
-            break;
-          case "call":
-            this.applyCall(transformation2);
-            break;
-          case "js":
-            this.applyJs(transformation2);
-            break;
-          case "post":
-            this.applyPost(transformation2);
-            break;
-          case "state":
-            this.applyState(transformation2);
-            break;
-          case "wait":
-            this.applyWait(transformation2);
-            break;
-        }
+        const traitMap = {
+          append: this.applyAppend,
+          attr: this.applyAttr,
+          click: this.applyClick,
+          call: this.applyCall,
+          js: this.applyJs,
+          get: this.applyGet,
+          post: this.applyPost,
+          replace: this.applyReplace,
+          state: this.applyState,
+          wait: this.applyWait
+        };
+        traitMap[trait](transformation2);
       }
     }
     applyAppend(transformation2) {
@@ -109,6 +118,12 @@
         return;
       el[method2](...args2);
     }
+    applyGet(transformation2) {
+      const [, url] = transformation2;
+      fetch(url, {
+        method: "GET"
+      }).then((r) => r.json().then(this.handleServerEvent));
+    }
     applyJs(transformation) {
       const [, method, ...args] = transformation;
       const m = eval(method);
@@ -129,6 +144,18 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
       }).then((r) => r.json().then(this.handleServerEvent));
+    }
+    applyReplace(transformation2) {
+      const [, selector, content] = transformation2;
+      const el = this.querySelector(selector);
+      if (!el)
+        return;
+      const parent = el.parentElement;
+      if (!parent)
+        return;
+      const tmpl = document.createElement("template");
+      tmpl.innerHTML = decodeURIComponent(content);
+      parent.replaceChild(tmpl.content, el);
     }
     applyState(transformation2) {
       const [, state] = transformation2;

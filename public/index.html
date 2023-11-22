@@ -1,15 +1,16 @@
 <html>
   <head>
     <script src="/js/dom-context.js"></script>
+    <script src="/js/dom-chart.js"></script>
   </head>
   <body>
     <dom-context src="/dx/todo.json">
       <form id="todo__form">
-        <input id="todo__guid" type="hidden" value="135566" />
         <input id="todo__input" autofocus type="text" value=""" />
-        <button id="todo__btn">Add</button>
+        <button id="todo__btn" dx:click="addNew">Add</button>
       </form>
-      <ul id="todo__list"></ul>
+      <div id="todo__list">Loading Items</div>
+      <dom-chart src="/dx/todo.json" />
     </dom-context>
   </body>
 </html>

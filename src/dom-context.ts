@@ -7,6 +7,7 @@ type DxCall = [
   method: string,
   ...args: (string | number)[]
 ];
+type DxGet = [dx: "get", url: string];
 type DxJs = [dx: "js", method: string, ...args: (string | number)[]];
 type DxPost = [
   dx: "post",
@@ -17,7 +18,8 @@ type DxPost = [
     val: "value" | "dataset" | "formData"
   ][]
 ];
-type DxServer = [dx: "server"];
+type DxReplace = [dx: "replace", selector: string, content: string];
+type DxServer = [dx: "server", key: string];
 type DxState = [dx: "state", state: string];
 type DxWait = [dx: "wait", milliseconds: number];
 
@@ -27,7 +29,9 @@ type DX =
   | DxClick
   | DxCall
   | DxJs
+  | DxGet
   | DxPost
+  | DxReplace
   | DxServer
   | DxState
   | DxWait;
@@ -42,32 +46,51 @@ class DomContext extends HTMLElement {
   config: Config;
   constructor() {
     super();
-    this.init = this.init.bind(this);
-    this.handleClientEvent = this.handleClientEvent.bind(this);
+    this.autoBind = this.autoBind.bind(this);
     this.transform = this.transform.bind(this);
     this.applyAppend = this.applyAppend.bind(this);
     this.applyAttr = this.applyAttr.bind(this);
     this.applyCall = this.applyCall.bind(this);
     this.applyClick = this.applyClick.bind(this);
+    this.applyGet = this.applyGet.bind(this);
     this.applyJs = this.applyJs.bind(this);
     this.applyPost = this.applyPost.bind(this);
+    this.applyReplace = this.applyReplace.bind(this);
     this.applyState = this.applyState.bind(this);
     this.applyWait = this.applyWait.bind(this);
+    this.handleClientEvent = this.handleClientEvent.bind(this);
     this.handleServerEvent = this.handleServerEvent.bind(this);
+    this.init = this.init.bind(this);
   }
   connectedCallback() {
     const src = this.getAttribute("src");
     if (!src) return;
     fetch(src).then((r) => r.json().then(this.init));
   }
+  autoBind() {
+    const bindMap = [["click", this.querySelectorAll("[dx\\:click]")]];
+    for (let i = 0; i < bindMap.length; i++) {
+      const [event, els] = bindMap[i] as [string, NodeListOf<HTMLElement>];
+      for (let j = 0; j < els.length; j++) {
+        const el = els[j] as HTMLElement;
+        const dx = el.getAttribute(`dx:${event}`);
+        if (!dx) continue;
+        el.addEventListener(event, (e) => {
+          e.preventDefault();
+          this.handleClientEvent(dx);
+        });
+      }
+    }
+  }
   handleClientEvent(event: string) {
     this.transform(this.config.states[this.state][event] as DX[]);
   }
-  handleServerEvent(se: { event: string; dx: DX[] }) {
-    const { event, dx } = se;
+  handleServerEvent(se: { event: string } & any) {
+    const { event } = se;
     const transformations = this.config.states[this.state][event].reduce(
       (acc, t) => {
-        if (t[0] === "server") return [...acc, ...dx];
+        const [dx, key] = t as any;
+        if (dx === "server") return [...acc, ...se[key]];
         return [...acc, t];
       },
       [] as DX[]
@@ -77,38 +100,27 @@ class DomContext extends HTMLElement {
   init(config: Config) {
     this.config = config;
     const initState = config.states[config.initialState];
+    this.state = config.initialState;
     if (initState.entry) this.transform(initState.entry);
+    this.autoBind();
   }
   transform(transformations: DX[]) {
     for (let i = 0; i < transformations.length; i++) {
       const transformation = transformations[i];
       const [trait] = transformation;
-      switch (trait) {
-        case "append":
-          this.applyAppend(transformation);
-          break;
-        case "attr":
-          this.applyAttr(transformation);
-          break;
-        case "click":
-          this.applyClick(transformation);
-          break;
-        case "call":
-          this.applyCall(transformation);
-          break;
-        case "js":
-          this.applyJs(transformation);
-          break;
-        case "post":
-          this.applyPost(transformation);
-          break;
-        case "state":
-          this.applyState(transformation);
-          break;
-        case "wait":
-          this.applyWait(transformation);
-          break;
-      }
+      const traitMap = {
+        append: this.applyAppend,
+        attr: this.applyAttr,
+        click: this.applyClick,
+        call: this.applyCall,
+        js: this.applyJs,
+        get: this.applyGet,
+        post: this.applyPost,
+        replace: this.applyReplace,
+        state: this.applyState,
+        wait: this.applyWait,
+      };
+      traitMap[trait](transformation);
     }
   }
   applyAppend(transformation: DxAppend) {
@@ -141,6 +153,12 @@ class DomContext extends HTMLElement {
     if (!el) return;
     el[method](...args);
   }
+  applyGet(transformation: DxGet) {
+    const [, url] = transformation;
+    fetch(url, {
+      method: "GET",
+    }).then((r) => r.json().then(this.handleServerEvent));
+  }
   applyJs(transformation: DxJs) {
     const [, method, ...args] = transformation;
     const m = eval(method);
@@ -160,6 +178,16 @@ class DomContext extends HTMLElement {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     }).then((r) => r.json().then(this.handleServerEvent));
+  }
+  applyReplace(transformation: DxReplace) {
+    const [, selector, content] = transformation;
+    const el = this.querySelector(selector);
+    if (!el) return;
+    const parent = el.parentElement;
+    if (!parent) return;
+    const tmpl = document.createElement("template");
+    tmpl.innerHTML = decodeURIComponent(content);
+    parent.replaceChild(tmpl.content, el);
   }
   applyState(transformation: DxState) {
     const [, state] = transformation;

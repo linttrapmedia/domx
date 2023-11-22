@@ -4,22 +4,25 @@
   "states": {
     "init": {
       "entry": [
-        ["click", "#todo__btn", "submit"],
         ["call", "#todo__input", "focus"],
+        ["get", "/api/todo"]
+      ],
+      "renderTodos": [
+        ["server", "todoList"],
         ["state", "ready"]
       ]
     },
     "ready": {
-      "submit": [
-        ["state", "processing"],
+      "addNew": [
         ["attr", "#todo__input", "disabled", true],
         ["attr", "#todo__btn", "disabled", true],
-        ["post", "/api/todo", ["todo", "#todo__input", "value"]]
+        ["post", "/api/todo", ["todo", "#todo__input", "value"]],
+        ["state", "processing"]
       ]
     },
     "processing": {
       "success": [
-        ["server"],
+        ["server", "appendTodo"],
         ["attr", "#todo__btn", "disabled", null],
         ["attr", "#todo__input", "disabled", null],
         ["call", "#todo__form", "reset"],
