@@ -1,15 +1,15 @@
-type TransformAppend = [domx: "append", selector: string, html: string];
-type TransformAttr = [
-  domx: "attr",
+type DxAppend = [dx: "append", selector: string, html: string];
+type DxAttr = [dx: "attr", selector: string, attr: string, value: string];
+type DxClick = [dx: "click", selector: string, event: string];
+type DxCall = [
+  dx: "call",
   selector: string,
-  attr: string,
-  value: string
+  method: string,
+  ...args: (string | number)[]
 ];
-type TransformClick = [domx: "click", selector: string, event: string];
-type TransformMethod = [domx: "method", selector: string, method: string];
-type TransformWait = [domx: "wait", timeInSeconds: number];
-type TransformPost = [
-  domx: "post",
+type DxJs = [dx: "js", method: string, ...args: (string | number)[]];
+type DxPost = [
+  dx: "post",
   url: string,
   ...data: [
     key: string,
@@ -17,26 +17,27 @@ type TransformPost = [
     val: "value" | "dataset" | "formData"
   ][]
 ];
-type TransformState = [domx: "state", state: string];
+type DxServer = [dx: "server"];
+type DxState = [dx: "state", state: string];
+type DxWait = [dx: "wait", milliseconds: number];
 
-type Transformations =
-  | TransformAppend
-  | TransformAttr
-  | TransformClick
-  | TransformMethod
-  | TransformPost
-  | TransformState
-  | TransformWait;
+type DX =
+  | DxAppend
+  | DxAttr
+  | DxClick
+  | DxCall
+  | DxJs
+  | DxPost
+  | DxServer
+  | DxState
+  | DxWait;
 
 type Config = {
   initialState: string;
-  states: Record<
-    string,
-    Record<string | "entry", Transformations[] | "server">
-  >;
+  states: Record<string, Record<string | "entry", DX[]>>;
 };
 
-class Domx extends HTMLElement {
+class DomContext extends HTMLElement {
   state: string;
   config: Config;
   constructor() {
@@ -44,12 +45,13 @@ class Domx extends HTMLElement {
     this.init = this.init.bind(this);
     this.handleClientEvent = this.handleClientEvent.bind(this);
     this.transform = this.transform.bind(this);
-    this.applyClick = this.applyClick.bind(this);
-    this.applyState = this.applyState.bind(this);
     this.applyAppend = this.applyAppend.bind(this);
-    this.applyMethod = this.applyMethod.bind(this);
     this.applyAttr = this.applyAttr.bind(this);
+    this.applyCall = this.applyCall.bind(this);
+    this.applyClick = this.applyClick.bind(this);
+    this.applyJs = this.applyJs.bind(this);
     this.applyPost = this.applyPost.bind(this);
+    this.applyState = this.applyState.bind(this);
     this.applyWait = this.applyWait.bind(this);
     this.handleServerEvent = this.handleServerEvent.bind(this);
   }
@@ -59,22 +61,25 @@ class Domx extends HTMLElement {
     fetch(src).then((r) => r.json().then(this.init));
   }
   handleClientEvent(event: string) {
-    if (this.config.states[this.state][event] === "server") return;
-    this.transform(this.config.states[this.state][event] as Transformations[]);
+    this.transform(this.config.states[this.state][event] as DX[]);
   }
-  handleServerEvent(se: { event: string; dx: Transformations[] }) {
+  handleServerEvent(se: { event: string; dx: DX[] }) {
     const { event, dx } = se;
-    const isServerEvent = this.config.states[this.state][event] === "server";
-    if (!isServerEvent) return;
-    this.transform(dx);
+    const transformations = this.config.states[this.state][event].reduce(
+      (acc, t) => {
+        if (t[0] === "server") return [...acc, ...dx];
+        return [...acc, t];
+      },
+      [] as DX[]
+    );
+    this.transform(transformations);
   }
   init(config: Config) {
     this.config = config;
     const initState = config.states[config.initialState];
-    if (initState.entry === "server") return;
     if (initState.entry) this.transform(initState.entry);
   }
-  transform(transformations: Transformations[]) {
+  transform(transformations: DX[]) {
     for (let i = 0; i < transformations.length; i++) {
       const transformation = transformations[i];
       const [trait] = transformation;
@@ -88,8 +93,11 @@ class Domx extends HTMLElement {
         case "click":
           this.applyClick(transformation);
           break;
-        case "method":
-          this.applyMethod(transformation);
+        case "call":
+          this.applyCall(transformation);
+          break;
+        case "js":
+          this.applyJs(transformation);
           break;
         case "post":
           this.applyPost(transformation);
@@ -103,61 +111,61 @@ class Domx extends HTMLElement {
       }
     }
   }
-  applyAppend(transformation: TransformAppend) {
+  applyAppend(transformation: DxAppend) {
     const [, selector, html] = transformation;
-    const el = document.querySelector(selector);
-    console.log(el, selector);
+    const el = this.querySelector(selector);
     if (!el) return;
     const tmpl = document.createElement("template");
     tmpl.innerHTML = decodeURIComponent(html);
     el.append(tmpl.content);
   }
-  applyAttr(transformation: TransformAttr) {
+  applyAttr(transformation: DxAttr) {
     const [, selector, attr, value] = transformation;
-    const el = document.querySelector(selector);
+    const el = this.querySelector(selector);
     if (!el) return;
     if (value === null) return el.removeAttribute(attr);
     el.setAttribute(attr, value);
   }
-  applyClick(transformation: TransformClick) {
+  applyClick(transformation: DxClick) {
     const [, selector, event] = transformation;
-    const el = document.querySelector(selector);
+    const el = this.querySelector(selector);
     if (!el) return;
     el?.addEventListener("click", (e) => {
       e.preventDefault();
       this.handleClientEvent(event);
     });
   }
-  applyMethod(transformation: TransformMethod) {
-    const [, selector, method] = transformation;
-    const el = document.querySelector(selector);
+  applyCall(transformation: DxCall) {
+    const [, selector, method, ...args] = transformation;
+    const el = this.querySelector(selector);
     if (!el) return;
-    el[method]();
+    el[method](...args);
   }
-  applyPost(transformation: TransformPost) {
+  applyJs(transformation: DxJs) {
+    const [, method, ...args] = transformation;
+    const m = eval(method);
+    m(...args);
+  }
+  applyPost(transformation: DxPost) {
     const [, url, ...data] = transformation;
-
     const body = {};
     for (let i = 0; i < data.length; i++) {
       const [key, selector, val] = data[i];
-      const el = document.querySelector(selector);
+      const el = this.querySelector(selector);
       if (!el) return;
       body[key] = el[val];
     }
-
-    console.log(body);
-
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     }).then((r) => r.json().then(this.handleServerEvent));
   }
-  applyState(transformation: TransformState) {
+  applyState(transformation: DxState) {
     const [, state] = transformation;
     this.state = state;
   }
-  applyWait(transformation: TransformWait) {
+  applyWait(transformation: DxWait) {
     const [, timeInSeconds] = transformation;
     const startTime = new Date().getTime();
     while (new Date().getTime() - startTime < timeInSeconds) {
@@ -166,4 +174,4 @@ class Domx extends HTMLElement {
   }
 }
 
-customElements.define("dom-x", Domx);
+customElements.define("dom-context", DomContext);

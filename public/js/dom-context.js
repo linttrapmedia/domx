@@ -1,5 +1,5 @@
 (() => {
-  class Domx extends HTMLElement {
+  class DomContext extends HTMLElement {
     constructor() {
       super();
       this.init = this.init.bind(this);
@@ -141,5 +141,5 @@
       }
     }
   }
-  customElements.define("dom-x", Domx);
+  customElements.define("dom-context", DomContext);
 })();

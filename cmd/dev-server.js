@@ -1,7 +1,5 @@
 import bodyParser from "body-parser";
 import express from "express";
-import multer from "multer";
-const upload = multer();
 const app = express();
 const port = 3000;
 
@@ -19,12 +17,6 @@ app.post("/api/todo", (req, res) => {
         "#todo__list",
         encodeURIComponent(`<li>${req.body.todo}</li>`),
       ],
-      ["method", "#todo__form", "reset"],
-      ["method", "#todo__input", "focus"],
-      ["attr", "#todo__btn", "disabled", null],
-      ["attr", "#todo__input", "disabled", null],
-      ["wait", 1000],
-      ["state", "ready"],
     ],
   });
 });

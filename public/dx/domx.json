@@ -75,7 +75,7 @@
           "type": "array",
           "items": [
             {
-              "enum": ["method"],
+              "enum": ["call"],
               "type": "string",
               "description": "Register a method call"
             },
