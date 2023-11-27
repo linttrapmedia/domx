@@ -32,7 +32,6 @@ app.post("/api/todo", (req, res) => {
   res.send({
     event: "success",
     appendTodo: [
-      ["wait", 2000],
       [
         "append",
         "#todo__list",

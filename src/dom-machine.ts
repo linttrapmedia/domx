@@ -41,9 +41,10 @@ type Config = {
   states: Record<string, Record<string | "entry", DX[]>>;
 };
 
-class DomContext extends HTMLElement {
+class DomMachine extends HTMLElement {
   state: string;
   config: Config;
+  subs: ((state: string, event: string, dx: DX) => void)[] = [];
   constructor() {
     super();
     this.autoBind = this.autoBind.bind(this);
@@ -61,67 +62,12 @@ class DomContext extends HTMLElement {
     this.handleClientEvent = this.handleClientEvent.bind(this);
     this.handleServerEvent = this.handleServerEvent.bind(this);
     this.init = this.init.bind(this);
+    this.sub = this.sub.bind(this);
   }
   connectedCallback() {
     const src = this.getAttribute("src");
     if (!src) return;
     fetch(src).then((r) => r.json().then(this.init));
-  }
-  autoBind() {
-    const bindMap = [["click", this.querySelectorAll("[dx\\:click]")]];
-    for (let i = 0; i < bindMap.length; i++) {
-      const [event, els] = bindMap[i] as [string, NodeListOf<HTMLElement>];
-      for (let j = 0; j < els.length; j++) {
-        const el = els[j] as HTMLElement;
-        const dx = el.getAttribute(`dx:${event}`);
-        if (!dx) continue;
-        el.addEventListener(event, (e) => {
-          e.preventDefault();
-          this.handleClientEvent(dx);
-        });
-      }
-    }
-  }
-  handleClientEvent(event: string) {
-    this.transform(this.config.states[this.state][event] as DX[]);
-  }
-  handleServerEvent(se: { event: string } & any) {
-    const { event } = se;
-    const transformations = this.config.states[this.state][event].reduce(
-      (acc, t) => {
-        const [dx, key] = t as any;
-        if (dx === "server") return [...acc, ...se[key]];
-        return [...acc, t];
-      },
-      [] as DX[]
-    );
-    this.transform(transformations);
-  }
-  init(config: Config) {
-    this.config = config;
-    const initState = config.states[config.initialState];
-    this.state = config.initialState;
-    if (initState.entry) this.transform(initState.entry);
-    this.autoBind();
-  }
-  transform(transformations: DX[]) {
-    for (let i = 0; i < transformations.length; i++) {
-      const transformation = transformations[i];
-      const [trait] = transformation;
-      const traitMap = {
-        append: this.applyAppend,
-        attr: this.applyAttr,
-        click: this.applyClick,
-        call: this.applyCall,
-        js: this.applyJs,
-        get: this.applyGet,
-        post: this.applyPost,
-        replace: this.applyReplace,
-        state: this.applyState,
-        wait: this.applyWait,
-      };
-      traitMap[trait](transformation);
-    }
   }
   applyAppend(transformation: DxAppend) {
     const [, selector, html] = transformation;
@@ -161,8 +107,7 @@ class DomContext extends HTMLElement {
   }
   applyJs(transformation: DxJs) {
     const [, method, ...args] = transformation;
-    const m = eval(method);
-    m(...args);
+    window[method](...args);
   }
   applyPost(transformation: DxPost) {
     const [, url, ...data] = transformation;
@@ -200,6 +145,66 @@ class DomContext extends HTMLElement {
       // Do nothing
     }
   }
+  autoBind() {
+    const bindMap = [["click", this.querySelectorAll("[dx\\:click]")]];
+    for (let i = 0; i < bindMap.length; i++) {
+      const [event, els] = bindMap[i] as [string, NodeListOf<HTMLElement>];
+      for (let j = 0; j < els.length; j++) {
+        const el = els[j] as HTMLElement;
+        const dx = el.getAttribute(`dx:${event}`);
+        if (!dx) continue;
+        el.addEventListener(event, (e) => {
+          e.preventDefault();
+          this.handleClientEvent(dx);
+        });
+      }
+    }
+  }
+  handleClientEvent(event: string) {
+    this.transform(event, this.config.states[this.state][event] as DX[]);
+  }
+  handleServerEvent(se: { event: string } & any) {
+    const { event } = se;
+    const transformations = this.config.states[this.state][event].reduce(
+      (acc, t) => {
+        const [dx, key] = t as any;
+        if (dx === "server") return [...acc, ...se[key]];
+        return [...acc, t];
+      },
+      [] as DX[]
+    );
+    this.transform(event, transformations);
+  }
+  init(config: Config) {
+    this.config = config;
+    const initState = config.states[config.initialState];
+    this.state = config.initialState;
+    if (initState.entry) this.transform("entry", initState.entry);
+    this.autoBind();
+  }
+  sub(s: (state: string, action: string, dx: DX) => void) {
+    this.subs.push(s);
+  }
+  transform(event: string, transformations: DX[]) {
+    for (let i = 0; i < transformations.length; i++) {
+      const transformation = transformations[i];
+      const [trait] = transformation;
+      const traitMap = {
+        append: this.applyAppend,
+        attr: this.applyAttr,
+        click: this.applyClick,
+        call: this.applyCall,
+        js: this.applyJs,
+        get: this.applyGet,
+        post: this.applyPost,
+        replace: this.applyReplace,
+        state: this.applyState,
+        wait: this.applyWait,
+      };
+      traitMap[trait](transformation);
+      this.subs.forEach((s) => s(this.state, event, transformation));
+    }
+  }
 }
 
-customElements.define("dom-context", DomContext);
+customElements.define("dom-machine", DomMachine);

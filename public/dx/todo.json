@@ -17,10 +17,28 @@
         ["attr", "#todo__input", "disabled", true],
         ["attr", "#todo__btn", "disabled", true],
         ["post", "/api/todo", ["todo", "#todo__input", "value"]],
-        ["state", "processing"]
+        ["state", "procAddNew"]
+      ],
+      "markDone": [
+        ["attr", "#todo__input", "disabled", true],
+        ["attr", "#todo__btn", "disabled", true],
+        ["put", "/api/todo", ["todo", "#todo__input", "value"]],
+        ["state", "procMarkDone"]
       ]
     },
-    "processing": {
+    "procAddNew": {
+      "success": [
+        ["wait", 1000],
+        ["server", "appendTodo"],
+        ["attr", "#todo__btn", "disabled", null],
+        ["attr", "#todo__input", "disabled", null],
+        ["call", "#todo__form", "reset"],
+        ["call", "#todo__input", "focus"],
+        ["state", "ready"]
+      ],
+      "error": [["server"]]
+    },
+    "procMarkDone": {
       "success": [
         ["server", "appendTodo"],
         ["attr", "#todo__btn", "disabled", null],

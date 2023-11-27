@@ -9,62 +9,52 @@
       const src = this.getAttribute("src");
       if (!src)
         return;
-      fetch(src).then((r) => r.json().then(this.init));
+      const mermaidSrc = this.getAttribute("mermaid");
+      if (!mermaidSrc)
+        return;
+      const script = document.createElement("script");
+      script.src = mermaidSrc;
+      script.onload = () => fetch(src).then((r) => r.json().then(this.init));
+      document.head.appendChild(script);
     }
     init(config) {
       this.config = config;
-      console.log(config);
       this.render();
     }
     render() {
-      const { states, initialState } = this.config;
-      const svgElem = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "svg"
-      );
-      svgElem.setAttribute("width", "500");
-      svgElem.setAttribute("height", "500");
-      let x = 10, y = 10;
-      const boxWidth = 100, boxHeight = 50, margin = 10;
-      Object.entries(states).forEach(([k, v]) => {
-        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        g.setAttribute("transform", `translate(${x}, ${y})`);
-        const rect = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "rect"
-        );
-        rect.setAttribute("width", boxWidth.toString());
-        rect.setAttribute("height", boxHeight.toString());
-        rect.setAttribute("fill", "white");
-        rect.setAttribute("stroke", "black");
-        rect.setAttribute("stroke-width", "1");
-        rect.setAttribute("rx", "5");
-        rect.setAttribute("ry", "5");
-        rect.style.cursor = "pointer";
-        if (k === initialState)
-          rect.setAttribute("stroke-width", "3");
-        const text = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "text"
-        );
-        text.setAttribute("x", (boxWidth / 2).toString());
-        text.setAttribute("y", (boxHeight / 2).toString());
-        text.setAttribute("alignment-baseline", "middle");
-        text.setAttribute("text-anchor", "middle");
-        text.setAttribute("font-size", "12");
-        text.setAttribute("font-family", "sans-serif");
-        text.style.pointerEvents = "none";
-        text.textContent = k;
-        g.appendChild(rect);
-        g.appendChild(text);
-        svgElem.appendChild(g);
-        x += boxWidth + margin;
-        if (x + boxWidth > 800) {
-          x = 10;
-          y += boxHeight + margin;
-        }
+      globalThis.mermaid.initialize({
+        startOnLoad: false,
+        boxMargin: 100,
+        theme: "neutral"
       });
-      this.appendChild(svgElem);
+      const { states, initialState } = this.config;
+      const mermaid = document.createElement("div");
+      mermaid.className = "mermaid";
+      this.appendChild(mermaid);
+      let graph = "";
+      graph += `flowchart LR
+`;
+      graph += `${initialState}[${initialState}]
+`;
+      for (const state in states) {
+        graph += `${state}[${state}]
+`;
+        for (const event in states[state]) {
+          for (const transformation of states[state][event]) {
+            const [dx, key] = transformation;
+            if (dx === "state") {
+              graph += `${state} -- ${event} --> ${key}
+`;
+            }
+          }
+        }
+      }
+      graph += `classDef node font-size:10pt,font-weight:bold,fill:#fff,stroke:#333,stroke-width:1px,rx:4px,ry:4px,padding:10pt;
+`;
+      graph += `classDef edgeLabel color:#999,font-size:10pt,font-weight:bold,fill:#fff,stroke:#999,stroke-width:1px,rx:4px,ry:4px,padding:5pt;
+`;
+      mermaid.textContent = graph;
+      globalThis.mermaid.init(void 0, mermaid);
     }
   }
   customElements.define("dom-chart", DomChart);
