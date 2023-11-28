@@ -4,12 +4,12 @@
     constructor() {
       super();
       this.subs = [];
-      this.autoBind = this.autoBind.bind(this);
       this.transform = this.transform.bind(this);
       this.applyAppend = this.applyAppend.bind(this);
       this.applyAttr = this.applyAttr.bind(this);
       this.applyCall = this.applyCall.bind(this);
       this.applyClick = this.applyClick.bind(this);
+      this.applyDispatch = this.applyDispatch.bind(this);
       this.applyGet = this.applyGet.bind(this);
       this.applyJs = this.applyJs.bind(this);
       this.applyPost = this.applyPost.bind(this);
@@ -38,21 +38,11 @@
     }
     applyAttr(transformation) {
       const [, selector, attr, value] = transformation;
-      const el = this.querySelector(selector);
-      if (!el)
-        return;
-      if (value === null)
-        return el.removeAttribute(attr);
-      el.setAttribute(attr, value);
-    }
-    applyClick(transformation) {
-      const [, selector, event] = transformation;
-      const el = this.querySelector(selector);
-      if (!el)
-        return;
-      el?.addEventListener("click", (e) => {
-        e.preventDefault();
-        this.handleClientEvent(event);
+      const els = this.querySelectorAll(selector);
+      els.forEach((el) => {
+        if (value === null)
+          return el.removeAttribute(attr);
+        el.setAttribute(attr, value);
       });
     }
     applyCall(transformation) {
@@ -61,6 +51,23 @@
       if (!el)
         return;
       el[method](...args);
+    }
+    applyClick(transformation) {
+      const [, selector, action] = transformation;
+      const els = this.querySelectorAll(selector);
+      for (let i = 0; i < els.length; i++) {
+        const el = els[i];
+        const cb = (e) => {
+          e.preventDefault();
+          this.handleClientEvent(action);
+        };
+        el.removeEventListener("click", cb);
+        el.addEventListener("click", cb);
+      }
+    }
+    applyDispatch(transformation) {
+      const [, action] = transformation;
+      this.handleClientEvent(action);
     }
     applyGet(transformation) {
       const [, url] = transformation;
@@ -102,36 +109,26 @@
     }
     applyState(transformation) {
       const [, state] = transformation;
+      const hasEntry = this.config.states[state].entry;
+      if (hasEntry)
+        this.transform("entry", this.config.states[state].entry);
       this.state = state;
     }
     applyWait(transformation) {
-      const [, timeInSeconds] = transformation;
+      const [, timeInSeconds, action] = transformation;
       const startTime = new Date().getTime();
       while (new Date().getTime() - startTime < timeInSeconds) {
       }
+      if (action)
+        this.handleClientEvent(action);
     }
-    autoBind() {
-      const bindMap = [["click", this.querySelectorAll("[dx\\:click]")]];
-      for (let i = 0; i < bindMap.length; i++) {
-        const [event, els] = bindMap[i];
-        for (let j = 0; j < els.length; j++) {
-          const el = els[j];
-          const dx = el.getAttribute(`dx:${event}`);
-          if (!dx)
-            continue;
-          el.addEventListener(event, (e) => {
-            e.preventDefault();
-            this.handleClientEvent(dx);
-          });
-        }
-      }
-    }
-    handleClientEvent(event) {
-      this.transform(event, this.config.states[this.state][event]);
+    handleClientEvent(action) {
+      console.log(action, this.config.states[this.state][action]);
+      this.transform(action, this.config.states[this.state][action]);
     }
     handleServerEvent(se) {
-      const { event } = se;
-      const transformations = this.config.states[this.state][event].reduce(
+      const { action } = se;
+      const transformations = this.config.states[this.state][action].reduce(
         (acc, t) => {
           const [dx, key] = t;
           if (dx === "server")
@@ -140,20 +137,55 @@
         },
         []
       );
-      this.transform(event, transformations);
+      this.transform(action, transformations);
     }
     init(config) {
       this.config = config;
+      const that = this;
+      const bindings = this.config.bindings ?? [];
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "childList") {
+            for (let i = 0; i < bindings.length; i++) {
+              const [selector, ...events] = bindings[i];
+              const els = this.querySelectorAll(
+                selector
+              );
+              for (let j = 0; j < els.length; j++) {
+                const el = els[j];
+                for (let k = 0; k < events.length; k++) {
+                  const [event, action] = events[k];
+                  const cb = (e) => {
+                    e.preventDefault();
+                    console.log(e.target, el);
+                    if (e.target !== el)
+                      return;
+                    this.handleClientEvent(action);
+                  };
+                  that.removeEventListener(event, cb);
+                  that.addEventListener(event, cb);
+                }
+              }
+            }
+          }
+        });
+      });
+      observer.observe(this, {
+        attributes: true,
+        childList: true,
+        subtree: true
+      });
       const initState = config.states[config.initialState];
       this.state = config.initialState;
       if (initState.entry)
         this.transform("entry", initState.entry);
-      this.autoBind();
     }
     sub(s) {
       this.subs.push(s);
     }
-    transform(event, transformations) {
+    transform(action, transformations) {
+      if (!transformations)
+        return;
       for (let i = 0; i < transformations.length; i++) {
         const transformation = transformations[i];
         const [trait] = transformation;
@@ -162,6 +194,7 @@
           attr: this.applyAttr,
           click: this.applyClick,
           call: this.applyCall,
+          dispatch: this.applyDispatch,
           js: this.applyJs,
           get: this.applyGet,
           post: this.applyPost,
@@ -170,7 +203,7 @@
           wait: this.applyWait
         };
         traitMap[trait](transformation);
-        this.subs.forEach((s) => s(this.state, event, transformation));
+        this.subs.forEach((s) => s(this.state, action, transformation));
       }
     }
   };

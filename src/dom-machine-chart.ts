@@ -52,7 +52,7 @@ function findMidpoint(points, halfLength) {
   return points[0]; // Fallback to the first point
 }
 
-class DomMachineDebugger extends HTMLElement {
+class DomMachineChart extends HTMLElement {
   previousState: string = "";
   currentState: string = "";
   currentEvent: string = "";
@@ -182,4 +182,4 @@ class DomMachineDebugger extends HTMLElement {
   }
 }
 
-customElements.define("dom-machine-debugger", DomMachineDebugger);
+customElements.define("dom-machine-chart", DomMachineChart);

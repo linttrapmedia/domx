@@ -1,12 +1,13 @@
 {
   "$schema": "domx.json",
   "initialState": "init",
+  "bindings": [
+    [".todo__list__item", ["click", "markDone"]],
+    ["#todo__btn", ["click", "addNew"]]
+  ],
   "states": {
     "init": {
-      "entry": [
-        ["call", "#todo__input", "focus"],
-        ["get", "/api/todo"]
-      ],
+      "entry": [["get", "/api/todo"]],
       "renderTodos": [
         ["server", "todoList"],
         ["state", "ready"]
@@ -17,18 +18,15 @@
         ["attr", "#todo__input", "disabled", true],
         ["attr", "#todo__btn", "disabled", true],
         ["post", "/api/todo", ["todo", "#todo__input", "value"]],
-        ["state", "procAddNew"]
+        ["state", "addingNew"]
       ],
       "markDone": [
-        ["attr", "#todo__input", "disabled", true],
-        ["attr", "#todo__btn", "disabled", true],
-        ["put", "/api/todo", ["todo", "#todo__input", "value"]],
-        ["state", "procMarkDone"]
+        ["state", "markingDone"],
+        ["dispatch", "success"]
       ]
     },
-    "procAddNew": {
+    "addingNew": {
       "success": [
-        ["wait", 1000],
         ["server", "appendTodo"],
         ["attr", "#todo__btn", "disabled", null],
         ["attr", "#todo__input", "disabled", null],
@@ -38,15 +36,8 @@
       ],
       "error": [["server"]]
     },
-    "procMarkDone": {
-      "success": [
-        ["server", "appendTodo"],
-        ["attr", "#todo__btn", "disabled", null],
-        ["attr", "#todo__input", "disabled", null],
-        ["call", "#todo__form", "reset"],
-        ["call", "#todo__input", "focus"],
-        ["state", "ready"]
-      ],
+    "markingDone": {
+      "success": [["state", "ready"]],
       "error": [["server"]]
     }
   }

@@ -10,17 +10,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const todos = ["Pick Up Groceries", "Walk The Dog"];
 const completed = ["Walk The Dog"];
 
+function renderTodoItem(todo) {
+  let style = "";
+  if (completed.includes(todo)) style += "text-decoration: line-through;";
+  return `<li class="todo__list__item" style="${style}" data-id="${todo}">${todo}</li>`;
+}
+
 app.get("/api/todo", (_, res) => {
   const todosHtml = `<ul id="todo__list">${todos
-    .map((todo) => {
-      let style = "";
-      if (completed.includes(todo)) style += "text-decoration: line-through;";
-      return `<li style="${style}">${todo}</li>`;
-    })
+    .map(renderTodoItem)
     .join("")}</ul>`;
   res.setHeader("Content-Type", "application/json");
   res.send({
-    event: "renderTodos",
+    action: "renderTodos",
     todoList: [["replace", "#todo__list", encodeURIComponent(todosHtml)]],
   });
 });
@@ -30,12 +32,12 @@ app.post("/api/todo", (req, res) => {
   console.log(todos);
   res.setHeader("Content-Type", "application/json");
   res.send({
-    event: "success",
+    action: "success",
     appendTodo: [
       [
         "append",
         "#todo__list",
-        encodeURIComponent(`<li>${req.body.todo}</li>`),
+        encodeURIComponent(renderTodoItem(req.body.todo)),
       ],
     ],
   });
