@@ -22,23 +22,24 @@ app.get("/api/todo", (_, res) => {
     .join("")}</ul>`;
   res.setHeader("Content-Type", "application/json");
   res.send({
-    action: "renderTodos",
-    todoList: [["replace", "#todo__list", encodeURIComponent(todosHtml)]],
+    todoList: [
+      ["replace", "#todo__list", encodeURIComponent(todosHtml)],
+      ["state", "ready"],
+    ],
   });
 });
 
 app.post("/api/todo", (req, res) => {
   todos.push(req.body.todo);
-  console.log(todos);
   res.setHeader("Content-Type", "application/json");
   res.send({
-    action: "success",
-    appendTodo: [
+    payload: [
       [
         "append",
         "#todo__list",
         encodeURIComponent(renderTodoItem(req.body.todo)),
       ],
+      ["dispatch", "success"],
     ],
   });
 });

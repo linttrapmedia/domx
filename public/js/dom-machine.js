@@ -8,7 +8,7 @@
       this.applyAppend = this.applyAppend.bind(this);
       this.applyAttr = this.applyAttr.bind(this);
       this.applyCall = this.applyCall.bind(this);
-      this.applyClick = this.applyClick.bind(this);
+      this.applyEventListener = this.applyEventListener.bind(this);
       this.applyDispatch = this.applyDispatch.bind(this);
       this.applyGet = this.applyGet.bind(this);
       this.applyJs = this.applyJs.bind(this);
@@ -52,8 +52,9 @@
         return;
       el[method](...args);
     }
-    applyClick(transformation) {
-      const [, selector, action] = transformation;
+    applyEventListener(transformation) {
+      const [event, selector, action] = transformation;
+      console.log(transformation);
       const els = this.querySelectorAll(selector);
       for (let i = 0; i < els.length; i++) {
         const el = els[i];
@@ -61,8 +62,8 @@
           e.preventDefault();
           this.handleClientEvent(action);
         };
-        el.removeEventListener("click", cb);
-        el.addEventListener("click", cb);
+        el.removeEventListener(event, cb);
+        el.addEventListener(event, cb);
       }
     }
     applyDispatch(transformation) {
@@ -70,17 +71,21 @@
       this.handleClientEvent(action);
     }
     applyGet(transformation) {
-      const [, url] = transformation;
+      const [, url, dxKey] = transformation;
       fetch(url, {
         method: "GET"
-      }).then((r) => r.json().then(this.handleServerEvent));
+      }).then(
+        (r) => r.json().then((d) => {
+          this.transform("entry", d[dxKey]);
+        })
+      );
     }
     applyJs(transformation) {
       const [, method, ...args] = transformation;
       window[method](...args);
     }
     applyPost(transformation) {
-      const [, url, ...data] = transformation;
+      const [, url, dxKey, ...data] = transformation;
       const body = {};
       for (let i = 0; i < data.length; i++) {
         const [key, selector, val] = data[i];
@@ -93,7 +98,11 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
-      }).then((r) => r.json().then(this.handleServerEvent));
+      }).then(
+        (r) => r.json().then((d) => {
+          this.transform("entry", d[dxKey]);
+        })
+      );
     }
     applyReplace(transformation) {
       const [, selector, content] = transformation;
@@ -123,7 +132,6 @@
         this.handleClientEvent(action);
     }
     handleClientEvent(action) {
-      console.log(action, this.config.states[this.state][action]);
       this.transform(action, this.config.states[this.state][action]);
     }
     handleServerEvent(se) {
@@ -142,29 +150,25 @@
     init(config) {
       this.config = config;
       const that = this;
-      const bindings = this.config.bindings ?? [];
+      const listeners = this.config.listeners ?? [];
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-          if (mutation.type === "childList") {
-            for (let i = 0; i < bindings.length; i++) {
-              const [selector, ...events] = bindings[i];
+          if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+            for (let i = 0; i < listeners.length; i++) {
+              const [selector, event, action] = listeners[i];
               const els = this.querySelectorAll(
                 selector
               );
               for (let j = 0; j < els.length; j++) {
                 const el = els[j];
-                for (let k = 0; k < events.length; k++) {
-                  const [event, action] = events[k];
-                  const cb = (e) => {
-                    e.preventDefault();
-                    console.log(e.target, el);
-                    if (e.target !== el)
-                      return;
-                    this.handleClientEvent(action);
-                  };
-                  that.removeEventListener(event, cb);
-                  that.addEventListener(event, cb);
-                }
+                const cb = (e) => {
+                  e.preventDefault();
+                  if (e.target !== el)
+                    return;
+                  this.handleClientEvent(action);
+                };
+                that.removeEventListener(event, cb);
+                that.addEventListener(event, cb);
               }
             }
           }
@@ -192,7 +196,7 @@
         const traitMap = {
           append: this.applyAppend,
           attr: this.applyAttr,
-          click: this.applyClick,
+          click: this.applyEventListener,
           call: this.applyCall,
           dispatch: this.applyDispatch,
           js: this.applyJs,
@@ -200,6 +204,7 @@
           post: this.applyPost,
           replace: this.applyReplace,
           state: this.applyState,
+          submit: this.applyEventListener,
           wait: this.applyWait
         };
         traitMap[trait](transformation);

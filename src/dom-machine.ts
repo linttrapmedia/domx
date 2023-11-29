@@ -8,11 +8,12 @@ type DxCall = [
   ...args: (string | number)[]
 ];
 type DxDispatch = [dx: "dispatch", action: string];
-type DxGet = [dx: "get", url: string];
+type DxGet = [dx: "get", url: string, dxKey: string];
 type DxJs = [dx: "js", method: string, ...args: (string | number)[]];
 type DxPost = [
   dx: "post",
   url: string,
+  dxKey: string,
   ...data: [
     key: string,
     selector: string,
@@ -22,6 +23,7 @@ type DxPost = [
 type DxReplace = [dx: "replace", selector: string, content: string];
 type DxServer = [dx: "server", key: string];
 type DxState = [dx: "state", state: string];
+type DxSubmit = [dx: "submit", selector: string, action: string];
 type DxWait = [dx: "wait", milliseconds: number, action: string];
 
 type DX =
@@ -35,11 +37,12 @@ type DX =
   | DxReplace
   | DxServer
   | DxState
+  | DxSubmit
   | DxWait;
 
 type Config = {
   initialState: string;
-  bindings: [selector: string, ...[event: string, action: string][]][];
+  listeners: [selector: string, event: string, action: string][];
   states: Record<string, Record<string | "entry", DX[]>>;
 };
 
@@ -53,7 +56,7 @@ class DomMachine extends HTMLElement {
     this.applyAppend = this.applyAppend.bind(this);
     this.applyAttr = this.applyAttr.bind(this);
     this.applyCall = this.applyCall.bind(this);
-    this.applyClick = this.applyClick.bind(this);
+    this.applyEventListener = this.applyEventListener.bind(this);
     this.applyDispatch = this.applyDispatch.bind(this);
     this.applyGet = this.applyGet.bind(this);
     this.applyJs = this.applyJs.bind(this);
@@ -93,8 +96,9 @@ class DomMachine extends HTMLElement {
     if (!el) return;
     el[method](...args);
   }
-  applyClick(transformation: DxClick) {
-    const [, selector, action] = transformation;
+  applyEventListener(transformation: DxClick) {
+    const [event, selector, action] = transformation;
+    console.log(transformation);
     const els = this.querySelectorAll(selector) as NodeListOf<HTMLElement>;
     for (let i = 0; i < els.length; i++) {
       const el = els[i];
@@ -102,8 +106,8 @@ class DomMachine extends HTMLElement {
         e.preventDefault();
         this.handleClientEvent(action);
       };
-      el.removeEventListener("click", cb);
-      el.addEventListener("click", cb);
+      el.removeEventListener(event, cb);
+      el.addEventListener(event, cb);
     }
   }
   applyDispatch(transformation: DxCall) {
@@ -111,17 +115,21 @@ class DomMachine extends HTMLElement {
     this.handleClientEvent(action);
   }
   applyGet(transformation: DxGet) {
-    const [, url] = transformation;
+    const [, url, dxKey] = transformation;
     fetch(url, {
       method: "GET",
-    }).then((r) => r.json().then(this.handleServerEvent));
+    }).then((r) =>
+      r.json().then((d) => {
+        this.transform("entry", d[dxKey] as DX[]);
+      })
+    );
   }
   applyJs(transformation: DxJs) {
     const [, method, ...args] = transformation;
     window[method](...args);
   }
   applyPost(transformation: DxPost) {
-    const [, url, ...data] = transformation;
+    const [, url, dxKey, ...data] = transformation;
     const body = {};
     for (let i = 0; i < data.length; i++) {
       const [key, selector, val] = data[i];
@@ -133,7 +141,11 @@ class DomMachine extends HTMLElement {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-    }).then((r) => r.json().then(this.handleServerEvent));
+    }).then((r) =>
+      r.json().then((d) => {
+        this.transform("entry", d[dxKey] as DX[]);
+      })
+    );
   }
   applyReplace(transformation: DxReplace) {
     const [, selector, content] = transformation;
@@ -160,7 +172,6 @@ class DomMachine extends HTMLElement {
     if (action) this.handleClientEvent(action);
   }
   handleClientEvent(action: string) {
-    console.log(action, this.config.states[this.state][action]);
     this.transform(action, this.config.states[this.state][action] as DX[]);
   }
   handleServerEvent(se: { action: string } & any) {
@@ -179,30 +190,26 @@ class DomMachine extends HTMLElement {
     this.config = config;
     const that = this;
 
-    // Apply bindings
-    const bindings = this.config.bindings ?? [];
+    // Apply listeners
+    const listeners = this.config.listeners ?? [];
 
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === "childList") {
-          for (let i = 0; i < bindings.length; i++) {
-            const [selector, ...events] = bindings[i];
+        if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+          for (let i = 0; i < listeners.length; i++) {
+            const [selector, event, action] = listeners[i];
             const els = this.querySelectorAll(
               selector
             ) as NodeListOf<HTMLElement>;
             for (let j = 0; j < els.length; j++) {
               const el = els[j];
-              for (let k = 0; k < events.length; k++) {
-                const [event, action] = events[k];
-                const cb = (e) => {
-                  e.preventDefault();
-                  console.log(e.target, el);
-                  if (e.target !== el) return;
-                  this.handleClientEvent(action);
-                };
-                that.removeEventListener(event, cb);
-                that.addEventListener(event, cb);
-              }
+              const cb = (e) => {
+                e.preventDefault();
+                if (e.target !== el) return;
+                this.handleClientEvent(action);
+              };
+              that.removeEventListener(event, cb);
+              that.addEventListener(event, cb);
             }
           }
         }
@@ -214,24 +221,6 @@ class DomMachine extends HTMLElement {
       childList: true,
       subtree: true,
     });
-
-    // for (let i = 0; i < bindings.length; i++) {
-    //   const [selector, events] = bindings[i];
-    //   const els = this.querySelectorAll(selector) as NodeListOf<HTMLElement>;
-    //   console.log(els);
-    //   for (let j = 0; j < els.length; j++) {
-    //     const el = els[j];
-    //     for (let k = 0; k < events.length; k++) {
-    //       const [event, action] = events[k];
-    //       this.addEventListener(event, (e) => {
-    //         console.log(e.target, el);
-    //         e.preventDefault();
-    //         if (e.target !== el) return;
-    //         this.handleClientEvent(action);
-    //       });
-    //     }
-    //   }
-    // }
 
     // Apply initial state
     const initState = config.states[config.initialState];
@@ -249,7 +238,7 @@ class DomMachine extends HTMLElement {
       const traitMap = {
         append: this.applyAppend,
         attr: this.applyAttr,
-        click: this.applyClick,
+        click: this.applyEventListener,
         call: this.applyCall,
         dispatch: this.applyDispatch,
         js: this.applyJs,
@@ -257,6 +246,7 @@ class DomMachine extends HTMLElement {
         post: this.applyPost,
         replace: this.applyReplace,
         state: this.applyState,
+        submit: this.applyEventListener,
         wait: this.applyWait,
       };
       traitMap[trait](transformation);

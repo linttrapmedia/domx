@@ -6,6 +6,48 @@
     "$schema": { "$ref": "#/definitions/schema" },
     "initialState": { "$ref": "#/definitions/initialState" },
     "init": { "$ref": "#/definitions/transformations" },
+    "states": { "$ref": "#/definitions/states" },
+    "listeners": { "$ref": "#/definitions/listeners" }
+  },
+  "required": ["initialState", "states"],
+  "additionalProperties": false,
+  "definitions": {
+    "schema": {
+      "type": "string",
+      "description": "The schema of the state machine."
+    },
+    "listeners": {
+      "type": "array",
+      "items": [
+        {
+          "type": "array",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string",
+                  "description": "Selector"
+                },
+                {
+                  "type": "string",
+                  "description": "Event name"
+                },
+                {
+                  "type": "string",
+                  "description": "Action name"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "description": "Array of events to register"
+    },
+    "initialState": {
+      "type": "string",
+      "description": "The initial state of the state machine."
+    },
     "states": {
       "type": "object",
       "patternProperties": {
@@ -19,48 +61,6 @@
         }
       },
       "description": "The states of the state machine."
-    },
-    "bindings": { "$ref": "#/definitions/bindings" }
-  },
-  "required": ["initialState", "states"],
-  "additionalProperties": false,
-  "definitions": {
-    "schema": {
-      "type": "string",
-      "description": "The schema of the state machine."
-    },
-    "bindings": {
-      "type": "array",
-      "items": [
-        {
-          "type": "array",
-          "items": [
-            {
-              "type": "string",
-              "description": "Selector"
-            },
-            {
-              "type": "array",
-              "oneOf": [
-                {
-                  "type": "array",
-                  "items": [
-                    {
-                      "type": "string",
-                      "description": "Event name"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Action name"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "description": "Array of events to register"
     },
     "transformations": {
       "type": "array",
@@ -161,10 +161,6 @@
       "minItems": 3,
       "maxItems": 3,
       "description": "An array representing a CSS selector, an attribute, and a value"
-    },
-    "initialState": {
-      "type": "string",
-      "description": "The initial state of the state machine."
     }
   }
 }

@@ -1,43 +1,31 @@
 {
   "$schema": "domx.json",
   "initialState": "init",
-  "bindings": [
-    [".todo__list__item", ["click", "markDone"]],
-    ["#todo__btn", ["click", "addNew"]]
+  "listeners": [
+    [".todo__list__item", "click", "markDone"],
+    ["#todo__form", "submit", "addNew"],
+    ["#todo__btn", "click", "addNew"]
   ],
   "states": {
     "init": {
-      "entry": [["get", "/api/todo"]],
-      "renderTodos": [
-        ["server", "todoList"],
-        ["state", "ready"]
-      ]
+      "entry": [["get", "/api/todo", "todoList"]]
     },
     "ready": {
       "addNew": [
         ["attr", "#todo__input", "disabled", true],
         ["attr", "#todo__btn", "disabled", true],
-        ["post", "/api/todo", ["todo", "#todo__input", "value"]],
+        ["post", "/api/todo", "payload", ["todo", "#todo__input", "value"]],
         ["state", "addingNew"]
-      ],
-      "markDone": [
-        ["state", "markingDone"],
-        ["dispatch", "success"]
       ]
     },
     "addingNew": {
       "success": [
-        ["server", "appendTodo"],
         ["attr", "#todo__btn", "disabled", null],
         ["attr", "#todo__input", "disabled", null],
         ["call", "#todo__form", "reset"],
         ["call", "#todo__input", "focus"],
         ["state", "ready"]
       ],
-      "error": [["server"]]
-    },
-    "markingDone": {
-      "success": [["state", "ready"]],
       "error": [["server"]]
     }
   }
