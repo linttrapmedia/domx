@@ -21,27 +21,39 @@ app.get("/api/todo", (_, res) => {
     .map(renderTodoItem)
     .join("")}</ul>`;
   res.setHeader("Content-Type", "application/json");
-  res.send({
-    todoList: [
-      ["replace", "#todo__list", encodeURIComponent(todosHtml)],
-      ["state", "ready"],
-    ],
-  });
+  res.send([
+    ["replace", "#todo__list", encodeURIComponent(todosHtml)],
+    ["dispatch", "success"],
+  ]);
 });
 
 app.post("/api/todo", (req, res) => {
-  todos.push(req.body.todo);
   res.setHeader("Content-Type", "application/json");
-  res.send({
-    payload: [
+
+  if (req.body.todo === "error") {
+    res.send([
+      ["attr", "#todo__btn", "disabled", null],
+      ["attr", "#todo__input", "disabled", null],
+      ["text", "#todo__input__error", "Please enter a todo"],
+      ["call", "#todo__input", "focus"],
+      ["dispatch", "error"],
+    ]);
+  } else {
+    todos.push(req.body.todo);
+    res.send([
       [
         "append",
         "#todo__list",
         encodeURIComponent(renderTodoItem(req.body.todo)),
       ],
+      ["attr", "#todo__btn", "disabled", null],
+      ["attr", "#todo__input", "disabled", null],
+      ["call", "#todo__form", "reset"],
+      ["call", "#todo__input", "focus"],
+      ["text", "#todo__input__error", ""],
       ["dispatch", "success"],
-    ],
-  });
+    ]);
+  }
 });
 
 app.listen(port, () => {

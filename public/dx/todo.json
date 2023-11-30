@@ -8,25 +8,20 @@
   ],
   "states": {
     "init": {
-      "entry": [["get", "/api/todo", "todoList"]]
+      "entry": [["get", "/api/todo"]],
+      "success": [["state", "ready"]]
     },
     "ready": {
       "addNew": [
         ["attr", "#todo__input", "disabled", true],
         ["attr", "#todo__btn", "disabled", true],
-        ["post", "/api/todo", "payload", ["todo", "#todo__input", "value"]],
-        ["state", "addingNew"]
+        ["state", "addingNew"],
+        ["post", "/api/todo", ["todo", "#todo__input", "value"]]
       ]
     },
     "addingNew": {
-      "success": [
-        ["attr", "#todo__btn", "disabled", null],
-        ["attr", "#todo__input", "disabled", null],
-        ["call", "#todo__form", "reset"],
-        ["call", "#todo__input", "focus"],
-        ["state", "ready"]
-      ],
-      "error": [["server"]]
+      "success": [["state", "ready"]],
+      "error": [["state", "ready"]]
     }
   }
 }

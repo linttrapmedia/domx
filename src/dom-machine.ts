@@ -8,12 +8,11 @@ type DxCall = [
   ...args: (string | number)[]
 ];
 type DxDispatch = [dx: "dispatch", action: string];
-type DxGet = [dx: "get", url: string, dxKey: string];
+type DxGet = [dx: "get", url: string];
 type DxJs = [dx: "js", method: string, ...args: (string | number)[]];
 type DxPost = [
   dx: "post",
   url: string,
-  dxKey: string,
   ...data: [
     key: string,
     selector: string,
@@ -24,6 +23,7 @@ type DxReplace = [dx: "replace", selector: string, content: string];
 type DxServer = [dx: "server", key: string];
 type DxState = [dx: "state", state: string];
 type DxSubmit = [dx: "submit", selector: string, action: string];
+type DxText = [dx: "text", selector: string, text: string];
 type DxWait = [dx: "wait", milliseconds: number, action: string];
 
 type DX =
@@ -63,6 +63,7 @@ class DomMachine extends HTMLElement {
     this.applyPost = this.applyPost.bind(this);
     this.applyReplace = this.applyReplace.bind(this);
     this.applyState = this.applyState.bind(this);
+    this.applyText = this.applyText.bind(this);
     this.applyWait = this.applyWait.bind(this);
     this.handleClientEvent = this.handleClientEvent.bind(this);
     this.handleServerEvent = this.handleServerEvent.bind(this);
@@ -115,21 +116,17 @@ class DomMachine extends HTMLElement {
     this.handleClientEvent(action);
   }
   applyGet(transformation: DxGet) {
-    const [, url, dxKey] = transformation;
+    const [, url] = transformation;
     fetch(url, {
       method: "GET",
-    }).then((r) =>
-      r.json().then((d) => {
-        this.transform("entry", d[dxKey] as DX[]);
-      })
-    );
+    }).then((r) => r.json().then((d) => this.transform("entry", d)));
   }
   applyJs(transformation: DxJs) {
     const [, method, ...args] = transformation;
     window[method](...args);
   }
   applyPost(transformation: DxPost) {
-    const [, url, dxKey, ...data] = transformation;
+    const [, url, ...data] = transformation;
     const body = {};
     for (let i = 0; i < data.length; i++) {
       const [key, selector, val] = data[i];
@@ -141,11 +138,7 @@ class DomMachine extends HTMLElement {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-    }).then((r) =>
-      r.json().then((d) => {
-        this.transform("entry", d[dxKey] as DX[]);
-      })
-    );
+    }).then((r) => r.json().then((d) => this.transform("entry", d)));
   }
   applyReplace(transformation: DxReplace) {
     const [, selector, content] = transformation;
@@ -162,6 +155,11 @@ class DomMachine extends HTMLElement {
     const hasEntry = this.config.states[state].entry;
     if (hasEntry) this.transform("entry", this.config.states[state].entry);
     this.state = state;
+  }
+  applyText(transformation: DxText) {
+    const [, selector, text] = transformation;
+    const els = this.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+    els.forEach((el) => (el.textContent = text));
   }
   applyWait(transformation: DxWait) {
     const [, timeInSeconds, action] = transformation;
@@ -247,6 +245,7 @@ class DomMachine extends HTMLElement {
         replace: this.applyReplace,
         state: this.applyState,
         submit: this.applyEventListener,
+        text: this.applyText,
         wait: this.applyWait,
       };
       traitMap[trait](transformation);

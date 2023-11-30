@@ -15,6 +15,7 @@
       this.applyPost = this.applyPost.bind(this);
       this.applyReplace = this.applyReplace.bind(this);
       this.applyState = this.applyState.bind(this);
+      this.applyText = this.applyText.bind(this);
       this.applyWait = this.applyWait.bind(this);
       this.handleClientEvent = this.handleClientEvent.bind(this);
       this.handleServerEvent = this.handleServerEvent.bind(this);
@@ -71,21 +72,17 @@
       this.handleClientEvent(action);
     }
     applyGet(transformation) {
-      const [, url, dxKey] = transformation;
+      const [, url] = transformation;
       fetch(url, {
         method: "GET"
-      }).then(
-        (r) => r.json().then((d) => {
-          this.transform("entry", d[dxKey]);
-        })
-      );
+      }).then((r) => r.json().then((d) => this.transform("entry", d)));
     }
     applyJs(transformation) {
       const [, method, ...args] = transformation;
       window[method](...args);
     }
     applyPost(transformation) {
-      const [, url, dxKey, ...data] = transformation;
+      const [, url, ...data] = transformation;
       const body = {};
       for (let i = 0; i < data.length; i++) {
         const [key, selector, val] = data[i];
@@ -98,11 +95,7 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
-      }).then(
-        (r) => r.json().then((d) => {
-          this.transform("entry", d[dxKey]);
-        })
-      );
+      }).then((r) => r.json().then((d) => this.transform("entry", d)));
     }
     applyReplace(transformation) {
       const [, selector, content] = transformation;
@@ -122,6 +115,11 @@
       if (hasEntry)
         this.transform("entry", this.config.states[state].entry);
       this.state = state;
+    }
+    applyText(transformation) {
+      const [, selector, text] = transformation;
+      const els = this.querySelectorAll(selector);
+      els.forEach((el) => el.textContent = text);
     }
     applyWait(transformation) {
       const [, timeInSeconds, action] = transformation;
@@ -205,6 +203,7 @@
           replace: this.applyReplace,
           state: this.applyState,
           submit: this.applyEventListener,
+          text: this.applyText,
           wait: this.applyWait
         };
         traitMap[trait](transformation);
