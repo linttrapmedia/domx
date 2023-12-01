@@ -1,17 +1,19 @@
 <html>
   <head>
-    <script src="/js/dom-machine.js"></script>
-    <script src="/js/dom-machine-chart.js"></script>
+    <script src="/js/dom-x.js"></script>
+    <script src="/js/dom-x-chart.js"></script>
+    <script src="/js/dom-logo.js"></script>
   </head>
   <body>
-    <dom-machine id="todo" src="/dx/todo.json">
+    <dom-logo></dom-logo>
+    <dom-x id="todo" src="/dx/todo.json">
       <form id="todo__form">
         <input id="todo__input" autofocus type="text" value="" />
         <div id="todo__input__error" style="color:red;"></div>
         <button id="todo__btn" type="button">Add</button>
       </form>
       <div id="todo__list">Loading Items</div>
-    </dom-machine>
-    <dom-machine-chart sub="#todo" src="/dx/todo.json" />
+    </dom-x>
+    <dom-x-chart sub="#todo" src="/dx/todo.json" />
   </body>
 </html>

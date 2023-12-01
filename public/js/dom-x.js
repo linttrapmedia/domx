@@ -1,6 +1,6 @@
 (() => {
-  // src/dom-machine.ts
-  var DomMachine = class extends HTMLElement {
+  // src/dom-x.ts
+  var DomX = class extends HTMLElement {
     constructor() {
       super();
       this.subs = [];
@@ -211,5 +211,6 @@
       }
     }
   };
-  customElements.define("dom-machine", DomMachine);
+  customElements.define("dom-x", DomX);
 })();
+//# sourceMappingURL=dom-x.js.map

@@ -46,7 +46,7 @@ type Config = {
   states: Record<string, Record<string | "entry", DX[]>>;
 };
 
-class DomMachine extends HTMLElement {
+export class DomX extends HTMLElement {
   state: string;
   config: Config;
   subs: ((state: string, action: string, dx: DX) => void)[] = [];
@@ -254,4 +254,4 @@ class DomMachine extends HTMLElement {
   }
 }
 
-customElements.define("dom-machine", DomMachine);
+customElements.define("dom-x", DomX);

@@ -3257,7 +3257,7 @@
     }
   });
 
-  // src/dom-machine-chart.ts
+  // src/dom-x-chart.ts
   var dagre = __toESM(require_dagre(), 1);
   function shortenForArrow(edge, amount) {
     if (edge.points.length < 2)
@@ -3394,5 +3394,6 @@
       this.innerHTML = svgContent;
     }
   };
-  customElements.define("dom-machine-chart", DomMachineChart);
+  customElements.define("dom-x-chart", DomMachineChart);
 })();
+//# sourceMappingURL=dom-x-chart.js.map
