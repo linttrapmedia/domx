@@ -1,9 +1,10 @@
 import bodyParser from "body-parser";
 import express from "express";
+import tododx from "../client/dx/todo.json" assert { type: "json" };
 const app = express();
 const port = 3000;
 
-app.use(express.static("public"));
+app.use(express.static("client"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -21,38 +22,20 @@ app.get("/api/todo", (_, res) => {
     .map(renderTodoItem)
     .join("")}</ul>`;
   res.setHeader("Content-Type", "application/json");
-  res.send([
-    ["replace", "#todo__list", encodeURIComponent(todosHtml)],
-    ["dispatch", "success"],
-  ]);
+  let response = tododx.states.fetchingList["server:success"];
+  response[0][2] = encodeURIComponent(todosHtml);
+  res.send(response);
 });
 
 app.post("/api/todo", (req, res) => {
   res.setHeader("Content-Type", "application/json");
-
   if (req.body.todo === "error") {
-    res.send([
-      ["attr", "#todo__btn", "disabled", null],
-      ["attr", "#todo__input", "disabled", null],
-      ["text", "#todo__input__error", "Please enter a todo"],
-      ["call", "#todo__input", "focus"],
-      ["dispatch", "error"],
-    ]);
+    res.send(tododx.states.addingNew["server:error"]);
   } else {
     todos.push(req.body.todo);
-    res.send([
-      [
-        "append",
-        "#todo__list",
-        encodeURIComponent(renderTodoItem(req.body.todo)),
-      ],
-      ["attr", "#todo__btn", "disabled", null],
-      ["attr", "#todo__input", "disabled", null],
-      ["call", "#todo__form", "reset"],
-      ["call", "#todo__input", "focus"],
-      ["text", "#todo__input__error", ""],
-      ["dispatch", "success"],
-    ]);
+    let response = tododx.states.addingNew["server:success"];
+    response[0][2] = encodeURIComponent(renderTodoItem(req.body.todo));
+    res.send(response);
   }
 });
 

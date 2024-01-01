@@ -1,5 +1,5 @@
 import * as dagre from "@dagrejs/dagre";
-import { DomX } from "./dom-x";
+import { DomX } from "./dx";
 
 // Function to shorten the path near the target node
 function shortenForArrow(edge, amount) {
@@ -154,7 +154,7 @@ class DomMachineChart extends HTMLElement {
         edge.id ===
         `${this.previousState}-${this.currentEvent}-${this.currentState}`
           ? "black"
-          : "grey";
+          : "#b2b2b2";
 
       svgContent += `<path d="${path}" style="fill: none; stroke: ${color};" marker-end="url(#arrowhead)"/>`;
 
@@ -183,4 +183,4 @@ class DomMachineChart extends HTMLElement {
   }
 }
 
-customElements.define("dom-x-chart", DomMachineChart);
+customElements.define("dx-x-chart", DomMachineChart);

@@ -1,1 +1,0 @@
-esbuild ./src/* --outdir=public/js --format=iife --minify --sourcemap --bundle

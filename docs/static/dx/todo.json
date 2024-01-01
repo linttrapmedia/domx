@@ -1,0 +1,56 @@
+{
+  "$schema": "domx.json",
+  "initialState": "init",
+  "listeners": [
+    [".todo__list__item", "click", "markDone"],
+    ["#todo__form", "submit", "addNew"],
+    ["#todo__btn", "click", "addNew"]
+  ],
+  "states": {
+    "init": {
+      "entry": [
+        ["state", "fetchingList"],
+        ["get", "/api/todo"]
+      ]
+    },
+    "fetchingList": {
+      "server:success": [
+        ["replace", "#todo__list"],
+        ["state", "ready"]
+      ],
+      "server:error": [
+        ["replace", "#todo__list", ""],
+        ["state", "error"]
+      ]
+    },
+    "error": {
+      "exit": [["state", "init"]]
+    },
+    "ready": {
+      "addNew": [
+        ["attr", "#todo__input", "disabled", true],
+        ["attr", "#todo__btn", "disabled", true],
+        ["state", "addingNew"],
+        ["post", "/api/todo", ["todo", "#todo__input", "value"]]
+      ]
+    },
+    "addingNew": {
+      "server:success": [
+        ["append", "#todo__list"],
+        ["attr", "#todo__btn", "disabled", null],
+        ["attr", "#todo__input", "disabled", null],
+        ["call", "#todo__form", "reset"],
+        ["call", "#todo__input", "focus"],
+        ["text", "#todo__input__error", ""],
+        ["state", "ready"]
+      ],
+      "server:error": [
+        ["attr", "#todo__btn", "disabled", null],
+        ["attr", "#todo__input", "disabled", null],
+        ["text", "#todo__input__error", "Please enter a todo"],
+        ["call", "#todo__input", "focus"],
+        ["state", "ready"]
+      ]
+    }
+  }
+}

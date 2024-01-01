@@ -1,5 +1,6 @@
+"use strict";
 (() => {
-  // src/dom-x.ts
+  // src/dx.ts
   var DomX = class extends HTMLElement {
     constructor() {
       super();
@@ -17,6 +18,7 @@
       this.applyState = this.applyState.bind(this);
       this.applyText = this.applyText.bind(this);
       this.applyWait = this.applyWait.bind(this);
+      this.dispatch = this.dispatch.bind(this);
       this.handleClientEvent = this.handleClientEvent.bind(this);
       this.handleServerEvent = this.handleServerEvent.bind(this);
       this.init = this.init.bind(this);
@@ -129,18 +131,16 @@
       if (action)
         this.handleClientEvent(action);
     }
+    dispatch(action) {
+      this.handleClientEvent(action);
+    }
     handleClientEvent(action) {
       this.transform(action, this.config.states[this.state][action]);
     }
     handleServerEvent(se) {
       const { action } = se;
       const transformations = this.config.states[this.state][action].reduce(
-        (acc, t) => {
-          const [dx, key] = t;
-          if (dx === "server")
-            return [...acc, ...se[key]];
-          return [...acc, t];
-        },
+        (acc, t) => [...acc, t],
         []
       );
       this.transform(action, transformations);
@@ -211,6 +211,6 @@
       }
     }
   };
-  customElements.define("dom-x", DomX);
+  customElements.define("dx-x", DomX);
 })();
-//# sourceMappingURL=dom-x.js.map
+//# sourceMappingURL=dx.js.map

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/dom-logo.module.css"],
-  "sourcesContent": [".wrapper {\n  color: red;\n}\n"],
-  "mappings": ";AAAA;AACE;AAAA;",
-  "names": []
-}

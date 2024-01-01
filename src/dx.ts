@@ -31,6 +31,7 @@ type DX =
   | DxAttr
   | DxClick
   | DxCall
+  | DxDispatch
   | DxJs
   | DxGet
   | DxPost
@@ -65,6 +66,7 @@ export class DomX extends HTMLElement {
     this.applyState = this.applyState.bind(this);
     this.applyText = this.applyText.bind(this);
     this.applyWait = this.applyWait.bind(this);
+    this.dispatch = this.dispatch.bind(this);
     this.handleClientEvent = this.handleClientEvent.bind(this);
     this.handleServerEvent = this.handleServerEvent.bind(this);
     this.init = this.init.bind(this);
@@ -169,17 +171,28 @@ export class DomX extends HTMLElement {
     }
     if (action) this.handleClientEvent(action);
   }
+  /**
+   * Dispatch an action to the state machine manually
+   * @param action name of action to dispatch
+   */
+  dispatch(action: string) {
+    this.handleClientEvent(action);
+  }
+  /**
+   * Handle a client event
+   * @param action name of action to dispatch
+   */
   handleClientEvent(action: string) {
     this.transform(action, this.config.states[this.state][action] as DX[]);
   }
+  /**
+   * Handle a server event
+   * @param se server event
+   */
   handleServerEvent(se: { action: string } & any) {
     const { action } = se;
     const transformations = this.config.states[this.state][action].reduce(
-      (acc, t) => {
-        const [dx, key] = t as any;
-        if (dx === "server") return [...acc, ...se[key]];
-        return [...acc, t];
-      },
+      (acc, t) => [...acc, t],
       [] as DX[]
     );
     this.transform(action, transformations);
@@ -254,4 +267,4 @@ export class DomX extends HTMLElement {
   }
 }
 
-customElements.define("dom-x", DomX);
+customElements.define("dx-x", DomX);

@@ -1,9 +1,9 @@
 {
-  "name": "@linttrap/web-state-charts",
+  "name": "@linttrap/domx",
   "author": "@linttrapmedia",
-  "title": "OEM Core",
-  "version": "1.0.3",
-  "description": "A Web Component Implementation Of State Charts",
+  "title": "domx",
+  "version": "0.0.1",
+  "description": "DOM Transformations",
   "type": "module",
   "exports": {
     ".": {
@@ -12,29 +12,23 @@
   },
   "main": "./src/index.ts",
   "module": "./src/index.ts",
-  "scripts": {
-    "build": "sh ./cmd/build.sh",
-    "dev": "sh ./cmd/dev.sh",
-    "clean": "sh ./cmd/clean.sh"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/linttrapmedia/oem-core.git"
+    "url": "git+https://github.com/linttrapmedia/domx.git"
   },
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/linttrapmedia/oem-core/issues"
+    "url": "https://github.com/linttrapmedia/domx/issues"
   },
-  "homepage": "https://github.com/linttrapmedia/oem-core#readme",
+  "homepage": "https://github.com/linttrapmedia/domx#readme",
   "devDependencies": {
+    "bun-types": "^1.0.20",
     "esbuild": "^0.14.27",
     "prettier": "2.7.1"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.0.4",
-    "body-parser": "^1.20.2",
     "d3": "^7.8.5",
-    "express": "^4.18.2",
-    "nodemon": "^3.0.1"
+    "hono": "^3.11.11"
   }
 }

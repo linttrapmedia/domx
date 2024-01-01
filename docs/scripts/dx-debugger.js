@@ -1,3 +1,4 @@
+"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -3257,7 +3258,7 @@
     }
   });
 
-  // src/dom-x-chart.ts
+  // src/dx-debugger.ts
   var dagre = __toESM(require_dagre(), 1);
   function shortenForArrow(edge, amount) {
     if (edge.points.length < 2)
@@ -3378,7 +3379,7 @@
       g.edges().forEach((e, i) => {
         let edge = g.edge(e);
         let path = shortenForArrow(edge, 10);
-        const color = edge.id === `${this.previousState}-${this.currentEvent}-${this.currentState}` ? "black" : "grey";
+        const color = edge.id === `${this.previousState}-${this.currentEvent}-${this.currentState}` ? "black" : "#b2b2b2";
         svgContent += `<path d="${path}" style="fill: none; stroke: ${color};" marker-end="url(#arrowhead)"/>`;
         const totalLength = calculatePathLength(edge.points);
         const midpoint = findMidpoint(edge.points, totalLength / 2);
@@ -3394,6 +3395,6 @@
       this.innerHTML = svgContent;
     }
   };
-  customElements.define("dom-x-chart", DomMachineChart);
+  customElements.define("dx-x-chart", DomMachineChart);
 })();
-//# sourceMappingURL=dom-x-chart.js.map
+//# sourceMappingURL=dx-debugger.js.map
