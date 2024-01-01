@@ -8,108 +8,101 @@
       content="domx is a web component library for building web applications."
     />
     <meta name="favicon" content="/favicon.png" />
-    <script src="/js/dx.js"></script>
-    <script src="/js/dx-mq.js"></script>
-    <script src="/js/dx-box.js"></script>
-    <script src="/js/dx-img.js"></script>
-    <script src="/js/dx-logo.js"></script>
-    <script src="/js/dx-tabs.js"></script>
-    <script src="/js/dx-text.js"></script>
-    <script src="/js/dx-theme.js"></script>
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-      }
-    </style>
+    <script src="/static/scripts/dx.js"></script>
+    <script src="/static/scripts/dx-mq.js"></script>
+    <script src="/static/scripts/dx-box.js"></script>
+    <script src="/static/scripts/dx-img.js"></script>
+    <script src="/static/scripts/dx-tabs.js"></script>
+    <script src="/static/scripts/dx-text.js"></script>
+    <script src="/static/scripts/dx-theme.js"></script>
+    <link rel="stylesheet" href="/static/styles/theme.css" />
+    <link rel="stylesheet" href="/static/styles/styles.css" />
   </head>
   <body>
     <dx-mq>
-      <dx-theme dark modern>
-        <dx-col align-items="center">
-          <dx-col gap="30px" padding="50px" max-width="960px">
-            <dx-col align-items="center" gap="20px">
-              <dx-text
-                color="primary"
-                weight="bold"
-                align="center"
-                size="42px,84px"
-                >DOMX</dx-text
-              >
-              <dx-text
-                sm:color="info"
-                align="center"
-                opacity="0.5"
-                size="18px,36px"
-                >A set of standalone, dependency-free web components that blend
-                traits from Tailwind, HTMX, and XState into a single
-                convention.</dx-text
-              >
-            </dx-col>
-            <dx-box direction="row" gap="20px" sm:flex-flow="column">
-              <dx-col
-                border-color="hsla(0, 0%, 100%, 0.15)"
-                border-radius="5px"
-                border-style="solid"
-                border-width="1px"
-                padding="20px"
-              >
-                <dx-text color="info" size="24px">No Javascript</dx-text>
-                <dx-text color="info" size="18px"
-                  >domx components are built with HTML and CSS. No Javascript
-                  required.</dx-text
-                >
-              </dx-col>
-              <dx-col
-                border-color="hsla(0, 0%, 100%, 0.15)"
-                border-radius="5px"
-                border-style="solid"
-                border-width="1px"
-                padding="20px"
-              >
-                <dx-text color="info" size="24px">No Javascript</dx-text>
-                <dx-text color="info" size="18px"
-                  >domx components are built with HTML and CSS. No Javascript
-                  required.</dx-text
-                >
-              </dx-col>
-              <dx-col
-                border-color="hsla(0, 0%, 100%, 0.15)"
-                border-radius="5px"
-                border-style="solid"
-                border-width="1px"
-                padding="20px"
-              >
-                <dx-text color="info" size="24px">No Javascript</dx-text>
-                <dx-text color="info" size="18px"
-                  >domx components are built with HTML and CSS. No Javascript
-                  required.</dx-text
-                >
-              </dx-col>
-            </dx-box>
-            <dx-tabs active="1">
-              <dx-tab-btn panel="tab-panel-1" active>Demo</dx-tab-btn>
-              <dx-tab-btn panel="tab-panel-2">demo.html</dx-tab-btn>
-              <dx-tab-btn panel="tab-panel-3">demo.json</dx-tab-btn>
-              <dx-tab-panel id="tab-panel-1" active>
-                <dx-col background-color="#222222" padding="20px">
-                  <dx-x id="todo" src="/dx/todo.json">
-                    <form id="todo__form">
-                      <input id="todo__input" autofocus type="text" value="" />
-                      <div id="todo__input__error" style="color: red"></div>
-                      <button id="todo__btn" type="button">Add</button>
-                    </form>
-                    <div id="todo__list">Loading Items</div>
-                  </dx-x>
-                </dx-col>
-              </dx-tab-panel>
-              <dx-tab-panel id="tab-panel-2">Panel 2</dx-tab-panel>
-              <dx-tab-panel id="tab-panel-3">Panel 3</dx-tab-panel>
-            </dx-tabs>
+      <dx-col align-items="center">
+        <dx-col gap="30px" padding="50px" max-width="960px">
+          <dx-col align-items="center" gap="20px">
+            <dx-text
+              font="Splash"
+              color="goldenrod"
+              align="center"
+              size="42px,84px"
+            >
+              domx
+            </dx-text>
+            <dx-text
+              color="--txt-white"
+              align="center"
+              size="18px,36px"
+              opacity="0.25"
+            >
+              The dependency-free web component library that blend traits from
+              HTMX, Tailwind and XState into a single convention.
+            </dx-text>
           </dx-col>
+          <dx-box direction="row" gap="20px" sm:flex-flow="column">
+            <dx-col
+              border-color="hsla(0, 0%, 100%, 0.15)"
+              border-radius="5px"
+              border-style="solid"
+              border-width="1px"
+              padding="20px"
+            >
+              <dx-text color="info" size="24px"> No Javascript </dx-text>
+              <dx-text color="info" size="18px">
+                domx components are built with HTML and CSS. No Javascript
+                required.
+              </dx-text>
+            </dx-col>
+            <dx-col
+              border-color="hsla(0, 0%, 100%, 0.15)"
+              border-radius="5px"
+              border-style="solid"
+              border-width="1px"
+              padding="20px"
+            >
+              <dx-text color="info" size="24px"> No Javascript </dx-text>
+              <dx-text color="info" size="18px">
+                domx components are built with HTML and CSS. No Javascript
+                required.
+              </dx-text>
+            </dx-col>
+            <dx-col
+              border-color="hsla(0, 0%, 100%, 0.15)"
+              border-radius="5px"
+              border-style="solid"
+              border-width="1px"
+              padding="20px"
+            >
+              <dx-text color="info" size="24px"> No Javascript </dx-text>
+              <dx-text color="info" size="18px">
+                domx components are built with HTML and CSS. No Javascript
+                required.
+              </dx-text>
+            </dx-col>
+          </dx-box>
+          <dx-tabs active="1">
+            <dx-tab-btn panel="tab-panel-1" active> Demo </dx-tab-btn>
+            <dx-tab-btn panel="tab-panel-2">demo.html</dx-tab-btn>
+            <dx-tab-btn panel="tab-panel-3">demo.json</dx-tab-btn>
+            <dx-tab-panel id="tab-panel-1" active>
+              <dx-col background-color="#222222" padding="20px">
+                <dx-x id="todo" src="/static/dx/todo.json">
+                  <form id="todo__form">
+                    <input id="todo__input" autofocus type="text" value="" />
+                    <div id="todo__input__error" style="color: red"></div>
+                    <button id="todo__btn" type="button">Add</button>
+                  </form>
+                  <div id="todo__list">Loading Items</div>
+                </dx-x>
+              </dx-col>
+            </dx-tab-panel>
+            <dx-tab-panel id="tab-panel-2">Panel 2</dx-tab-panel>
+            <dx-tab-panel id="tab-panel-3">Panel 3</dx-tab-panel>
+          </dx-tabs>
         </dx-col>
-      </dx-theme>
+      </dx-col>
     </dx-mq>
   </body>
 </html>

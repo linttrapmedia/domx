@@ -25,12 +25,16 @@ help:
 clean: ## Clean the project
 	@echo $(STATUS) Cleaning...
 	@rm -rf ./node_modules
-	@rm -rf ./docs/scripts/dx-*.js 
-	@rm -rf ./docs/scripts/dx-*.map
+	@rm -rf ./docs/static/scripts/dx* 
 
 dev: ## Run the project in development mode
 	@echo $(STATUS) Running in development mode...
-	@npx esbuild ./src/* --outdir=docs/scripts --watch --bundle --sourcemap & bun run --hot docs/index.tsx
+	@npx esbuild ./src/components/* --outdir=docs/static/scripts --watch --bundle --sourcemap --minify
+
+serve-docs: ## Serve the docs
+	@echo $(STATUS) Serving docs...
+	@npx http-server docs
+
 
 install: ## Install the project
 	@echo $(STATUS) Installing...
@@ -38,7 +42,7 @@ install: ## Install the project
 
 kill: ## Kill the project
 	@echo $(STATUS) Killing...
-	@lsof -i :3000 | grep LISTEN | awk '{print $2}' | xargs kill
+	@lsof -i :8081 | grep LISTEN | awk '{print $2}' | xargs kill -9
 
 publish: ## Publish the project to npm
 	@echo $(STATUS) Publish package...

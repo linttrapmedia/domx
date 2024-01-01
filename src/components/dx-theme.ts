@@ -1,7 +1,7 @@
-import { attachShadow, attachStyles, attachTemplate } from "./helpers";
+import { attachShadow, attachStyles, attachTemplate } from "../helpers";
 
 const lite = `
---dx-theme-primary-color: #6a8efa;
+--dx-theme-primary-color: goldenrod;
 --dx-theme-secondary-color: #6efa8e;
 --dx-theme-tertiary-color: #fa6a6a;
 --dx-theme-info-color: #6afafa;
@@ -15,7 +15,7 @@ const lite = `
 `;
 
 const dark = `
---dx-theme-primary-color: #3a3fda;
+--dx-theme-primary-color: goldenrod;
 --dx-theme-secondary-color: #3dda4e;
 --dx-theme-tertiary-color: #da3a3a;
 --dx-theme-info-color: #3adada;
@@ -23,7 +23,7 @@ const dark = `
 --dx-theme-warning-color: #dad53a;
 --dx-theme-danger-color: #da3a3a;
 --dx-theme-text-color: #ffffff;
---dx-theme-bg-color: #333333;
+--dx-theme-bg-color: #111111;
 --dx-theme-color-black: #ffffff;
 --dx-theme-color-white: #333333;
 `;

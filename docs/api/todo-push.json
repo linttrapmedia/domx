@@ -1,0 +1,13 @@
+[
+  [
+    "append",
+    "#todo__list",
+    "<li class=\"todo__list__item\" data-id=\"new-item\">new-item</li>"
+  ],
+  ["attr", "#todo__btn", "disabled", null],
+  ["attr", "#todo__input", "disabled", null],
+  ["call", "#todo__form", "reset"],
+  ["call", "#todo__input", "focus"],
+  ["text", "#todo__input__error", ""],
+  ["dispatch", "success"]
+]

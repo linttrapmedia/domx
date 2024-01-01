@@ -1,4 +1,4 @@
-import { attachShadow, attachStyles, attachTemplate } from "./helpers";
+import { attachShadow, attachStyles, attachTemplate } from "../helpers";
 
 export type Breakpoint = "sm" | "md" | "lg" | "xl" | "xxl";
 

@@ -1,10 +1,10 @@
-import { Breakpoint, DomMQ } from "./dx-mq";
 import {
   attachShadow,
   attachStyles,
   attachTemplate,
   cssObjectToString,
-} from "./helpers";
+} from "../helpers";
+import { Breakpoint, DomMQ } from "./dx-mq";
 
 class DomBox extends HTMLElement {
   baseStyles: string = `

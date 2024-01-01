@@ -1,0 +1,8 @@
+[
+  [
+    "replace",
+    "#todo__list",
+    "<li class=\"todo__list__item\" data-id=\"item-one\">item-one</li><li class=\"todo__list__item\" data-id=\"item-two\">item-two</li><li class=\"todo__list__item\" data-id=\"new-item\">new-item</li>"
+  ],
+  ["dispatch", "success"]
+]

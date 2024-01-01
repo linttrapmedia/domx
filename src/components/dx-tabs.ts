@@ -1,4 +1,4 @@
-import { attachShadow, attachStyles, attachTemplate } from "./helpers";
+import { attachShadow, attachStyles, attachTemplate } from "../helpers";
 
 const DomTabBtnStyles = `
 :host {

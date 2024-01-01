@@ -10,7 +10,7 @@
     "init": {
       "entry": [
         ["state", "fetchingList"],
-        ["get", "/api/todo"]
+        ["get", "/api/todo-get.json"]
       ]
     },
     "fetchingList": {
@@ -31,7 +31,7 @@
         ["attr", "#todo__input", "disabled", true],
         ["attr", "#todo__btn", "disabled", true],
         ["state", "addingNew"],
-        ["post", "/api/todo", ["todo", "#todo__input", "value"]]
+        ["post", "/api/todo-post.json", ["todo", "#todo__input", "value"]]
       ]
     },
     "addingNew": {

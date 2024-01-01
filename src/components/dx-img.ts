@@ -3,7 +3,7 @@ import {
   attachStyles,
   attachTemplate,
   mergeByIndex,
-} from "./helpers";
+} from "../helpers";
 
 const styles = `
 :host {
