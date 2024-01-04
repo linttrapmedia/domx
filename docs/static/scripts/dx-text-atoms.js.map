@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../src/components/dx-text-atoms.ts"],
+  "sourcesContent": ["import { AttrMap, AttrProp } from \"../vars\";\n\nclass xxDomText extends HTMLElement {\n  styleSheet: CSSStyleSheet = new CSSStyleSheet();\n  constructor() {\n    super();\n    this.attachShadow({ mode: \"open\" });\n    this.shadowRoot!.innerHTML = \"<slot></slot>\";\n    this.render = this.render.bind(this);\n    this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];\n    const observer = new MutationObserver((mutations) => {\n      mutations.forEach((mutation) => {\n        if (mutation.type === \"attributes\") this.render();\n      });\n    });\n    observer.observe(this, { attributes: true });\n  }\n  connectedCallback() {\n    window.addEventListener(\"resize\", this.render);\n  }\n  disconnectedCallback() {\n    window.removeEventListener(\"resize\", this.render);\n  }\n  render() {\n    let styles = \"\";\n    this.getAttributeNames().forEach((attr) => {\n      const [_attr, bp] = attr.split(\":\") as [AttrProp, string];\n      if (AttrMap.hasOwnProperty(_attr)) {\n        const breakpoint = Number(bp ?? 0);\n        if (window.innerWidth < breakpoint) return;\n        const value = Boolean(this.getAttribute(attr))\n          ? this.getAttribute(attr)\n          : `var(${_attr})`;\n        styles += `${AttrMap[_attr as AttrProp]}: ${value};`;\n      }\n    });\n    this.styleSheet.replace(`:host { ${styles} }`);\n  }\n}\n\ncustomElements.define(\"dx-text\", DomText);\n"],
+  "mappings": "mBAwCA,eAAe,OAAO,UAAW,OAAO",
+  "names": []
+}

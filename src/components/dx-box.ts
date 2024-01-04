@@ -1,79 +1,83 @@
-import {
-  attachShadow,
-  attachStyles,
-  attachTemplate,
-  cssObjectToString,
-} from "../helpers";
-import { Breakpoint, DomMQ } from "./dx-mq";
-
 class DomBox extends HTMLElement {
-  baseStyles: string = `
-  box-sizing: border-box;
-  display: flex; 
-  transition: padding 0.25s ease-in-out;`;
-  styleSheet: CSSStyleSheet;
-  template: Node;
+  baseStyles: string[][] = [
+    ["box-sizing", "border-box"],
+    ["display", "flex"],
+  ];
+  psuedoStyles: Record<string, [string, string][]> = {};
+  styleSheet: CSSStyleSheet = new CSSStyleSheet();
   constructor() {
     super();
-    attachShadow(this, { mode: "open" });
-    this.styleSheet = attachStyles(this, "");
-    this.template = attachTemplate(this, `<slot></slot>`);
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot!.innerHTML = "<slot></slot>";
     this.render = this.render.bind(this);
+    this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "attributes") this.render();
+      });
+    });
+    observer.observe(this, { attributes: true });
   }
   connectedCallback() {
-    const bp = this.parentElement?.closest("dx-mq") as DomMQ;
-    bp.subscribe(this);
-    this.render(bp.calculateBreakpoint());
+    this.render();
+    window.addEventListener("resize", this.render);
   }
-  render(breakpoint: Breakpoint) {
-    const styles = {};
-
-    [
-      "align-items",
-      "border-color",
-      "border-radius",
-      "border-style",
-      "border-width",
-      "flex-direction",
-      "flex-wrap",
-      "flex-flow",
-      "gap",
-      "margin",
-      "padding",
-      "max-width",
-    ].forEach((key) => {
-      if (this.hasAttribute(key)) styles[key] = this.getAttribute(key);
-      if (this.hasAttribute(`${breakpoint}:${key}`))
-        styles[key] = this.getAttribute(`${breakpoint}:${key}`)!;
+  disconnectedCallback() {
+    window.removeEventListener("resize", this.render);
+  }
+  render() {
+    let styles = this.baseStyles;
+    let psuedoStyles: Record<string, [string, string][]> = {};
+    this.getAttributeNames().forEach((attributeName) => {
+      const [style, bp] = attributeName.split("__");
+      const [attr, psuedo] = style.split(":");
+      const breakpoint = Number(bp ?? 0);
+      if (window.innerWidth < breakpoint) return;
+      const value = (this as any).getAttribute(attributeName);
+      if (psuedo) {
+        if (!psuedoStyles[psuedo]) psuedoStyles[psuedo] = [];
+        psuedoStyles[psuedo].push([attr, value]);
+      } else {
+        styles.push([attr, value]);
+      }
     });
 
-    this.styleSheet.replace(`:host { 
-      ${this.baseStyles}
-      ${cssObjectToString(styles)}
-    }`);
+    // generate host styles
+    const hostStyles = `:host{ ${styles
+      .map(([attr, value]) => `${attr}:${value};`)
+      .join("")}}`;
 
-    if (this.hasAttribute("debug")) console.log(styles);
+    // generate host psuedo styles
+    const hostPsuedoStyles = Object.entries(psuedoStyles)
+      .map(([psuedo, styles]) => {
+        const _styles = styles
+          .map(([attr, value]) => `${attr}:${value};`)
+          .join("");
+        return `:host(:${psuedo}) { ${_styles} }`;
+      })
+      .join("");
+
+    this.styleSheet.replace(hostStyles + hostPsuedoStyles);
   }
 }
 
 customElements.define("dx-box", DomBox);
 
 class DomCol extends DomBox {
-  baseStyles: string = `
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  transition: padding 0.25s ease-in-out;`;
+  baseStyles = [
+    ["box-sizing", "border-box"],
+    ["display", "flex"],
+    ["flex-direction", "column"],
+  ];
 }
 
 customElements.define("dx-col", DomCol);
 
 class DomRow extends DomBox {
-  baseStyles: string = `
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  transition: padding 0.25s ease-in-out;`;
+  baseStyles = [
+    ["box-sizing", "border-box"],
+    ["display", "flex"],
+    ["flex-direction", "row"],
+  ];
 }
-
 customElements.define("dx-row", DomRow);

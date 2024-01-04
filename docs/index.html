@@ -7,102 +7,144 @@
       name="description"
       content="domx is a web component library for building web applications."
     />
-    <meta name="favicon" content="/favicon.png" />
+    <meta name="favicon" content="/static/images/favicon.svg" />
     <script src="/static/scripts/dx.js"></script>
-    <script src="/static/scripts/dx-mq.js"></script>
     <script src="/static/scripts/dx-box.js"></script>
-    <script src="/static/scripts/dx-img.js"></script>
     <script src="/static/scripts/dx-tabs.js"></script>
     <script src="/static/scripts/dx-text.js"></script>
-    <script src="/static/scripts/dx-theme.js"></script>
-    <link rel="stylesheet" href="/static/styles/theme.css" />
+    <script src="/static/scripts/dx-style.js"></script>
+    <script src="/static/scripts/dx-grid.js"></script>
     <link rel="stylesheet" href="/static/styles/styles.css" />
   </head>
   <body>
-    <dx-mq>
-      <dx-col align-items="center">
-        <dx-col gap="30px" padding="50px" max-width="960px">
-          <dx-col align-items="center" gap="20px">
+    <dx-col align-items="center">
+      <dx-col gap="30px" padding="50px" max-width="960px">
+        <dx-col align-items="center" gap="20px">
+          <dx-row align-items="flex-start">
             <dx-text
-              font="Splash"
-              color="goldenrod"
-              align="center"
-              size="42px,84px"
+              font-family="Splash"
+              color="gold"
+              font-size="50px"
+              font-size__960="75px"
+              line-height="0.85"
+              >domx</dx-text
+            ><dx-text
+              color="gold"
+              font-family="monospace"
+              font-size="10px"
+              padding-left="10px"
+              >beta</dx-text
             >
-              domx
-            </dx-text>
-            <dx-text
-              color="--txt-white"
-              align="center"
-              size="18px,36px"
-              opacity="0.25"
-            >
-              The dependency-free web component library that blend traits from
-              HTMX, Tailwind and XState into a single convention.
-            </dx-text>
-          </dx-col>
-          <dx-box direction="row" gap="20px" sm:flex-flow="column">
-            <dx-col
-              border-color="hsla(0, 0%, 100%, 0.15)"
-              border-radius="5px"
-              border-style="solid"
-              border-width="1px"
-              padding="20px"
-            >
-              <dx-text color="info" size="24px"> No Javascript </dx-text>
-              <dx-text color="info" size="18px">
-                domx components are built with HTML and CSS. No Javascript
-                required.
-              </dx-text>
-            </dx-col>
-            <dx-col
-              border-color="hsla(0, 0%, 100%, 0.15)"
-              border-radius="5px"
-              border-style="solid"
-              border-width="1px"
-              padding="20px"
-            >
-              <dx-text color="info" size="24px"> No Javascript </dx-text>
-              <dx-text color="info" size="18px">
-                domx components are built with HTML and CSS. No Javascript
-                required.
-              </dx-text>
-            </dx-col>
-            <dx-col
-              border-color="hsla(0, 0%, 100%, 0.15)"
-              border-radius="5px"
-              border-style="solid"
-              border-width="1px"
-              padding="20px"
-            >
-              <dx-text color="info" size="24px"> No Javascript </dx-text>
-              <dx-text color="info" size="18px">
-                domx components are built with HTML and CSS. No Javascript
-                required.
-              </dx-text>
-            </dx-col>
-          </dx-box>
-          <dx-tabs active="1">
-            <dx-tab-btn panel="tab-panel-1" active> Demo </dx-tab-btn>
-            <dx-tab-btn panel="tab-panel-2">demo.html</dx-tab-btn>
-            <dx-tab-btn panel="tab-panel-3">demo.json</dx-tab-btn>
-            <dx-tab-panel id="tab-panel-1" active>
-              <dx-col background-color="#222222" padding="20px">
-                <dx-x id="todo" src="/static/dx/todo.json">
-                  <form id="todo__form">
-                    <input id="todo__input" autofocus type="text" value="" />
-                    <div id="todo__input__error" style="color: red"></div>
-                    <button id="todo__btn" type="button">Add</button>
-                  </form>
-                  <div id="todo__list">Loading Items</div>
-                </dx-x>
-              </dx-col>
-            </dx-tab-panel>
-            <dx-tab-panel id="tab-panel-2">Panel 2</dx-tab-panel>
-            <dx-tab-panel id="tab-panel-3">Panel 3</dx-tab-panel>
-          </dx-tabs>
+          </dx-row>
+          <dx-text
+            color="white"
+            text-align="center"
+            font-size="32px"
+            font-size__960="52px"
+          >
+            A novel UI library for managing the dom without javascript
+          </dx-text>
         </dx-col>
+        <dx-row
+          background-color="rgba(255,255,255,0.1)"
+          border-radius="5px"
+          flex-wrap="wrap"
+          gap="10px"
+          padding="20px"
+          justify-content="center"
+        >
+          <dx-style
+            background-color:hover="white"
+            background-color="transparent"
+            border-radius="20px"
+            border="none"
+            border__960="1px solid rgba(255, 255, 255, 0.1)"
+            box-sizing="border-box"
+            color:hover="black"
+            color="white"
+            cursor="pointer"
+            font-size="13px"
+            font-weight="bold"
+            gap="10px"
+            line-height="1"
+            padding="5px 10px"
+          >
+            <dx-row><span>🚯</span> No Javascript</dx-row>
+            <dx-row><span>💫</span> Reactive DOM</dx-row>
+            <dx-row><span>💅</span> Responsive Styles</dx-row>
+            <dx-row><span>📼</span> State Management</dx-row>
+            <dx-row><span>💩</span> No Virtual DOM</dx-row>
+            <dx-row><span>🪶</span> Flyweight Size</dx-row>
+            <dx-row><span>📬</span> HTMX-esque</dx-row>
+            <dx-row><span>💨</span> Tailwind-esque</dx-row>
+            <dx-row><span>🤖</span> XState-esque</dx-row>
+          </dx-style>
+        </dx-row>
+        <dx-grid
+          grid-template-columns="1fr"
+          grid-template-columns__960="1fr 1fr"
+          gap="30px"
+          text-align="center"
+        >
+          <dx-col
+            border="2px solid gold"
+            border-radius="20px"
+            padding="20px"
+            box-shadow="gold 20px 20px 0px"
+            align-items="center"
+            justify-content="center"
+          >
+            <dx-text font-size="32px">Why?</dx-text>
+            <dx-text opacity="0.5" padding="20px 0"
+              >I wanted a small UI library of self contained web components that
+              would allow me to manage dom states, styles and behaviors from the
+              backend without javascript</dx-text
+            >
+          </dx-col>
+          <dx-col padding="20px" gap="20px">
+            <dx-text font-size="32px">Install</dx-text>
+            <dx-text opacity="0.5">(Every component is self-contained)</dx-text>
+            <dx-style
+              padding="30px"
+              background-color="gold"
+              background-color:hover="transparent"
+              border-radius="5px"
+              border-color="gold"
+              border="1px solid gold"
+              color="black"
+            >
+              <a href="https://unpkg.com/@linttrap/domx@latest/dist/domx.zip"
+                >download zip</a
+              >
+              <a href="https://unpkg.com/@linttrap/domx@latest/dist/domx.zip"
+                >download zip</a
+              >
+            </dx-style>
+            <dx-text opacity="0.3" font-size="14px"
+              >It's just the dist folder from the repo</dx-text
+            >
+          </dx-col>
+        </dx-grid>
+        <dx-tabs active="1">
+          <dx-tab-btn panel="tab-panel-1" active> Demo </dx-tab-btn>
+          <dx-tab-btn panel="tab-panel-2">demo.html</dx-tab-btn>
+          <dx-tab-btn panel="tab-panel-3">demo.json</dx-tab-btn>
+          <dx-tab-panel id="tab-panel-1" active>
+            <dx-col background-color="#222222" padding="20px">
+              <dx-x id="todo" src="/static/dx/todo.json">
+                <form id="todo__form">
+                  <input id="todo__input" autofocus type="text" value="" />
+                  <div id="todo__input__error" style="color: red"></div>
+                  <button id="todo__btn" type="button">Add</button>
+                </form>
+                <div id="todo__list">Loading Items</div>
+              </dx-x>
+            </dx-col>
+          </dx-tab-panel>
+          <dx-tab-panel id="tab-panel-2">Panel 2</dx-tab-panel>
+          <dx-tab-panel id="tab-panel-3">Panel 3</dx-tab-panel>
+        </dx-tabs>
       </dx-col>
-    </dx-mq>
+    </dx-col>
   </body>
 </html>

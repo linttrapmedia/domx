@@ -1,16 +1,2 @@
-"use strict";(()=>{function l(e){let s="";for(let t in e)s+=`${t}: ${e[t]};`;return s}function d(e,s){e.attachShadow(s)}function h(e,s){let t=new CSSStyleSheet;return t.replace(s),e.shadowRoot.adoptedStyleSheets=[t],t}function c(e,s){let t=document.createElement("template");t.innerHTML=s;let n=t.content.cloneNode(!0);return e.shadowRoot.appendChild(n),n}var o=class extends HTMLElement{constructor(){super();this.baseStyles=`
-  box-sizing: border-box;
-  display: flex; 
-  transition: padding 0.25s ease-in-out;`;d(this,{mode:"open"}),this.styleSheet=h(this,""),this.template=c(this,"<slot></slot>"),this.render=this.render.bind(this)}connectedCallback(){let t=this.parentElement?.closest("dx-mq");t.subscribe(this),this.render(t.calculateBreakpoint())}render(t){let n={};["align-items","border-color","border-radius","border-style","border-width","flex-direction","flex-wrap","flex-flow","gap","margin","padding","max-width"].forEach(i=>{this.hasAttribute(i)&&(n[i]=this.getAttribute(i)),this.hasAttribute(`${t}:${i}`)&&(n[i]=this.getAttribute(`${t}:${i}`))}),this.styleSheet.replace(`:host { 
-      ${this.baseStyles}
-      ${l(n)}
-    }`),this.hasAttribute("debug")&&console.log(n)}};customElements.define("dx-box",o);var r=class extends o{constructor(){super(...arguments);this.baseStyles=`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  transition: padding 0.25s ease-in-out;`}};customElements.define("dx-col",r);var a=class extends o{constructor(){super(...arguments);this.baseStyles=`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  transition: padding 0.25s ease-in-out;`}};customElements.define("dx-row",a);})();
+"use strict";(()=>{var i=class extends HTMLElement{constructor(){super();this.baseStyles=[["box-sizing","border-box"],["display","flex"]];this.psuedoStyles={};this.styleSheet=new CSSStyleSheet;this.attachShadow({mode:"open"}),this.shadowRoot.innerHTML="<slot></slot>",this.render=this.render.bind(this),this.shadowRoot.adoptedStyleSheets=[this.styleSheet],new MutationObserver(e=>{e.forEach(d=>{d.type==="attributes"&&this.render()})}).observe(this,{attributes:!0})}connectedCallback(){this.render(),window.addEventListener("resize",this.render)}disconnectedCallback(){window.removeEventListener("resize",this.render)}render(){let o=this.baseStyles,e={};this.getAttributeNames().forEach(t=>{let[n,l]=t.split("__"),[r,s]=n.split(":"),u=Number(l??0);if(window.innerWidth<u)return;let y=this.getAttribute(t);s?(e[s]||(e[s]=[]),e[s].push([r,y])):o.push([r,y])});let d=`:host{ ${o.map(([t,n])=>`${t}:${n};`).join("")}}`,S=Object.entries(e).map(([t,n])=>{let l=n.map(([r,s])=>`${r}:${s};`).join("");return`:host(:${t}) { ${l} }`}).join("");this.styleSheet.replace(d+S)}};customElements.define("dx-box",i);var h=class extends i{constructor(){super(...arguments);this.baseStyles=[["box-sizing","border-box"],["display","flex"],["flex-direction","column"]]}};customElements.define("dx-col",h);var a=class extends i{constructor(){super(...arguments);this.baseStyles=[["box-sizing","border-box"],["display","flex"],["flex-direction","row"]]}};customElements.define("dx-row",a);})();
 //# sourceMappingURL=dx-box.js.map

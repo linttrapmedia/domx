@@ -1,5 +1,8 @@
-class DomText extends HTMLElement {
-  baseStyles: string[][] = [];
+class DomGrid extends HTMLElement {
+  baseStyles: string[][] = [
+    ["box-sizing", "border-box"],
+    ["display", "grid"],
+  ];
   psuedoStyles: Record<string, [string, string][]> = {};
   styleSheet: CSSStyleSheet = new CSSStyleSheet();
   constructor() {
@@ -58,4 +61,4 @@ class DomText extends HTMLElement {
   }
 }
 
-customElements.define("dx-text", DomText);
+customElements.define("dx-grid", DomGrid);

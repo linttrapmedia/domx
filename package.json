@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.0.4",
-    "@linttrap/oem": "^0.0.2",
+    "@linttrap/oem": "^0.0.3",
     "d3": "^7.8.5"
   }
 }

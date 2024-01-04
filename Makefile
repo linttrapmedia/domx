@@ -21,20 +21,18 @@ help:
 
 # TASKS
 
-
 clean: ## Clean the project
 	@echo $(STATUS) Cleaning...
 	@rm -rf ./node_modules
 	@rm -rf ./docs/static/scripts/dx* 
 
-dev: ## Run the project in development mode
+dev-js: ## Run the project in development mode
 	@echo $(STATUS) Running in development mode...
 	@npx esbuild ./src/components/* --outdir=docs/static/scripts --watch --bundle --sourcemap --minify
 
-serve-docs: ## Serve the docs
+dev-docs: ## Serve the docs
 	@echo $(STATUS) Serving docs...
 	@npx http-server docs
-
 
 install: ## Install the project
 	@echo $(STATUS) Installing...
