@@ -1,5 +1,5 @@
 import * as dagre from "@dagrejs/dagre";
-import { DomX } from "./dx";
+import { DomState } from "./dx-state";
 
 // Function to shorten the path near the target node
 function shortenForArrow(edge, amount) {
@@ -68,7 +68,7 @@ class DomMachineChart extends HTMLElement {
     if (!src) return;
     const sub = this.getAttribute("sub");
     if (sub) {
-      const subEl = document.querySelector(sub) as DomX;
+      const subEl = document.querySelector(sub) as DomState;
       if (subEl) {
         this.currentState = subEl.state;
         subEl.sub((state: string, event: string) => {

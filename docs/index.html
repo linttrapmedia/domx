@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
   <head>
     <title>domx</title>
     <meta charset="utf-8" />
@@ -8,7 +8,7 @@
       content="domx is a web component library for building web applications."
     />
     <meta name="favicon" content="/static/images/favicon.svg" />
-    <script src="/static/scripts/dx.js"></script>
+    <script src="/static/scripts/dx-state.js"></script>
     <script src="/static/scripts/dx-box.js"></script>
     <script src="/static/scripts/dx-tabs.js"></script>
     <script src="/static/scripts/dx-text.js"></script>
@@ -17,8 +17,26 @@
     <link rel="stylesheet" href="/static/styles/styles.css" />
   </head>
   <body>
+    <dx-box
+      align-items="flex-start"
+      background="linear-gradient(45deg,rgba(255, 255, 255, 0.1) 50%, gold 50%)"
+      display="flex"
+      height="75px"
+      justify-content="flex-end"
+      padding="5px"
+      position="absolute"
+      right="0px"
+      text-align="right"
+      top="0px"
+      width="75px"
+    >
+      <a href="https://github.com/linttrapmedia/domx" target="_blank"
+        ><img src="static/images/github.svg" width="50%"
+      /></a>
+    </dx-box>
     <dx-col align-items="center">
       <dx-col gap="30px" padding="50px" max-width="960px">
+        <!-- header -->
         <dx-col align-items="center" gap="20px">
           <dx-row align-items="flex-start">
             <dx-text
@@ -45,6 +63,7 @@
             A novel UI library for managing the dom without javascript
           </dx-text>
         </dx-col>
+        <!-- features -->
         <dx-row
           background-color="rgba(255,255,255,0.1)"
           border-radius="5px"
@@ -80,10 +99,13 @@
             <dx-row><span>🤖</span> XState-esque</dx-row>
           </dx-style>
         </dx-row>
+        <!-- why -->
         <dx-grid
+          align-items="center"
           grid-template-columns="1fr"
           grid-template-columns__960="1fr 1fr"
           gap="30px"
+          justify-content="center"
           text-align="center"
         >
           <dx-col
@@ -93,57 +115,130 @@
             box-shadow="gold 20px 20px 0px"
             align-items="center"
             justify-content="center"
+            height="max-content"
           >
             <dx-text font-size="32px">Why?</dx-text>
-            <dx-text opacity="0.5" padding="20px 0"
-              >I wanted a small UI library of self contained web components that
-              would allow me to manage dom states, styles and behaviors from the
-              backend without javascript</dx-text
+            <dx-text opacity="0.35" padding="20px 0"
+              >I wanted a library of isolated web components to manage dom
+              states, styles and behaviors from the backend without javascript
+              and having HTMX, Tailwind and XState-like features.</dx-text
             >
           </dx-col>
-          <dx-col padding="20px" gap="20px">
-            <dx-text font-size="32px">Install</dx-text>
-            <dx-text opacity="0.5">(Every component is self-contained)</dx-text>
+          <dx-col
+            justify-self="center"
+            padding="20px"
+            gap="20px"
+            width="max-content"
+          >
+            <dx-text font-size="32px">Download</dx-text>
+            <dx-text opacity="0.5">(It's safe, link is using unpkg)</dx-text>
             <dx-style
               padding="30px"
-              background-color="gold"
-              background-color:hover="transparent"
+              background-color:hover="gold"
+              background-color="transparent"
               border-radius="5px"
               border-color="gold"
-              border="1px solid gold"
-              color="black"
+              border="2px solid gold"
+              color:hover="black"
+              color="gold"
+              gap="10px"
+              text-decoration="none"
+              transition="all 0.2s ease-in-out"
             >
               <a href="https://unpkg.com/@linttrap/domx@latest/dist/domx.zip"
-                >download zip</a
-              >
-              <a href="https://unpkg.com/@linttrap/domx@latest/dist/domx.zip"
-                >download zip</a
+                >📦 &nbsp; download zip</a
               >
             </dx-style>
-            <dx-text opacity="0.3" font-size="14px"
-              >It's just the dist folder from the repo</dx-text
+            <dx-text
+              font-size="14px"
+              text-align="center"
+              gap="10px"
+              opacity="0.5"
+            >
+              Or
+              <a href="https://github.com/linttrapmedia/domx" target="_blank"
+                >install the repo</a
+              >
+              and bundle it yourself</dx-text
             >
           </dx-col>
         </dx-grid>
-        <dx-tabs active="1">
+
+        <!-- example -->
+        <dx-state id="example" src="/api/stoplight.json">
+          <dx-col
+            id="stoplight"
+            align-items="center"
+            background-color="rgba(255, 255, 255, 0.1)"
+            background-color:hover="rgba(255, 255, 255, 0.05)"
+            cursor="pointer"
+            border-radius="5px"
+            box-sizing="border-box"
+            gap="30px"
+            justify-content="center"
+            padding="50px"
+            width="100%"
+            text-align="center"
+            transition="all 0.2s ease-in-out"
+          >
+            <dx-text font-size="28px"> Click The Stoplight </dx-text>
+            <dx-row gap="20px">
+              <dx-box
+                id="stoplight__red"
+                background-color="red"
+                border="2px solid rgba(0,0,0,0.75)"
+                border-radius="50%"
+                height="50px"
+                opacity="0.25"
+                width="50px"
+              ></dx-box>
+              <dx-box
+                id="stoplight__yellow"
+                background-color="yellow"
+                border="2px solid rgba(0,0,0,0.75)"
+                border-radius="50%"
+                height="50px"
+                opacity="0.25"
+                width="50px"
+              ></dx-box>
+              <dx-box
+                id="stoplight__green"
+                background-color="#07e407"
+                border="2px solid rgba(0,0,0,0.75)"
+                border-radius="50%"
+                height="50px"
+                opacity="0.25"
+                width="50px"
+              ></dx-box>
+            </dx-row>
+          </dx-col>
+        </dx-state>
+
+        <!-- how it works -->
+        <dx-col text-align="center">
+          <dx-text font-size="32px">How It Works</dx-text>
+        </dx-col>
+
+        <!-- demo -->
+        <!-- <dx-tabs active="1">
           <dx-tab-btn panel="tab-panel-1" active> Demo </dx-tab-btn>
           <dx-tab-btn panel="tab-panel-2">demo.html</dx-tab-btn>
           <dx-tab-btn panel="tab-panel-3">demo.json</dx-tab-btn>
           <dx-tab-panel id="tab-panel-1" active>
             <dx-col background-color="#222222" padding="20px">
-              <dx-x id="todo" src="/static/dx/todo.json">
+              <dx-state id="todo" src="/static/dx/todo.json">
                 <form id="todo__form">
                   <input id="todo__input" autofocus type="text" value="" />
                   <div id="todo__input__error" style="color: red"></div>
                   <button id="todo__btn" type="button">Add</button>
                 </form>
                 <div id="todo__list">Loading Items</div>
-              </dx-x>
+              </dx-state>
             </dx-col>
           </dx-tab-panel>
           <dx-tab-panel id="tab-panel-2">Panel 2</dx-tab-panel>
           <dx-tab-panel id="tab-panel-3">Panel 3</dx-tab-panel>
-        </dx-tabs>
+        </dx-tabs> -->
       </dx-col>
     </dx-col>
   </body>

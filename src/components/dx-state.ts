@@ -7,7 +7,7 @@ type DxCall = [
   method: string,
   ...args: (string | number)[]
 ];
-type DxDispatch = [dx: "dispatch", action: string];
+type DxDispatch = [dx: "dispatch", action: string, timeout?: number];
 type DxGet = [dx: "get", url: string];
 type DxJs = [dx: "js", method: string, ...args: (string | number)[]];
 type DxPost = [
@@ -47,10 +47,15 @@ type Config = {
   states: Record<string, Record<string | "entry", DX[]>>;
 };
 
-export class DomX extends HTMLElement {
-  state: string;
-  config: Config;
+export class DomState extends HTMLElement {
+  state: string = "";
+  config: Config = {
+    initialState: "",
+    listeners: [],
+    states: {},
+  };
   subs: ((state: string, action: string, dx: DX) => void)[] = [];
+  timeouts: Record<string, NodeJS.Timeout> = {};
   constructor() {
     super();
     this.transform = this.transform.bind(this);
@@ -95,7 +100,7 @@ export class DomX extends HTMLElement {
   }
   applyCall(transformation: DxCall) {
     const [, selector, method, ...args] = transformation;
-    const el = this.querySelector(selector);
+    const el: any = this.querySelector(selector);
     if (!el) return;
     el[method](...args);
   }
@@ -105,7 +110,7 @@ export class DomX extends HTMLElement {
     const els = this.querySelectorAll(selector) as NodeListOf<HTMLElement>;
     for (let i = 0; i < els.length; i++) {
       const el = els[i];
-      const cb = (e) => {
+      const cb = (e: any) => {
         e.preventDefault();
         this.handleClientEvent(action);
       };
@@ -113,9 +118,13 @@ export class DomX extends HTMLElement {
       el.addEventListener(event, cb);
     }
   }
-  applyDispatch(transformation: DxCall) {
-    const [, action] = transformation;
-    this.handleClientEvent(action);
+  applyDispatch(transformation: DxDispatch) {
+    const [, action, timeout = 0] = transformation;
+    clearTimeout(this.timeouts[action]);
+    this.timeouts[action] = setTimeout(
+      () => this.handleClientEvent(action),
+      timeout
+    );
   }
   applyGet(transformation: DxGet) {
     const [, url] = transformation;
@@ -125,14 +134,14 @@ export class DomX extends HTMLElement {
   }
   applyJs(transformation: DxJs) {
     const [, method, ...args] = transformation;
-    window[method](...args);
+    (<any>window)[method](...args);
   }
   applyPost(transformation: DxPost) {
     const [, url, ...data] = transformation;
-    const body = {};
+    const body: any = {};
     for (let i = 0; i < data.length; i++) {
       const [key, selector, val] = data[i];
-      const el = this.querySelector(selector);
+      const el: any = this.querySelector(selector);
       if (!el) return;
       body[key] = el[val];
     }
@@ -204,26 +213,26 @@ export class DomX extends HTMLElement {
     // Apply listeners
     const listeners = this.config.listeners ?? [];
 
+    const register = () => {
+      for (let i = 0; i < listeners.length; i++) {
+        const [selector, event, action] = listeners[i];
+        const els = this.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+        for (let j = 0; j < els.length; j++) {
+          const el = els[j];
+          const cb = (e: any) => {
+            e.preventDefault();
+            if (e.target !== el) return;
+            this.handleClientEvent(action);
+          };
+          that.removeEventListener(event, cb);
+          that.addEventListener(event, cb);
+        }
+      }
+    };
+
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
-          for (let i = 0; i < listeners.length; i++) {
-            const [selector, event, action] = listeners[i];
-            const els = this.querySelectorAll(
-              selector
-            ) as NodeListOf<HTMLElement>;
-            for (let j = 0; j < els.length; j++) {
-              const el = els[j];
-              const cb = (e) => {
-                e.preventDefault();
-                if (e.target !== el) return;
-                this.handleClientEvent(action);
-              };
-              that.removeEventListener(event, cb);
-              that.addEventListener(event, cb);
-            }
-          }
-        }
+        if (mutation.type === "childList" && mutation.addedNodes) register();
       });
     });
 
@@ -232,6 +241,8 @@ export class DomX extends HTMLElement {
       childList: true,
       subtree: true,
     });
+
+    register();
 
     // Apply initial state
     const initState = config.states[config.initialState];
@@ -261,10 +272,10 @@ export class DomX extends HTMLElement {
         text: this.applyText,
         wait: this.applyWait,
       };
-      traitMap[trait](transformation);
+      (traitMap as any)[trait](transformation);
       this.subs.forEach((s) => s(this.state, action, transformation));
     }
   }
 }
 
-customElements.define("dx-x", DomX);
+customElements.define("dx-state", DomState);

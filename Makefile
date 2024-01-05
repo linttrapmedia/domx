@@ -32,7 +32,7 @@ dev-js: ## Run the project in development mode
 
 dev-docs: ## Serve the docs
 	@echo $(STATUS) Serving docs...
-	@npx http-server docs
+	@npx http-server docs --gzip
 
 install: ## Install the project
 	@echo $(STATUS) Installing...
