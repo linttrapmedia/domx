@@ -8,13 +8,23 @@
       content="domx is a web component library for building web applications."
     />
     <meta name="favicon" content="/static/images/favicon.svg" />
+    <link rel="stylesheet" href="static/scripts/prism.css" type="text/css" />
+    <link rel="stylesheet" href="/static/styles/styles.css" />
+    <script type="text/javascript" src="static/scripts/prism.min.js"></script>
+    <script
+      type="text/javascript"
+      src="static/scripts/prism-markup.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="static/scripts/prism-typescript.min.js"
+    ></script>
     <script src="/static/scripts/dx-state.js"></script>
     <script src="/static/scripts/dx-box.js"></script>
     <script src="/static/scripts/dx-tabs.js"></script>
     <script src="/static/scripts/dx-text.js"></script>
     <script src="/static/scripts/dx-style.js"></script>
     <script src="/static/scripts/dx-grid.js"></script>
-    <link rel="stylesheet" href="/static/styles/styles.css" />
   </head>
   <body>
     <dx-box
@@ -34,8 +44,8 @@
         ><img src="static/images/github.svg" width="50%"
       /></a>
     </dx-box>
-    <dx-col align-items="center">
-      <dx-col gap="30px" padding="50px" max-width="960px">
+    <dx-col align-items="normal" align-items--960="center">
+      <dx-col gap="50px" padding="50px" max-width="960px">
         <!-- header -->
         <dx-col align-items="center" gap="20px">
           <dx-row align-items="flex-start">
@@ -43,7 +53,7 @@
               font-family="Splash"
               color="gold"
               font-size="50px"
-              font-size__960="75px"
+              font-size--960="75px"
               line-height="0.85"
               >domx</dx-text
             ><dx-text
@@ -58,9 +68,9 @@
             color="white"
             text-align="center"
             font-size="32px"
-            font-size__960="52px"
+            font-size--960="52px"
           >
-            A novel UI library for managing the dom without javascript
+            A novel UI library for managing the DOM without javascript
           </dx-text>
         </dx-col>
         <!-- features -->
@@ -77,7 +87,7 @@
             background-color="transparent"
             border-radius="20px"
             border="none"
-            border__960="1px solid rgba(255, 255, 255, 0.1)"
+            border--960="1px solid rgba(255, 255, 255, 0.1)"
             box-sizing="border-box"
             color:hover="black"
             color="white"
@@ -103,23 +113,23 @@
         <dx-grid
           align-items="center"
           grid-template-columns="1fr"
-          grid-template-columns__960="1fr 1fr"
+          grid-template-columns--960="1fr 1fr"
           gap="30px"
           justify-content="center"
           text-align="center"
         >
           <dx-col
-            border="2px solid gold"
+            border="2px solid rgba(255,255,255,0.3)"
             border-radius="20px"
             padding="20px"
-            box-shadow="gold 20px 20px 0px"
+            box-shadow="rgba(255,255,255,0.3) 20px 20px 0px"
             align-items="center"
             justify-content="center"
             height="max-content"
           >
             <dx-text font-size="32px">Why?</dx-text>
             <dx-text opacity="0.35" padding="20px 0"
-              >I wanted a library of isolated web components to manage dom
+              >I wanted a library of isolated web components to manage DOM
               states, styles and behaviors from the backend without javascript
               and having HTMX, Tailwind and XState-like features.</dx-text
             >
@@ -182,7 +192,7 @@
             transition="all 0.2s ease-in-out"
           >
             <dx-text font-size="28px"> Click The Stoplight </dx-text>
-            <dx-row gap="20px">
+            <dx-row gap="20px" pointer-events="none">
               <dx-box
                 id="stoplight__red"
                 background-color="red"
@@ -215,8 +225,140 @@
         </dx-state>
 
         <!-- how it works -->
-        <dx-col text-align="center">
-          <dx-text font-size="32px">How It Works</dx-text>
+        <dx-col text-align="center" gap="20px">
+          <dx-col>
+            <dx-text color="gold" font-size="32px">How It Works</dx-text>
+            <dx-text opacity="0.35" padding="20px 0"
+              >domx works by introducing the idea of modeling DOM
+              transformations in a simple state machine on the backend. The
+              result is a super-powered HTMX-like app that pairs well with web
+              components.</dx-text
+            ></dx-col
+          >
+          <dx-box
+            align-items="flex-start"
+            flex-direction="column"
+            flex-direction--960="row"
+            justify-content="space-between"
+            text-align="center"
+            gap="20px"
+          >
+            <dx-col
+              gap="10px"
+              justify-content="center"
+              height="100%"
+              width="100%"
+              width--960="50%"
+              ><dx-text>Step 1: Define the state machine on the server</dx-text>
+              <dx-style border-radius="5px">
+                <pre><code class="language-typescript">{
+  "$schema": "domx.json",
+  "initialState": "red",
+  "listeners": [
+    ["#stoplight", "click", "changeState"],
+  ],
+  "actions": {
+    "reset": [
+      ["attr", "#stoplight__red", "opacity", "0.25"],
+      ["attr", "#stoplight__yellow", "opacity", "0.25"],
+      ["attr", "#stoplight__green", "opacity", "0.25"]
+    ]
+  },
+  "states": {
+    "red": {
+      "entry": [
+        ["action", "reset"],
+        ["attr", "#stoplight__red", "opacity", "1"],
+        ["dispatch", "changeState", 2000]
+      ],
+      "changeState": [["state", "yellow"]]
+    },
+    "yellow": {
+      "entry": [
+        ["action", "reset"],
+        ["attr", "#stoplight__yellow", "opacity", "1"],
+        ["dispatch", "changeState", 2000]
+      ],
+      "changeState": [["state", "green"]]
+    },
+    "green": {
+      "entry": [
+        ["action", "reset"],
+        ["attr", "#stoplight__green", "opacity", "1"],
+        ["dispatch", "changeState", 2000]
+      ],
+      "changeState": [["state", "red"]]
+    }
+  }
+}
+              </code></pre>
+              </dx-style>
+            </dx-col>
+            <dx-col
+              gap="10px"
+              justify-content="center"
+              height="100%"
+              width="100%"
+              width--960="50%"
+              ><dx-text
+                >Step 2: Wrap markup with the
+                <code>dx-state</code> component</dx-text
+              >
+              <dx-style border-radius="5px">
+                <pre><code class="language-markup">
+&lt;-- Some styles omitted for brevity --&gt;
+&lt;dx-state src="/api/stoplight.json"&gt;
+  &lt;dx-row&gt;
+    &lt;dx-box
+      id="stoplight__red"
+      background-color="red"
+      opacity="0.25"
+    &gt;&lt;/dx-box&gt;
+    &lt;dx-box
+      id="stoplight__yellow"
+      background-color="yellow"
+      opacity="0.25"
+    &gt;&lt;/dx-box&gt;
+    &lt;dx-box
+      id="stoplight__green"
+      background-color="#07e407"
+      opacity="0.25"
+    &gt;&lt;/dx-box&gt;
+  &lt;/dx-row&gt;
+&lt;/dx-state&gt;
+              </code></pre>
+              </dx-style>
+            </dx-col>
+          </dx-box>
+        </dx-col>
+
+        <!-- What can it do? -->
+        <dx-col text-align="center" gap="20px">
+          <dx-col>
+            <dx-text color="gold" font-size="32px"
+              >OK, So What Can It Do?</dx-text
+            >
+            <dx-text opacity="0.35" padding="20px 0"
+              >It's All About the <code>dx-state</code> component and the
+              <code>[TRAIT,...[TRAIT ARGS]]</code></dx-text
+            ></dx-col
+          >
+          <table>
+            <thead>
+              <tr>
+                <th>Trait</th>
+                <th>Example</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Action</td>
+                <td><code>['action','reset']</code></td>
+                <td>Call an action</td>
+              </tr>
+            </tbody>
+          </table>
         </dx-col>
 
         <!-- demo -->

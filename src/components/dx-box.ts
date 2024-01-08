@@ -29,7 +29,7 @@ class DomBox extends HTMLElement {
     let styles = this.baseStyles;
     let psuedoStyles: Record<string, [string, string][]> = {};
     this.getAttributeNames().forEach((attributeName) => {
-      const [style, bp] = attributeName.split("__");
+      const [style, bp] = attributeName.split("--");
       const [attr, psuedo] = style.split(":");
       const breakpoint = Number(bp ?? 0);
       if (window.innerWidth < breakpoint) return;

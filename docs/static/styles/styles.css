@@ -36,6 +36,7 @@
 html,
 body {
   background-color: black;
+  box-sizing: border-box;
   color: white;
   font-family: "Space Grotesk", sans-serif;
   height: 100%;
@@ -50,4 +51,26 @@ a {
 
 a:hover {
   color: gold;
+}
+
+code {
+  font-family: monospace;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 2px;
+  display: inline-block;
+  padding: 0 3px;
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: black;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: black;
+  border-radius: 20px;
+  border: 1px solid gold;
 }

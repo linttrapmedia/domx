@@ -1,3 +1,4 @@
+type DxAction = [dx: "action", action: string];
 type DxAppend = [dx: "append", selector: string, html: string];
 type DxAttr = [dx: "attr", selector: string, attr: string, value: string];
 type DxClick = [dx: "click", selector: string, action: string];
@@ -42,6 +43,7 @@ type DX =
   | DxWait;
 
 type Config = {
+  actions: Record<string, DX[]>;
   initialState: string;
   listeners: [selector: string, event: string, action: string][];
   states: Record<string, Record<string | "entry", DX[]>>;
@@ -50,6 +52,7 @@ type Config = {
 export class DomState extends HTMLElement {
   state: string = "";
   config: Config = {
+    actions: {},
     initialState: "",
     listeners: [],
     states: {},
@@ -59,6 +62,7 @@ export class DomState extends HTMLElement {
   constructor() {
     super();
     this.transform = this.transform.bind(this);
+    this.applyAction = this.applyAction.bind(this);
     this.applyAppend = this.applyAppend.bind(this);
     this.applyAttr = this.applyAttr.bind(this);
     this.applyCall = this.applyCall.bind(this);
@@ -77,10 +81,9 @@ export class DomState extends HTMLElement {
     this.init = this.init.bind(this);
     this.sub = this.sub.bind(this);
   }
-  connectedCallback() {
-    const src = this.getAttribute("src");
-    if (!src) return;
-    fetch(src).then((r) => r.json().then(this.init));
+  applyAction(transformation: DxAction) {
+    const [, action] = transformation;
+    this.config.actions[action].forEach((t) => this.transform(action, [t]));
   }
   applyAppend(transformation: DxAppend) {
     const [, selector, html] = transformation;
@@ -180,6 +183,11 @@ export class DomState extends HTMLElement {
     }
     if (action) this.handleClientEvent(action);
   }
+  connectedCallback() {
+    const src = this.getAttribute("src");
+    if (!src) return;
+    fetch(src).then((r) => r.json().then(this.init));
+  }
   /**
    * Dispatch an action to the state machine manually
    * @param action name of action to dispatch
@@ -258,6 +266,7 @@ export class DomState extends HTMLElement {
       const transformation = transformations[i];
       const [trait] = transformation;
       const traitMap = {
+        action: this.applyAction,
         append: this.applyAppend,
         attr: this.applyAttr,
         click: this.applyEventListener,

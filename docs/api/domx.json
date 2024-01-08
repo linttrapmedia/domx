@@ -7,6 +7,7 @@
     "initialState": { "$ref": "#/definitions/initialState" },
     "init": { "$ref": "#/definitions/transformations" },
     "states": { "$ref": "#/definitions/states" },
+    "actions": { "$ref": "#/definitions/actions" },
     "listeners": { "$ref": "#/definitions/listeners" }
   },
   "required": ["initialState", "states"],
@@ -47,6 +48,13 @@
     "initialState": {
       "type": "string",
       "description": "The initial state of the state machine."
+    },
+    "actions": {
+      "type": "object",
+      "patternProperties": {
+        "^[A-Z0-9_]+$": { "$ref": "#/definitions/transformations" }
+      },
+      "description": "The states of the state machine."
     },
     "states": {
       "type": "object",

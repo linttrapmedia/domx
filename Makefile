@@ -26,12 +26,16 @@ clean: ## Clean the project
 	@rm -rf ./node_modules
 	@rm -rf ./docs/static/scripts/dx* 
 
+dev: ## Run the project in development mode
+	@echo $(STATUS) Running in development mode...
+	@${MAKE} -j 2 dev-docs dev-js
+
 dev-js: ## Run the project in development mode
 	@echo $(STATUS) Running in development mode...
 	@npx esbuild ./src/components/* --outdir=docs/static/scripts --watch --bundle --sourcemap --minify
 
-dev-docs: ## Serve the docs
-	@echo $(STATUS) Serving docs...
+dev-docs: ## Run the project in development mode
+	@echo $(STATUS) Running in development mode...
 	@npx http-server docs --gzip
 
 install: ## Install the project
