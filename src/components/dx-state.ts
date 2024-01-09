@@ -1,16 +1,16 @@
-type DxAction = [dx: "action", action: string];
+type DxEvent = [dx: "evt", evt: string];
 type DxAppend = [dx: "append", selector: string, html: string];
 type DxAttr = [dx: "attr", selector: string, attr: string, value: string];
-type DxClick = [dx: "click", selector: string, action: string];
+type DxClick = [dx: "click", selector: string, evt: string];
 type DxCall = [
   dx: "call",
   selector: string,
   method: string,
   ...args: (string | number)[]
 ];
-type DxDispatch = [dx: "dispatch", action: string, timeout?: number];
+type DxDispatch = [dx: "dispatch", evt: string, timeout?: number];
 type DxGet = [dx: "get", url: string];
-type DxJs = [dx: "js", method: string, ...args: (string | number)[]];
+type DxWin = [dx: "win", method: string, ...args: (string | number)[]];
 type DxPost = [
   dx: "post",
   url: string,
@@ -23,9 +23,9 @@ type DxPost = [
 type DxReplace = [dx: "replace", selector: string, content: string];
 type DxServer = [dx: "server", key: string];
 type DxState = [dx: "state", state: string];
-type DxSubmit = [dx: "submit", selector: string, action: string];
+type DxSubmit = [dx: "submit", selector: string, evt: string];
 type DxText = [dx: "text", selector: string, text: string];
-type DxWait = [dx: "wait", milliseconds: number, action: string];
+type DxWait = [dx: "wait", milliseconds: number, evt: string];
 
 type DX =
   | DxAppend
@@ -33,7 +33,7 @@ type DX =
   | DxClick
   | DxCall
   | DxDispatch
-  | DxJs
+  | DxWin
   | DxGet
   | DxPost
   | DxReplace
@@ -46,7 +46,7 @@ type DX =
 type Config = {
   actions: Record<string, DX[]>;
   initialState: string;
-  listeners: [selector: string, event: string, action: string][];
+  listeners: [selector: string, event: string, evt: string][];
   states: Record<string, Record<string | "entry", DX[]>>;
 };
 
@@ -58,11 +58,11 @@ export class DomxState extends HTMLElement {
     listeners: [],
     states: {},
   };
-  subs: ((state: string, action: string, dx: DX) => void)[] = [];
+  subs: ((state: string, evt: string, dx: DX) => void)[] = [];
   timeouts: Record<string, NodeJS.Timeout> = {};
   constructor() {
     super();
-    this.transform = this.transform.bind(this);
+    this.handleEvent = this.handleEvent.bind(this);
     this.applyAction = this.applyAction.bind(this);
     this.applyAppend = this.applyAppend.bind(this);
     this.applyAttr = this.applyAttr.bind(this);
@@ -70,7 +70,7 @@ export class DomxState extends HTMLElement {
     this.applyEventListener = this.applyEventListener.bind(this);
     this.applyDispatch = this.applyDispatch.bind(this);
     this.applyGet = this.applyGet.bind(this);
-    this.applyJs = this.applyJs.bind(this);
+    this.applyWin = this.applyWin.bind(this);
     this.applyPost = this.applyPost.bind(this);
     this.applyReplace = this.applyReplace.bind(this);
     this.applyState = this.applyState.bind(this);
@@ -81,10 +81,11 @@ export class DomxState extends HTMLElement {
     this.handleServerEvent = this.handleServerEvent.bind(this);
     this.init = this.init.bind(this);
     this.sub = this.sub.bind(this);
+    this.transform = this.transform.bind(this);
   }
-  applyAction(transformation: DxAction) {
+  applyAction(transformation: DxEvent) {
     const [, action] = transformation;
-    this.config.actions[action].forEach((t) => this.transform(action, [t]));
+    this.config.actions[action].forEach((t) => this.handleEvent(action, [t]));
   }
   applyAppend(transformation: DxAppend) {
     const [, selector, html] = transformation;
@@ -109,33 +110,30 @@ export class DomxState extends HTMLElement {
     el[method](...args);
   }
   applyEventListener(transformation: DxClick) {
-    const [event, selector, action] = transformation;
+    const [event, selector, evt] = transformation;
     const els = this.querySelectorAll(selector) as NodeListOf<HTMLElement>;
     for (let i = 0; i < els.length; i++) {
       const el = els[i];
       const cb = (e: any) => {
         e.preventDefault();
-        this.handleClientEvent(action);
+        this.handleClientEvent(evt);
       };
       el.removeEventListener(event, cb);
       el.addEventListener(event, cb);
     }
   }
   applyDispatch(transformation: DxDispatch) {
-    const [, action, timeout = 0] = transformation;
-    clearTimeout(this.timeouts[action]);
-    this.timeouts[action] = setTimeout(
-      () => this.handleClientEvent(action),
-      timeout
-    );
+    const [, evt, timeout = 0] = transformation;
+    clearTimeout(this.timeouts[evt]);
+    this.timeouts[evt] = setTimeout(() => this.handleClientEvent(evt), timeout);
   }
   applyGet(transformation: DxGet) {
     const [, url] = transformation;
     fetch(url, {
       method: "GET",
-    }).then((r) => r.json().then((d) => this.transform("entry", d)));
+    }).then((r) => r.json().then((d) => this.handleEvent("entry", d)));
   }
-  applyJs(transformation: DxJs) {
+  applyWin(transformation: DxWin) {
     const [, method, ...args] = transformation;
     (<any>window)[method](...args);
   }
@@ -152,7 +150,7 @@ export class DomxState extends HTMLElement {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-    }).then((r) => r.json().then((d) => this.transform("entry", d)));
+    }).then((r) => r.json().then((d) => this.handleEvent("entry", d)));
   }
   applyReplace(transformation: DxReplace) {
     const [, selector, content] = transformation;
@@ -167,7 +165,7 @@ export class DomxState extends HTMLElement {
   applyState(transformation: DxState) {
     const [, state] = transformation;
     const hasEntry = this.config.states[state].entry;
-    if (hasEntry) this.transform("entry", this.config.states[state].entry);
+    if (hasEntry) this.handleEvent("entry", this.config.states[state].entry);
     this.state = state;
   }
   applyText(transformation: DxText) {
@@ -176,12 +174,12 @@ export class DomxState extends HTMLElement {
     els.forEach((el) => (el.textContent = text));
   }
   applyWait(transformation: DxWait) {
-    const [, timeInSeconds, action] = transformation;
+    const [, timeInSeconds, evt] = transformation;
     const startTime = new Date().getTime();
     while (new Date().getTime() - startTime < timeInSeconds) {
       // Do nothing
     }
-    if (action) this.handleClientEvent(action);
+    if (evt) this.handleClientEvent(evt);
   }
   connectedCallback() {
     const src = this.getAttribute("src");
@@ -189,30 +187,60 @@ export class DomxState extends HTMLElement {
     fetch(src).then((r) => r.json().then(this.init));
   }
   /**
-   * Dispatch an action to the state machine manually
-   * @param action name of action to dispatch
+   * Dispatch an evt to the state machine manually
+   * @param evt name of evt to dispatch
    */
-  dispatch(action: string) {
-    this.handleClientEvent(action);
+  dispatch(evt: string) {
+    this.handleClientEvent(evt);
   }
   /**
    * Handle a client event
-   * @param action name of action to dispatch
+   * @param evt name of evt to dispatch
    */
-  handleClientEvent(action: string) {
-    this.transform(action, this.config.states[this.state][action] as DX[]);
+  handleClientEvent(evt: string) {
+    this.handleEvent(evt, this.config.states[this.state][evt] as DX[]);
   }
   /**
    * Handle a server event
    * @param se server event
    */
-  handleServerEvent(se: { action: string } & any) {
-    const { action } = se;
-    const transformations = this.config.states[this.state][action].reduce(
+  handleServerEvent(se: { evt: string } & any) {
+    const { evt } = se;
+    const transformations = this.config.states[this.state][evt].reduce(
       (acc, t) => [...acc, t],
       [] as DX[]
     );
-    this.transform(action, transformations);
+    this.handleEvent(evt, transformations);
+  }
+  /**
+   * Transform the state machine
+   * @param evt name of application to run
+   * @param transformations transformations to apply
+   */
+  handleEvent(evt: string, transformations: DX[]) {
+    if (!transformations) return;
+    for (let i = 0; i < transformations.length; i++) {
+      const transformation = transformations[i];
+      const [trait] = transformation;
+      const traitMap = {
+        action: this.applyAction,
+        append: this.applyAppend,
+        attr: this.applyAttr,
+        call: this.applyCall,
+        click: this.applyEventListener,
+        dispatch: this.applyDispatch,
+        get: this.applyGet,
+        post: this.applyPost,
+        replace: this.applyReplace,
+        state: this.applyState,
+        submit: this.applyEventListener,
+        text: this.applyText,
+        wait: this.applyWait,
+        win: this.applyWin,
+      };
+      (traitMap as any)[trait](transformation);
+      this.subs.forEach((s) => s(this.state, evt, transformation));
+    }
   }
   init(config: Config) {
     this.config = config;
@@ -223,14 +251,14 @@ export class DomxState extends HTMLElement {
 
     const register = () => {
       for (let i = 0; i < listeners.length; i++) {
-        const [selector, event, action] = listeners[i];
+        const [selector, event, evt] = listeners[i];
         const els = this.querySelectorAll(selector) as NodeListOf<HTMLElement>;
         for (let j = 0; j < els.length; j++) {
           const el = els[j];
           const cb = (e: any) => {
             e.preventDefault();
             if (e.target !== el) return;
-            this.handleClientEvent(action);
+            this.handleClientEvent(evt);
           };
           that.removeEventListener(event, cb);
           that.addEventListener(event, cb);
@@ -255,35 +283,13 @@ export class DomxState extends HTMLElement {
     // Apply initial state
     const initState = config.states[config.initialState];
     this.state = config.initialState;
-    if (initState.entry) this.transform("entry", initState.entry);
+    if (initState.entry) this.handleEvent("entry", initState.entry);
   }
-  sub(s: (state: string, action: string, dx: DX) => void) {
+  sub(s: (state: string, evt: string, dx: DX) => void) {
     this.subs.push(s);
   }
-  transform(action: string, transformations: DX[]) {
-    if (!transformations) return;
-    for (let i = 0; i < transformations.length; i++) {
-      const transformation = transformations[i];
-      const [trait] = transformation;
-      const traitMap = {
-        action: this.applyAction,
-        append: this.applyAppend,
-        attr: this.applyAttr,
-        click: this.applyEventListener,
-        call: this.applyCall,
-        dispatch: this.applyDispatch,
-        js: this.applyJs,
-        get: this.applyGet,
-        post: this.applyPost,
-        replace: this.applyReplace,
-        state: this.applyState,
-        submit: this.applyEventListener,
-        text: this.applyText,
-        wait: this.applyWait,
-      };
-      (traitMap as any)[trait](transformation);
-      this.subs.forEach((s) => s(this.state, action, transformation));
-    }
+  transform(evt: string, transformations: DX[]) {
+    this.handleEvent(evt, transformations);
   }
 }
 
