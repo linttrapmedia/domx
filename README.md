@@ -205,27 +205,70 @@ When a state machine event is triggered, the [current state] -> [event name] tra
   // Desc: Add a wait between transformations
   // Type: [dx: "wait", ms: number];
   ["wait", 2000],
+
+  // Name: Win
+  // Desc: Call a method on the window object
+  // Type: [dx: "win", method: string, ...args: any[]];
+  ["win", "alert", "Hello World!"],
 ]
 ```
 
 ## Web Components
 
 ### `dx-state`
-The state machine component
+The state machine component is the core of domx. It makes a fetch to it's `src` onload and processes the state machine and exposes it's API to the DOM.
 
 ```html
+
 <!-- 
   Attributes:
   - [src]=[/path/to/state.json]
 -->
-
-<dx-state src="/todo-machine.json">
+<dx-state id="todo-state" src="/todo-machine.json">
   <!-- DOM scope -->
 </dx-state>
+    
+```
+
+Checkout the state machine api for the stoplight machine. Run the following in your development console:
+
+```javascript
+const stoplight = document.getElementById('stoplight');
+console.log(Object.keys(stoplight));
+```
+
+Even though event binding is taken care of by the state machine and complex functionality is to be delegated to web components it's still good to have the ability to use the state machine's API directly when you need to:
+
+```javascript
+// get a reference to the state machine
+const stoplight = document.getElementById('stoplight');
+
+// dispatch an event
+stoplight.dispatch("changeState"); // try this above alongside the stoplight example
+
+// subscribe to state changeState
+stoplight.sub((state: string, action: string, dx: DX) => { ... })
+
+// run an ad-hoc transformation
+// try this in the console
+stoplight.transform(
+  "name-of-your-adhoc-event",
+  [
+    ["attr", "#stoplight__red", "background-color", "blue"],
+    ["win", "alert", "You changed the red stoplight to blue!"],
+    ["call", "#stoplight","scrollIntoView"]
+  ]
+)
+
+// get current state
+console.log(stoplight.state)
+
+// get the state machine config
+console.log(stoplight.config)
 ```
 
 ### `dx-text`
-The text component
+The text component makes it easy to do ad-hoc styling and responsive behaviors.
 
 ```html
 <!-- 
@@ -242,7 +285,7 @@ The text component
 ```
 
 ### `dx-box, dx-row, dx-col`
-The flexbox component
+The flexbox components make doing responsive styling and layout a snap.
 
 ```html
 <!-- 
@@ -268,7 +311,7 @@ The flexbox component
 ```
 
 ### `dx-grid`
-The grid component
+The grid component makes doing responsive styling and layout a snap.
 
 ```html
 <!-- 
@@ -286,7 +329,36 @@ The grid component
   <div>Cell One</div>
   <div>Cell Two</div>
 </dx-grid>
+```
 
+
+### `dx-style`
+The style component allows you to use domx's component inline style syntax to add style and responsive properties to any element.
+
+```html
+<!-- 
+  Attributes:
+  - [css-prop]:[psuedo-el]--[breakpoint]="[css-value]"
+-->
+
+<!-- Font size 32px, 64px at 960px, white in color and red on hover -->
+<dx-style
+  font-size="32px"
+  font-size--960="64px"
+  color="white"
+  color:hover="red">
+  <style>Some Text</style>
+</dx-style>
+
+<!-- It also works on all immediate children -->
+<ul>
+  <dx-style font-size="32px">
+    <li>All these children will be 32px</li>
+    <li>All these children will be 32px</li>
+    <li>All these children will be 32px</li>
+    <li>All these children will be 32px</li>
+  </dx-style>
+</ul>
 ```
 
 ## domx
