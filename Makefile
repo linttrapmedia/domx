@@ -1,6 +1,6 @@
 #!/usr/bin/env
 
-.PHONY: help build clean cdn dev docs deploy install publish test
+.PHONY: help build clean cdn dev docs deploy dist install publish test
 
 STATUS:="\x1b[96;01m\xE2\x80\xA2\x1b[0m"
 ECHO = @echo "\033[0;34m$(1)\033[0m$(2)"
@@ -24,7 +24,21 @@ help:
 clean: ## Clean the project
 	@echo $(STATUS) Cleaning...
 	@rm -rf ./node_modules
-	@rm -rf ./docs/static/scripts/dx* 
+	@rm -rf ./docs/static/scripts/dx*
+	@rm -rf ./dist
+
+deploy: ## Deploy the project
+	@echo $(STATUS) Deploying...
+	@git branch -D gh-pages
+	@git checkout -b gh-pages
+	@git merge main --no-commit --no-ff
+	@make clean
+	@npm i
+	@make docs
+	@git add .
+	@git commit -m 'deploy'
+	@git push -f origin gh-pages
+	@git checkout main
 
 dev: ## Run the project in development mode
 	@echo $(STATUS) Running in development mode...
@@ -37,6 +51,16 @@ dev-js: ## Run the project in development mode
 dev-docs: ## Run the project in development mode
 	@echo $(STATUS) Running in development mode...
 	@npx http-server docs --gzip
+
+dist: ## Build the project for distribution
+	@echo $(STATUS) Building...
+	@rm -rf dist
+	@npx esbuild ./src/components/* --outdir=dist --bundle --sourcemap --minify --out-extension:.js=.min.js
+	@npx esbuild ./src/components/* --outdir=dist --bundle
+	@zip -r dist/domx.zip dist
+
+docs: ## Build the project documentation
+	@npx esbuild ./src/components/* --outdir=docs/static/scripts --bundle --sourcemap --minify
 
 install: ## Install the project
 	@echo $(STATUS) Installing...
