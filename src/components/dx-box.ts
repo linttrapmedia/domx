@@ -1,4 +1,4 @@
-class DomBox extends HTMLElement {
+export class DomxBox extends HTMLElement {
   baseStyles: string[][] = [
     ["box-sizing", "border-box"],
     ["display", "flex"],
@@ -61,9 +61,9 @@ class DomBox extends HTMLElement {
   }
 }
 
-customElements.define("dx-box", DomBox);
+customElements.define("dx-box", DomxBox);
 
-class DomCol extends DomBox {
+export class DomxCol extends DomxBox {
   baseStyles = [
     ["box-sizing", "border-box"],
     ["display", "flex"],
@@ -71,13 +71,13 @@ class DomCol extends DomBox {
   ];
 }
 
-customElements.define("dx-col", DomCol);
+customElements.define("dx-col", DomxCol);
 
-class DomRow extends DomBox {
+export class DomxRow extends DomxBox {
   baseStyles = [
     ["box-sizing", "border-box"],
     ["display", "flex"],
     ["flex-direction", "row"],
   ];
 }
-customElements.define("dx-row", DomRow);
+customElements.define("dx-row", DomxRow);

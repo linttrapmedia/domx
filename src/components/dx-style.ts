@@ -1,4 +1,4 @@
-class DomStyle extends HTMLElement {
+export class DomxStyle extends HTMLElement {
   baseStyles: string[][] = [["display", "inherit"]];
   slottedStyles: string[][] = [];
   psuedoStyles: Record<string, [string, string][]> = {};
@@ -66,4 +66,4 @@ class DomStyle extends HTMLElement {
   }
 }
 
-customElements.define("dx-style", DomStyle);
+customElements.define("dx-style", DomxStyle);

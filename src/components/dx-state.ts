@@ -40,6 +40,7 @@ type DX =
   | DxServer
   | DxState
   | DxSubmit
+  | DxText
   | DxWait;
 
 type Config = {
@@ -49,7 +50,7 @@ type Config = {
   states: Record<string, Record<string | "entry", DX[]>>;
 };
 
-export class DomState extends HTMLElement {
+export class DomxState extends HTMLElement {
   state: string = "";
   config: Config = {
     actions: {},
@@ -286,4 +287,4 @@ export class DomState extends HTMLElement {
   }
 }
 
-customElements.define("dx-state", DomState);
+customElements.define("dx-state", DomxState);

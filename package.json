@@ -3,7 +3,7 @@
   "author": "@linttrapmedia",
   "title": "domx",
   "version": "0.0.1",
-  "description": "DOM Transformations",
+  "description": "A novel UI library for managing the DOM without javascript",
   "type": "module",
   "exports": {
     ".": {

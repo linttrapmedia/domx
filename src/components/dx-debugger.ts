@@ -1,5 +1,5 @@
 import * as dagre from "@dagrejs/dagre";
-import { DomState } from "./dx-state";
+import { DomxState } from "./dx-state";
 
 // Function to shorten the path near the target node
 function shortenForArrow(edge, amount) {
@@ -53,7 +53,7 @@ function findMidpoint(points, halfLength) {
   return points[0]; // Fallback to the first point
 }
 
-class DomMachineChart extends HTMLElement {
+class DomxMachineChart extends HTMLElement {
   previousState: string = "";
   currentState: string = "";
   currentEvent: string = "";
@@ -68,7 +68,7 @@ class DomMachineChart extends HTMLElement {
     if (!src) return;
     const sub = this.getAttribute("sub");
     if (sub) {
-      const subEl = document.querySelector(sub) as DomState;
+      const subEl = document.querySelector(sub) as DomxState;
       if (subEl) {
         this.currentState = subEl.state;
         subEl.sub((state: string, event: string) => {
@@ -183,4 +183,4 @@ class DomMachineChart extends HTMLElement {
   }
 }
 
-customElements.define("dx-x-chart", DomMachineChart);
+customElements.define("dx-x-chart", DomxMachineChart);

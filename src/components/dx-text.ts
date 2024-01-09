@@ -1,4 +1,4 @@
-class DomText extends HTMLElement {
+export class DomxText extends HTMLElement {
   baseStyles: string[][] = [];
   psuedoStyles: Record<string, [string, string][]> = {};
   styleSheet: CSSStyleSheet = new CSSStyleSheet();
@@ -58,4 +58,4 @@ class DomText extends HTMLElement {
   }
 }
 
-customElements.define("dx-text", DomText);
+customElements.define("dx-text", DomxText);

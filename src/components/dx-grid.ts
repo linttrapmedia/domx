@@ -1,4 +1,4 @@
-class DomGrid extends HTMLElement {
+export class DomxGrid extends HTMLElement {
   baseStyles: string[][] = [
     ["box-sizing", "border-box"],
     ["display", "grid"],
@@ -61,4 +61,4 @@ class DomGrid extends HTMLElement {
   }
 }
 
-customElements.define("dx-grid", DomGrid);
+customElements.define("dx-grid", DomxGrid);
