@@ -106,7 +106,7 @@ domx works by introducing the idea of modeling DOM transformations in a simple s
 
 The state machine is an XState inspired JSON configration object which takes the following format:
 
-```json
+```js
 
 {
   // the domx schema
@@ -142,7 +142,7 @@ The state machine is an XState inspired JSON configration object which takes the
 ## The Transformation Object
 When a state machine event is triggered, the [current state] -> [event name] transformation object is processed. Each item in the transformation object is responsible for a specific transformation which is called a "trait". Here are examples of all the traits:
 
-```json
+```js
 [
   // Name: Action
   // Desc: Trigger an action
