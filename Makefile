@@ -33,7 +33,7 @@ deploy: ## Deploy the project
 	@git checkout -b gh-pages
 	@git merge main --no-commit --no-ff
 	@make clean
-	@npm i
+	@make install
 	@make docs
 	@git add .
 	@git commit -m 'deploy'
