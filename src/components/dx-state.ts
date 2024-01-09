@@ -109,7 +109,6 @@ export class DomState extends HTMLElement {
   }
   applyEventListener(transformation: DxClick) {
     const [event, selector, action] = transformation;
-    console.log(transformation);
     const els = this.querySelectorAll(selector) as NodeListOf<HTMLElement>;
     for (let i = 0; i < els.length; i++) {
       const el = els[i];

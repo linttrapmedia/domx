@@ -25,6 +25,7 @@
     <script src="/static/scripts/dx-text.js"></script>
     <script src="/static/scripts/dx-style.js"></script>
     <script src="/static/scripts/dx-grid.js"></script>
+    <script src="/static/scripts/dx-table.js"></script>
   </head>
   <body>
     <dx-box
@@ -45,7 +46,7 @@
       /></a>
     </dx-box>
     <dx-col align-items="normal" align-items--960="center">
-      <dx-col gap="50px" padding="50px" max-width="960px">
+      <dx-col gap="50px" padding="50px 20px" max-width="960px">
         <!-- header -->
         <dx-col align-items="center" gap="20px">
           <dx-row align-items="flex-start">
@@ -330,35 +331,182 @@
               </dx-style>
             </dx-col>
           </dx-box>
-        </dx-col>
 
-        <!-- What can it do? -->
-        <dx-col text-align="center" gap="20px">
           <dx-col>
-            <dx-text color="gold" font-size="32px"
-              >OK, So What Can It Do?</dx-text
-            >
             <dx-text opacity="0.35" padding="20px 0"
-              >It's All About the <code>dx-state</code> component and the
-              <code>[TRAIT,...[TRAIT ARGS]]</code></dx-text
-            ></dx-col
-          >
-          <table>
-            <thead>
-              <tr>
-                <th>Trait</th>
-                <th>Example</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Action</td>
-                <td><code>['action','reset']</code></td>
-                <td>Call an action</td>
-              </tr>
-            </tbody>
-          </table>
+              >The <code>dx-state</code> component loads the state machine
+              config. Each time a new action is triggered, it's transformation
+              object is processed. Each item in the transformation object is
+              responsible for a specific transformation which is called a
+              "trait". Here's a zoom in on some of transformation objects from
+              above</dx-text
+            >
+          </dx-col>
+
+          <pre><code class="language-typescript">
+// actions -> reset transformation object
+[
+  // set the "opacity" attribute to 0.25
+  ["attr", "#stoplight__red", "opacity", "0.25"],
+  ["attr", "#stoplight__yellow", "opacity", "0.25"],
+  ["attr", "#stoplight__green", "opacity", "0.25"]
+]
+...
+// states -> red -> entry state transformation object
+[
+  // run the "reset" actions transformation object
+  ["action", "reset"],
+  // set the "opacity" attribute to 1
+  ["attr", "#stoplight__red", "opacity", "1"],
+  // dispatch the "changeState" action after 2000ms
+  ["dispatch", "changeState", 2000]
+],
+...
+
+</code></pre>
+          <dx-text>Here's a table of the traits:</dx-text>
+          <dx-row overflow-x="auto">
+            <dx-table>
+              <thead>
+                <dx-tr>
+                  <dx-th>Trait</dx-th>
+                  <dx-th>Description</dx-th>
+                  <dx-th>Example</dx-th>
+                </dx-tr>
+              </thead>
+              <tbody>
+                <dx-tr>
+                  <dx-td><code>action</code></dx-td>
+                  <dx-td>Call an action</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                    >["action", "reset"]</code></pre>
+                  </dx-td>
+                </dx-tr>
+                <dx-tr>
+                  <dx-td><code>append</code></dx-td>
+                  <dx-td>Append html to element</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                      >["append", "#list", "&lt;li&gt;new item&lt;/li&gt;"]</code
+                    ></pre>
+                  </dx-td>
+                </dx-tr>
+                <dx-tr>
+                  <dx-td><code>attr</code></dx-td>
+                  <dx-td>Set an attribute</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                    >["attr", "dialog", "open", "true"]</code></pre>
+                  </dx-td>
+                </dx-tr>
+                <!-- <dx-tr>
+                  <dx-td><code>click</code></dx-td>
+                  <dx-td>Attach a click handler to trigger an action</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                    >["click","#btn","reset"]</code></pre>
+                  </dx-td>
+                </dx-tr> -->
+                <dx-tr>
+                  <dx-td><code>call</code></dx-td>
+                  <dx-td>Call a method on an object</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                      >["call","#custom-drawer-component","toggle"]</code
+                    ></pre>
+                  </dx-td>
+                </dx-tr>
+                <dx-tr>
+                  <dx-td><code>dispatch</code></dx-td>
+                  <dx-td>Dispatch an action</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                    >["dispatch", "reset"]</code></pre>
+                  </dx-td>
+                </dx-tr>
+                <dx-tr>
+                  <dx-td><code>js</code></dx-td>
+                  <dx-td>Call a method on the window object</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                    >["alert", "Hello World!"]</code></pre>
+                  </dx-td>
+                </dx-tr>
+                <dx-tr>
+                  <dx-td><code>get</code></dx-td>
+                  <dx-td
+                    >Trigger a get request and process the result (a
+                    transformation object)</dx-td
+                  >
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                    >["get", "/some/endpoint"]</code></pre>
+                  </dx-td>
+                </dx-tr>
+                <dx-tr>
+                  <dx-td><code>post</code></dx-td>
+                  <dx-td
+                    >Post selected data to endpoint and process the result (a
+                    transformation object)</dx-td
+                  >
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                      >["post", 
+  "/some/endpoint", [
+  ["form-data","#todoForm","formData"]
+]]</code
+                    ></pre>
+                  </dx-td>
+                </dx-tr>
+                <dx-tr>
+                  <dx-td><code>replace</code></dx-td>
+                  <dx-td>Replace an element</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                      >["replace", "#list", "&lt;li&gt;updated item&lt;/li&gt;"]</code
+                    ></pre>
+                  </dx-td>
+                </dx-tr>
+                <dx-tr>
+                  <dx-td><code>state</code></dx-td>
+                  <dx-td>Change current state</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                      >["state", "processing"]</code
+                    ></pre>
+                  </dx-td>
+                </dx-tr>
+                <!-- <dx-tr>
+                  <dx-td><code>submit</code></dx-td>
+                  <dx-td>Attach a submit handler to trigger an action</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                      >["submit", "#form", "submit-form"]</code
+                    ></pre>
+                  </dx-td>
+                </dx-tr> -->
+                <dx-tr>
+                  <dx-td><code>text</code></dx-td>
+                  <dx-td>Update text</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                      >["text", "#msg", "Hello World"]</code
+                    ></pre>
+                  </dx-td>
+                </dx-tr>
+                <dx-tr>
+                  <dx-td><code>wait</code></dx-td>
+                  <dx-td>Add a wait between transformations</dx-td>
+                  <dx-td>
+                    <pre><code class="language-typescript"
+                      >["wait", "2000"]</code
+                    ></pre>
+                  </dx-td>
+                </dx-tr>
+              </tbody>
+            </dx-table>
+          </dx-row>
         </dx-col>
 
         <!-- demo -->
