@@ -289,7 +289,6 @@ The grid component
 
 ```
 
-
 ## domx
 
 ©Copyright 2023 All rights reserved. Made in the USA 🇺🇸 by [Kevin Lint](http://kevinlint.com) as a product of [Lint Trap Media](http://linttrap.media).
