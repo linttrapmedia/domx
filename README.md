@@ -361,6 +361,17 @@ The style component allows you to use domx's component inline style syntax to ad
 </ul>
 ```
 
+### Coming Soon
+
+[ ] dx-debugger - diagram state machine
+[ ] dx-img - responsive image
+[ ] dx-table - responsive table
+[ ] dx-tabs - responsive tabs
+[ ] dx-drawer - responsive drawer
+[ ] dx-dialog - responsive dialog
+[ ] dx-alert - responsive dialog
+[ ] condition attribute - maybe add state condition attributes to components to ease the amount of show/hide transformation commands 
+
 ## domx
 
 ©Copyright 2023 All rights reserved. Made in the USA 🇺🇸 by [Kevin Lint](http://kevinlint.com) as a product of [Lint Trap Media](http://linttrap.media).
