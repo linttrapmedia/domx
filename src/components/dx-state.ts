@@ -156,11 +156,8 @@ export class DomxState extends HTMLElement {
     const [, selector, content] = transformation;
     const el = this.querySelector(selector);
     if (!el) return;
-    const parent = el.parentElement;
-    if (!parent) return;
-    const tmpl = document.createElement("template");
-    tmpl.innerHTML = decodeURIComponent(content);
-    parent.replaceChild(tmpl.content, el);
+    el.innerHTML = "";
+    el.innerHTML = decodeURIComponent(content);
   }
   applyState(transformation: DxState) {
     const [, state] = transformation;
@@ -260,8 +257,8 @@ export class DomxState extends HTMLElement {
             if (e.target !== el) return;
             this.handleClientEvent(evt);
           };
-          that.removeEventListener(event, cb);
-          that.addEventListener(event, cb);
+          el.removeEventListener(event, cb);
+          el.addEventListener(event, cb);
         }
       }
     };

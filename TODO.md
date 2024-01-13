@@ -1,3 +1,5 @@
+- [ ] optionally preload state machine instead of using "src"
+- [ ] dx-drag
 - [ ] dx-debugger
 - [ ] dx-if
 - [ ] dx-img
