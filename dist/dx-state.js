@@ -9,7 +9,7 @@
         actions: {},
         initialState: "",
         listeners: [],
-        states: {},
+        states: {}
       };
       this.subs = [];
       this.timeouts = {};
@@ -41,7 +41,8 @@
     applyAppend(transformation) {
       const [, selector, html] = transformation;
       const el = this.querySelector(selector);
-      if (!el) return;
+      if (!el)
+        return;
       const tmpl = document.createElement("template");
       tmpl.innerHTML = decodeURIComponent(html);
       el.append(tmpl.content);
@@ -50,14 +51,16 @@
       const [, selector, attr, value] = transformation;
       const els = this.querySelectorAll(selector);
       els.forEach((el) => {
-        if (value === null) return el.removeAttribute(attr);
+        if (value === null)
+          return el.removeAttribute(attr);
         el.setAttribute(attr, value);
       });
     }
     applyCall(transformation) {
       const [, selector, method, ...args] = transformation;
       const el = this.querySelector(selector);
-      if (!el) return;
+      if (!el)
+        return;
       el[method](...args);
     }
     applyEventListener(transformation) {
@@ -76,15 +79,12 @@
     applyDispatch(transformation) {
       const [, evt, timeout = 0] = transformation;
       clearTimeout(this.timeouts[evt]);
-      this.timeouts[evt] = setTimeout(
-        () => this.handleClientEvent(evt),
-        timeout
-      );
+      this.timeouts[evt] = setTimeout(() => this.handleClientEvent(evt), timeout);
     }
     applyGet(transformation) {
       const [, url] = transformation;
       fetch(url, {
-        method: "GET",
+        method: "GET"
       }).then((r) => r.json().then((d) => this.handleEvent("entry", d)));
     }
     applyWin(transformation) {
@@ -97,42 +97,48 @@
       for (let i = 0; i < data.length; i++) {
         const [key, selector, val] = data[i];
         const el = this.querySelector(selector);
-        if (!el) return;
+        if (!el)
+          return;
         body[key] = el[val];
       }
       fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(body)
       }).then((r) => r.json().then((d) => this.handleEvent("entry", d)));
     }
     applyReplace(transformation) {
       const [, selector, content] = transformation;
       const el = this.querySelector(selector);
-      if (!el) return;
+      if (!el)
+        return;
       el.innerHTML = "";
       el.innerHTML = decodeURIComponent(content);
     }
     applyState(transformation) {
       const [, state] = transformation;
       const hasEntry = this.config.states[state].entry;
-      if (hasEntry) this.handleEvent("entry", this.config.states[state].entry);
+      if (hasEntry)
+        this.handleEvent("entry", this.config.states[state].entry);
       this.state = state;
     }
     applyText(transformation) {
       const [, selector, text] = transformation;
       const els = this.querySelectorAll(selector);
-      els.forEach((el) => (el.textContent = text));
+      els.forEach((el) => el.textContent = text);
     }
     applyWait(transformation) {
       const [, timeInSeconds, evt] = transformation;
       const startTime = new Date().getTime();
-      while (new Date().getTime() - startTime < timeInSeconds) {}
-      if (evt) this.handleClientEvent(evt);
+      while (new Date().getTime() - startTime < timeInSeconds) {
+      }
+      if (evt)
+        this.handleClientEvent(evt);
     }
     connectedCallback() {
       const src = this.getAttribute("src");
-      if (!src) return;
+      if (!src)
+        return;
       fetch(src).then((r) => r.json().then(this.init));
     }
     dispatch(evt) {
@@ -150,7 +156,8 @@
       this.handleEvent(evt, transformations);
     }
     handleEvent(evt, transformations) {
-      if (!transformations) return;
+      if (!transformations)
+        return;
       for (let i = 0; i < transformations.length; i++) {
         const transformation = transformations[i];
         const [trait] = transformation;
@@ -168,7 +175,7 @@
           submit: this.applyEventListener,
           text: this.applyText,
           wait: this.applyWait,
-          win: this.applyWin,
+          win: this.applyWin
         };
         traitMap[trait](transformation);
         this.subs.forEach((s) => s(this.state, evt, transformation));
@@ -181,35 +188,36 @@
       const register = () => {
         for (let i = 0; i < listeners.length; i++) {
           const [selector, event, evt] = listeners[i];
-          const selectorAndDxNotReady = `${selector}:not([data-dx-ready])`;
-          const els = this.querySelectorAll(selectorAndDxNotReady);
+          const els = this.querySelectorAll(selector);
           for (let j = 0; j < els.length; j++) {
             const el = els[j];
             const cb = (e) => {
               e.preventDefault();
-              if (e.target !== el) return;
+              if (e.target !== el)
+                return;
               this.handleClientEvent(evt);
             };
             el.removeEventListener(event, cb);
             el.addEventListener(event, cb);
-            el.dataset.dxReady = "true";
           }
         }
       };
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-          if (mutation.type === "childList" && mutation.addedNodes) register();
+          if (mutation.type === "childList" && mutation.addedNodes)
+            register();
         });
       });
       observer.observe(this, {
         attributes: true,
         childList: true,
-        subtree: true,
+        subtree: true
       });
       register();
       const initState = config.states[config.initialState];
       this.state = config.initialState;
-      if (initState.entry) this.handleEvent("entry", initState.entry);
+      if (initState.entry)
+        this.handleEvent("entry", initState.entry);
     }
     sub(s) {
       this.subs.push(s);
