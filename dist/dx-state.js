@@ -188,7 +188,10 @@
       const register = () => {
         for (let i = 0; i < listeners.length; i++) {
           const [selector, event, evt] = listeners[i];
-          const els = this.querySelectorAll(selector);
+          const selectorIfNotRegistered = `${selector}:not([data-dx-state="registered"])`;
+          const els = this.querySelectorAll(
+            selectorIfNotRegistered
+          );
           for (let j = 0; j < els.length; j++) {
             const el = els[j];
             const cb = (e) => {
@@ -197,8 +200,8 @@
                 return;
               this.handleClientEvent(evt);
             };
-            el.removeEventListener(event, cb);
             el.addEventListener(event, cb);
+            el.dataset.dxState = "registered";
           }
         }
       };
