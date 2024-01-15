@@ -10,6 +10,7 @@ type DxCall = [
 ];
 type DxDispatch = [dx: "dispatch", evt: string, timeout?: number];
 type DxGet = [dx: "get", url: string];
+type DxHistory = [dx: "history", method: string, ...args: (string | number)[]];
 type DxWin = [dx: "win", method: string, ...args: (string | number)[]];
 type DxPost = [
   dx: "post",
@@ -70,6 +71,7 @@ export class DomxState extends HTMLElement {
     this.applyEventListener = this.applyEventListener.bind(this);
     this.applyDispatch = this.applyDispatch.bind(this);
     this.applyGet = this.applyGet.bind(this);
+    this.applyHistory = this.applyHistory.bind(this);
     this.applyWin = this.applyWin.bind(this);
     this.applyPost = this.applyPost.bind(this);
     this.applyReplace = this.applyReplace.bind(this);
@@ -132,6 +134,10 @@ export class DomxState extends HTMLElement {
     fetch(url, {
       method: "GET",
     }).then((r) => r.json().then((d) => this.handleEvent("entry", d)));
+  }
+  applyHistory(transformation: DxHistory) {
+    const [, method, ...args] = transformation;
+    (<any>history)[method](...args);
   }
   applyWin(transformation: DxWin) {
     const [, method, ...args] = transformation;
@@ -227,6 +233,7 @@ export class DomxState extends HTMLElement {
         click: this.applyEventListener,
         dispatch: this.applyDispatch,
         get: this.applyGet,
+        history: this.applyHistory,
         post: this.applyPost,
         replace: this.applyReplace,
         state: this.applyState,
@@ -241,7 +248,6 @@ export class DomxState extends HTMLElement {
   }
   init(config: Config) {
     this.config = config;
-    const that = this;
 
     // Apply listeners
     const listeners = this.config.listeners ?? [];

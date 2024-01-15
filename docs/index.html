@@ -436,6 +436,11 @@
   // Type: [dx: "get", url: string, ...args: any[]];
   ["get", "/some/endpoint"],
 
+  // Name: History
+  // Desc: Update the browser history
+  // Type: [dx: "history", method: string, ...args: (string | number)[]];
+  ["history", "pushState", {}, "Record List", "/records/list"],
+
   // Name: Post
   // Desc: Post selected data to endpoint and process the result (a transformation object)
   // Type: [dx: "post", url: string, ...data: [key: string, selector: string, val: "value" | "dataset" | "formData"][]];

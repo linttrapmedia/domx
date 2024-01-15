@@ -1,4 +1,5 @@
-- [ ] optionally preload state machine instead of using "src"
+- [ ] update url trait
+- [ ] load state machine from window scoped object
 - [ ] dx-drag
 - [ ] dx-debugger
 - [ ] dx-if

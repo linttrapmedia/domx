@@ -21,6 +21,7 @@
       this.applyEventListener = this.applyEventListener.bind(this);
       this.applyDispatch = this.applyDispatch.bind(this);
       this.applyGet = this.applyGet.bind(this);
+      this.applyHistory = this.applyHistory.bind(this);
       this.applyWin = this.applyWin.bind(this);
       this.applyPost = this.applyPost.bind(this);
       this.applyReplace = this.applyReplace.bind(this);
@@ -86,6 +87,10 @@
       fetch(url, {
         method: "GET"
       }).then((r) => r.json().then((d) => this.handleEvent("entry", d)));
+    }
+    applyHistory(transformation) {
+      const [, method, ...args] = transformation;
+      history[method](...args);
     }
     applyWin(transformation) {
       const [, method, ...args] = transformation;
@@ -169,6 +174,7 @@
           click: this.applyEventListener,
           dispatch: this.applyDispatch,
           get: this.applyGet,
+          history: this.applyHistory,
           post: this.applyPost,
           replace: this.applyReplace,
           state: this.applyState,
@@ -183,7 +189,6 @@
     }
     init(config) {
       this.config = config;
-      const that = this;
       const listeners = this.config.listeners ?? [];
       const register = () => {
         for (let i = 0; i < listeners.length; i++) {
