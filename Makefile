@@ -9,7 +9,7 @@ ECHO = @echo "\033[0;34m$(1)\033[0m$(2)"
 # thanks to https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help:
 	@echo
-	@echo 📻 OEM:
+	@echo 🚀 DOMX:
 	@echo
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-10s\033[0m %s\n", $$1, $$2}'
 	@echo
