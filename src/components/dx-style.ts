@@ -27,16 +27,16 @@ export class DomxStyle extends HTMLElement {
     let slottedStylesList = this.slottedStyles;
     let psuedoStylesList: Record<string, [string, string][]> = {};
     this.getAttributeNames().forEach((attributeName) => {
-      const [style, bp] = attributeName.split("--");
-      const [attr, psuedo] = style.split(":");
+      const [attr, psuedo] = attributeName.split(":");
+      const [style, bp] = attr.split("--");
       const breakpoint = Number(bp ?? 0);
       if (window.innerWidth < breakpoint) return;
       const value = (this as any).getAttribute(attributeName);
       if (psuedo) {
         if (!psuedoStylesList[psuedo]) psuedoStylesList[psuedo] = [];
-        psuedoStylesList[psuedo].push([attr, value]);
+        psuedoStylesList[psuedo].push([style, value]);
       } else {
-        slottedStylesList.push([attr, value]);
+        slottedStylesList.push([style, value]);
       }
     });
 

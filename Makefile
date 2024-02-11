@@ -44,12 +44,12 @@ dev: ## Run the project in development mode
 	@echo $(STATUS) Running in development mode...
 	@${MAKE} -j 2 dev-docs dev-js
 
-dev-js: ## Run the project in development mode
-	@echo $(STATUS) Running in development mode...
+dev-js: ## Run the js in development mode
+	@echo $(STATUS) Running js in development mode...
 	@npx esbuild ./src/components/* --outdir=docs/static/scripts --watch --bundle --sourcemap --minify
 
-dev-docs: ## Run the project in development mode
-	@echo $(STATUS) Running in development mode...
+dev-docs: ## Run the docs in development mode
+	@echo $(STATUS) Running docs in development mode...
 	@npx http-server docs --gzip
 
 dist: ## Build the project for distribution

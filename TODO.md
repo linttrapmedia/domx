@@ -1,8 +1,7 @@
 - [ ] update url trait
-- [ ] load state machine from window scoped object
+- [ ] dx-template
 - [ ] dx-drag
 - [ ] dx-debugger
-- [ ] dx-if
 - [ ] dx-img
 - [ ] dx-table
 - [ ] dx-tabs

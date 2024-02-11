@@ -60,7 +60,7 @@ export class DomxState extends HTMLElement {
     states: {},
   };
   subs: ((state: string, evt: string, dx: DX) => void)[] = [];
-  timeouts: Record<string, NodeJS.Timeout> = {};
+  timeouts: Record<string, number> = {};
   constructor() {
     super();
     this.handleEvent = this.handleEvent.bind(this);
@@ -186,8 +186,10 @@ export class DomxState extends HTMLElement {
   }
   connectedCallback() {
     const src = this.getAttribute("src");
-    if (!src) return;
-    fetch(src).then((r) => r.json().then(this.init));
+    if (src) return fetch(src).then((r) => r.json().then(this.init));
+    const obj: any = this.getAttribute("obj");
+    if (obj) return this.init(window[obj] as any);
+    return;
   }
   /**
    * Dispatch an evt to the state machine manually

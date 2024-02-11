@@ -20,6 +20,7 @@
       src="static/scripts/prism-typescript.min.js"
     ></script>
     <script src="/static/scripts/dx-box.js"></script>
+    <script src="/static/scripts/dx-if.js"></script>
     <script src="/static/scripts/dx-grid.js"></script>
     <script src="/static/scripts/dx-state.js"></script>
     <script src="/static/scripts/dx-style.js"></script>
@@ -236,6 +237,15 @@
                 width="50px"
               ></dx-box>
             </dx-row>
+            <dx-if state="#stoplight" is="red">
+              <dx-text font-size="14px">The stoplight is red</dx-text>
+            </dx-if>
+            <dx-if state="#stoplight" is="yellow">
+              <dx-text font-size="14px">The stoplight is yellow</dx-text>
+            </dx-if>
+            <dx-if state="#stoplight" is="green">
+              <dx-text font-size="14px">The stoplight is green</dx-text>
+            </dx-if>
           </dx-col>
         </dx-state>
 
@@ -248,7 +258,7 @@
               transformations in a simple state machine on the backend in a JSON
               configuration object. The state machine is then loaded into the
               <code>dx-state</code> component which handles all the
-              transformations based on state and exposes it's API to the DOM.
+              transformations based on state and exposes its API to the DOM.
             </dx-text></dx-col
           >
         </dx-col>
@@ -345,7 +355,8 @@
      opacity="0.25"
    &gt;&lt;/dx-box&gt;
  &lt;/dx-row&gt;
-&lt;/dx-state&gt;</code></pre>
+&lt;/dx-state&gt;
+</code></pre>
             </dx-style>
           </dx-col>
         </dx-box>
@@ -490,12 +501,13 @@
           >
         </dx-col>
 
+        <!-- DX State -->
         <dx-col gap="20px">
           <dx-text font-size="24px">dx-state</dx-text>
           <dx-text opacity="0.35"
             >The state machine component is the core of domx. It makes a fetch
-            to it's `src` onload and processes the state machine and exposes
-            it's API to the DOM.
+            to its `src` onload and processes the state machine and exposes its
+            API to the DOM.
           </dx-text>
           <pre><code class="language-markup">&lt;!-- 
   Attributes:
@@ -504,7 +516,11 @@
 
 &lt;dx-state id="todo-state" src="/todo-machine.json"&gt;
   &lt;!-- DOM scope --&gt;
-&lt;/dx-state&gt;</code></pre>
+&lt;/dx-state&gt;
+
+&lt;!-- Alternatively you can set the state machine from the window object with [obj]=[window-scoped-variable] --&gt;
+
+</code></pre>
           <dx-text opacity="0.35"
             >Checkout the state machine api for the stoplight machine. Run the
             following in your development console:
@@ -514,9 +530,9 @@ console.log(Object.keys(stoplight));
 </code></pre>
           <dx-text opacity="0.35"
             >Even though event binding is taken care of by the state machine and
-            complex functionality is to be delegated to web components it's
-            still good to have the ability to use the state machine's API
-            directly when you need to:
+            complex functionality is to be delegated to web components its still
+            good to have the ability to use the state machine's API directly
+            when you need to:
           </dx-text>
           <pre><code class="language-typescript">// get a reference to the state machine
 const stoplight = document.getElementById('stoplight');
@@ -545,6 +561,7 @@ console.log(stoplight.state)
 console.log(stoplight.config)</code></pre>
         </dx-col>
 
+        <!-- DX Text -->
         <dx-col gap="20px">
           <dx-text font-size="24px">dx-text</dx-text>
           <dx-text opacity="0.35"
@@ -554,7 +571,7 @@ console.log(stoplight.config)</code></pre>
           <pre><code class="language-markup">&lt;!-- 
   Attributes:
   - [prop]=[value]
-  - [css-prop]:[psuedo-el]--[breakpoint]="[css-value]"
+  - [css-prop]--[breakpoint]:[psuedo-element]="[css-value]"
 --&gt;
 
 &lt;!-- Basic flexbox --&gt;
@@ -564,6 +581,7 @@ console.log(stoplight.config)</code></pre>
 &lt;dx-text font-size="21px" color="white" color:hover="red"&gt;Hello World&lt;/dx-text&gt;</code></pre>
         </dx-col>
 
+        <!-- DX Box, Row, Col -->
         <dx-col gap="20px">
           <dx-text font-size="24px">dx-box, dx-row, dx-col</dx-text>
           <dx-text opacity="0.35"
@@ -573,7 +591,7 @@ console.log(stoplight.config)</code></pre>
           <pre><code class="language-markup">&lt;!-- 
   Attributes:
   - [prop]=[value]
-  - [css-prop]:[psuedo-el]--[breakpoint]="[css-value]"
+  - [css-prop]--[breakpoint]:[psuedo-element]="[css-value]"
 --&gt;
 
 &lt;!-- Basic flexbox --&gt;
@@ -592,6 +610,7 @@ console.log(stoplight.config)</code></pre>
 &lt;dx-row&gt;Hello World&lt;/dx-row&gt;</code></pre>
         </dx-col>
 
+        <!-- DX Grid -->
         <dx-col gap="20px">
           <dx-text font-size="24px">dx-grid</dx-text>
           <dx-text opacity="0.35"
@@ -601,7 +620,7 @@ console.log(stoplight.config)</code></pre>
           <pre><code class="language-markup">&lt;!-- 
   Attributes:
   - [prop]=[value]
-  - [css-prop]:[psuedo-el]--[breakpoint]="[css-value]"
+  - [css-prop]--[breakpoint]:[psuedo-element]="[css-value]"
 --&gt;
 
 &lt;!-- 1 column on mobile, 2 columns at 960px --&gt;
@@ -614,6 +633,7 @@ console.log(stoplight.config)</code></pre>
 &lt;/dx-grid&gt;</code></pre>
         </dx-col>
 
+        <!-- DX Style -->
         <dx-col gap="20px">
           <dx-text font-size="24px">dx-style</dx-text>
           <dx-text opacity="0.35"
@@ -624,7 +644,7 @@ console.log(stoplight.config)</code></pre>
           <pre><code class="language-markup">
 &lt;!-- 
   Attributes:
-  - [css-prop]:[psuedo-el]--[breakpoint]="[css-value]"
+  - [css-prop]--[breakpoint]:[psuedo-element]="[css-value]"
 --&gt;
 
 &lt;!-- Font size 32px, 64px at 960px, white in color and red on hover --&gt;
@@ -647,6 +667,28 @@ console.log(stoplight.config)</code></pre>
 &lt;/ul&gt;</code></pre>
         </dx-col>
 
+        <!-- DX Style -->
+        <dx-col gap="20px">
+          <dx-text font-size="24px">dx-if</dx-text>
+          <dx-text opacity="0.35"
+            >The if component will show/hide its contents based on the state of
+            the dx-state object</dx-text
+          >
+          <pre><code class="language-markup">
+&lt;!-- 
+  Attributes:
+  - [state]:[selector of the dx-state object to watch]
+  - [is]:[state value to test]
+--&gt;
+
+&lt;dx-if state="stoplight" is="red" &gt;
+  &lt;div&gt;The stoplight is red&lt;/div&gt;
+&lt;/dx-if&gt;
+
+</code></pre>
+        </dx-col>
+
+        <!-- Coming soon -->
         <dx-col gap="20px">
           <dx-text font-size="24px">Coming Soon</dx-text>
           <dx-text opacity="0.35"
@@ -661,7 +703,9 @@ console.log(stoplight.config)</code></pre>
         <!-- Footer -->
         <dx-col text-align="center" gap="20px">
           <dx-col>
-            <dx-text color="gold" font-size="32px">domx</dx-text>
+            <dx-text font-family="Splash" color="gold" font-size="32px"
+              >domx</dx-text
+            >
             <dx-text opacity="0.35" padding="20px 0"
               >©Copyright 2024 All rights reserved. Made in the USA 🇺🇸 by
               <a href="https://kevinlint.com" target="_blank">Kevin Lint</a> as

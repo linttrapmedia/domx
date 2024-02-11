@@ -26,16 +26,16 @@ export class DomxText extends HTMLElement {
     let styles = this.baseStyles;
     let psuedoStyles: Record<string, [string, string][]> = {};
     this.getAttributeNames().forEach((attributeName) => {
-      const [style, bp] = attributeName.split("--");
-      const [attr, psuedo] = style.split(":");
+      const [attr, psuedo] = attributeName.split(":");
+      const [style, bp] = attr.split("--");
       const breakpoint = Number(bp ?? 0);
       if (window.innerWidth < breakpoint) return;
       const value = (this as any).getAttribute(attributeName);
       if (psuedo) {
         if (!psuedoStyles[psuedo]) psuedoStyles[psuedo] = [];
-        psuedoStyles[psuedo].push([attr, value]);
+        psuedoStyles[psuedo].push([style, value]);
       } else {
-        styles.push([attr, value]);
+        styles.push([style, value]);
       }
     });
 
