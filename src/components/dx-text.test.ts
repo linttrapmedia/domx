@@ -2,23 +2,17 @@ import { Test } from "../types";
 import "./dx-text";
 import { DomxText } from "./dx-text";
 
-export const CanRenderText: Test = async () => {
+// polyfillStyleSheet(DomxText);
+
+export const CanRenderText: Test = (sandbox) => {
   const el = document.createElement("dx-text") as DomxText;
-  el.styleSheet = new CSSStyleSheet();
-  el.styleSheet.replace = function (newStyles) {
-    newStyles.split("}").forEach((rule) => {
-      const trimmedRule = rule.trim();
-      if (trimmedRule) {
-        el.styleSheet.insertRule(trimmedRule + "}", this.cssRules.length);
-      }
-    });
-
-    return null as any;
-  };
-
-  console.log('"======"', el.styleSheet.cssRules);
-  el.setAttribute("font-size", "12px");
+  el.setAttribute("font-size", "13px");
   el.innerHTML = "<div>test</div>";
-  const t1 = el.outerHTML === "<dx-text><div>test</div></dx-text>";
+  sandbox!.appendChild(el);
+  el.render();
+  const html = `<dx-text font-size="13px"><div>test</div></dx-text>`;
+  const t1 = el.outerHTML === html;
+  const computedStyle = getComputedStyle(el);
+  console.log("styles read", el.styleSheet.textContent);
   return { pass: t1 };
 };

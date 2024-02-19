@@ -19,6 +19,7 @@ const unitTestCode = esbuild.buildSync({
   globalName: "domx",
   minify: !isDebugging,
   outdir: "test",
+  platform: "browser",
   sourcemap: false,
   target: ["esnext"],
   treeShaking: true,

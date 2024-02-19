@@ -1,13 +1,13 @@
 export class DomxText extends HTMLElement {
   baseStyles: string[][] = [];
   psuedoStyles: Record<string, [string, string][]> = {};
-  styleSheet: CSSStyleSheet = new CSSStyleSheet();
+  styleSheet: HTMLStyleElement = document.createElement("style");
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
     this.shadowRoot!.innerHTML = "<slot></slot>";
     this.render = this.render.bind(this);
-    this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
+    this.shadowRoot!.appendChild(this.styleSheet);
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === "attributes") this.render();
@@ -54,7 +54,9 @@ export class DomxText extends HTMLElement {
       })
       .join("");
 
-    this.styleSheet.replace(hostStyles + hostPsuedoStyles);
+    this.styleSheet.textContent = "";
+    if (hostStyles) this.styleSheet.textContent += hostStyles;
+    if (hostPsuedoStyles) this.styleSheet.textContent += hostPsuedoStyles;
   }
 }
 

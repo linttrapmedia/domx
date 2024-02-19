@@ -76,4 +76,4 @@ publish: ## Publish the project to npm
 
 test: ## Run tests
 	@echo $(STATUS) Testing...
-	@node ./cmd/test.js
+	@node ./cmd/test-hd.js

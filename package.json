@@ -23,8 +23,8 @@
   "homepage": "https://github.com/linttrapmedia/domx#readme",
   "devDependencies": {
     "@types/node": "^20.11.19",
-    "construct-style-sheets-polyfill": "^3.1.0",
     "esbuild": "^0.14.27",
+    "happy-dom": "^13.3.8",
     "http-server": "^14.1.1",
     "jsdom": "^24.0.0",
     "prettier": "2.7.1"
