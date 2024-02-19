@@ -1,4 +1,4 @@
-- [ ] testing
+- [ ] testing - JSDOM needs a polyfill for stylesheet replace, or just use another technique
 - [ ] update url trait
 - [ ] dx-template
 - [ ] dx-drag
