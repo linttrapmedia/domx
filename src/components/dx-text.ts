@@ -57,7 +57,9 @@ export class DomxText extends HTMLElement {
     this.styleSheet.textContent = "";
     if (hostStyles) this.styleSheet.textContent += hostStyles;
     if (hostPsuedoStyles) this.styleSheet.textContent += hostPsuedoStyles;
+    this.dispatchEvent(new CustomEvent("rendered"));
   }
 }
 
 customElements.define("dx-text", DomxText);
+console.log("register text =======");

@@ -22,15 +22,16 @@
   },
   "homepage": "https://github.com/linttrapmedia/domx#readme",
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
     "@types/node": "^20.11.19",
     "esbuild": "^0.14.27",
-    "happy-dom": "^13.3.8",
     "http-server": "^14.1.1",
-    "jsdom": "^24.0.0",
-    "prettier": "2.7.1"
+    "prettier": "2.7.1",
+    "serve": "^14.2.1"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.0.4",
     "d3": "^7.8.5"
-  }
+  },
+  "scripts": {}
 }

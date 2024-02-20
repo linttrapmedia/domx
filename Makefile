@@ -55,8 +55,9 @@ dev-docs: ## Run the docs in development mode
 dist: ## Build the project for distribution
 	@echo $(STATUS) Building...
 	@rm -rf dist
-	@npx esbuild ./src/components/* --outdir=dist --bundle --sourcemap --minify --out-extension:.js=.min.js
-	@npx esbuild ./src/components/* --outdir=dist --bundle
+	@mkdir dist
+	@cp -v ./src/components/*.html dist/
+	@npx esbuild ./src/components/*.ts --outdir=dist --bundle --sourcemap --minify --out-extension:.js=.min.js
 	@zip -r dist/domx.zip dist
 
 docs: ## Build the project documentation
@@ -76,4 +77,4 @@ publish: ## Publish the project to npm
 
 test: ## Run tests
 	@echo $(STATUS) Testing...
-	@node ./cmd/test-hd.js
+	@npx playwright test
