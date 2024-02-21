@@ -9,112 +9,107 @@
       to the DOM.
     </dx-text></dx-col
   >
-</dx-col>
-
-<!-- example -->
+  <!-- example -->
 <dx-box
-  align-items="flex-start"
-  flex-direction="column"
-  flex-direction--960="row"
-  justify-content="space-between"
-  text-align="center"
-  gap="20px"
+align-items="flex-start"
+flex-direction="column"
+flex-direction--960="row"
+justify-content="space-between"
+text-align="center"
+gap="20px"
 >
-  <dx-col
-    gap="10px"
-    justify-content="center"
-    height="100%"
-    width="100%"
-    width--960="50%"
-    ><dx-text>Step 1: Define the state machine on the server</dx-text>
-    <dx-style border-radius="5px">
-      <pre><code class="language-typescript">{
+<dx-col
+  gap="10px"
+  justify-content="center"
+  height="100%"
+  width="100%"
+  width--960="50%"
+  ><dx-text>Step 1: Define the state machine on the server</dx-text>
+  <!-- prettier-ignore -->
+  <dx-prismjs src="/static/scripts" language="typescript">
+{
 "$schema": "domx.json",
 "initialState": "red",
-"listeners": [
-["#stoplight", "click", "changeState"],
-],
+"listeners": [["#stoplight", "click", "changeState"]],
 "actions": {
-"reset": [
-["attr", "#stoplight__red", "opacity", "0.25"],
-["attr", "#stoplight__yellow", "opacity", "0.25"],
-["attr", "#stoplight__green", "opacity", "0.25"]
-]
+  "reset": [
+    ["attr", "#stoplight__red", "opacity", "0.25"],
+    ["attr", "#stoplight__yellow", "opacity", "0.25"],
+    ["attr", "#stoplight__green", "opacity", "0.25"]
+  ]
 },
 "states": {
-"red": {
-"entry": [
-["action", "reset"],
-["attr", "#stoplight__red", "opacity", "1"],
-["dispatch", "changeState", 2000]
-],
-"changeState": [["state", "yellow"]]
-},
-"yellow": {
-"entry": [
-["action", "reset"],
-["attr", "#stoplight__yellow", "opacity", "1"],
-["dispatch", "changeState", 2000]
-],
-"changeState": [["state", "green"]]
-},
-"green": {
-"entry": [
-["action", "reset"],
-["attr", "#stoplight__green", "opacity", "1"],
-["dispatch", "changeState", 2000]
-],
-"changeState": [["state", "red"]]
+  "red": {
+    "entry": [
+      ["action", "reset"],
+      ["attr", "#stoplight__red", "opacity", "1"],
+      ["dispatch", "changeState", 2000]
+    ],
+    "changeState": [["state", "yellow"]]
+  },
+  "yellow": {
+    "entry": [
+      ["action", "reset"],
+      ["attr", "#stoplight__yellow", "opacity", "1"],
+      ["dispatch", "changeState", 2000]
+    ],
+    "changeState": [["state", "green"]]
+  },
+  "green": {
+    "entry": [
+      ["action", "reset"],
+      ["attr", "#stoplight__green", "opacity", "1"],
+      ["dispatch", "changeState", 2000]
+    ],
+    "changeState": [["state", "red"]]
+  }
 }
-}
-}
-    </code></pre>
-    </dx-style>
-  </dx-col>
-  <dx-col
-    gap="10px"
-    justify-content="center"
-    height="100%"
-    width="100%"
-    width--960="50%"
-    ><dx-text
-      >Step 2: Wrap markup with the <code>dx-state</code> component</dx-text
-    >
-    <dx-style border-radius="5px">
-      <pre><code class="language-markup">
+}</dx-code>
+</dx-col>
+<dx-col
+  gap="10px"
+  justify-content="center"
+  height="100%"
+  width="100%"
+  width--960="50%"
+  ><dx-text
+    >Step 2: Wrap markup with the <code>dx-state</code> component</dx-text
+  >
+   <!-- prettier-ignore -->
+   <dx-prismjs src="/static/scripts" language="markup">
 &lt;-- Some styles omitted for brevity --&gt;
 &lt;dx-state src="/api/stoplight.json"&gt;
 &lt;dx-row&gt;
-&lt;dx-box
-id="stoplight__red"
-background-color="red"
-opacity="0.25"
-&gt;&lt;/dx-box&gt;
-&lt;dx-box
-id="stoplight__yellow"
-background-color="yellow"
-opacity="0.25"
-&gt;&lt;/dx-box&gt;
-&lt;dx-box
-id="stoplight__green"
-background-color="#07e407"
-opacity="0.25"
-&gt;&lt;/dx-box&gt;
+  &lt;dx-box
+    id="stoplight__red"
+    background-color="red"
+    opacity="0.25"
+  &gt;&lt;/dx-box&gt;
+  &lt;dx-box
+    id="stoplight__yellow"
+    background-color="yellow"
+    opacity="0.25"
+  &gt;&lt;/dx-box&gt;
+  &lt;dx-box
+    id="stoplight__green"
+    background-color="#07e407"
+    opacity="0.25"
+  &gt;&lt;/dx-box&gt;
 &lt;/dx-row&gt;
 &lt;/dx-state&gt;
-</code></pre>
-    </dx-style>
-  </dx-col>
+   </dx-prismjs>
+</dx-col>
 </dx-box>
 
 <!-- state machine -->
 <dx-col gap="20px">
-  <dx-text font-size="24px">The State Machine</dx-text>
-  <dx-text opacity="0.35"
-    >The state machine is an XState inspired JSON configration object which
-    takes the following format:</dx-text
-  >
-  <pre><code class="language-typescript">
+<dx-text font-size="24px">The State Machine</dx-text>
+<dx-text opacity="0.35"
+  >The state machine is an XState inspired JSON configration object which
+  takes the following format:</dx-text
+>
+ <!-- prettier-ignore -->
+ <dx-prismjs src="/static/scripts" language="typescript">
 {
 // the domx schema
 "$schema": "domx.json",
@@ -122,40 +117,41 @@ opacity="0.25"
 "initialState": "red",
 // list of event listeners to attach
 "listeners": [
-// selector, event, event name
-["#some-btn",'click','handleClick']
+  // selector, event, event name
+  ["#some-btn",'click','handleClick']
 ],
 // common transformation objects
 "actions": {
-// action name
-"reset": TRANSFORMATION_OBJECT
+  // action name
+  "reset": TRANSFORMATION_OBJECT
 },
 // state machine
 "states": {
-// current state
-"red": {
-// automatically run when state is entered
-"entry": TRANSFORMATION_OBJECT,
-// run when the "changeState" event is dispatched
-"changeState": TRANSFORMATION_OBJECT,
-// automatically run when state is exited
-"exit": TRANSFORMATION_OBJECT
-},
+  // current state
+  "red": {
+    // automatically run when state is entered
+    "entry": TRANSFORMATION_OBJECT,
+    // run when the "changeState" event is dispatched
+    "changeState": TRANSFORMATION_OBJECT,
+    // automatically run when state is exited
+    "exit": TRANSFORMATION_OBJECT
+  },
 // ...more states
 }
-}</code></pre>
+}</dx-prismjs>
 </dx-col>
 
 <!-- transformation object -->
 <dx-col gap="20px">
-  <dx-text font-size="24px">The Transformation Object</dx-text>
-  <dx-text opacity="0.35"
-    >When a state machine event is triggered, the [current state] -> [event
-    name] transformation object is processed. Each item in the transformation
-    object is responsible for a specific transformation which is called a
-    "trait". Here are examples of all the traits:</dx-text
-  >
-  <pre><code class="language-typescript">
+<dx-text font-size="24px">The Transformation Object</dx-text>
+<dx-text opacity="0.35"
+  >When a state machine event is triggered, the [current state] -> [event
+  name] transformation object is processed. Each item in the transformation
+  object is responsible for a specific transformation which is called a
+  "trait". Here are examples of all the traits:</dx-text
+>
+ <!-- prettier-ignore -->
+ <dx-prismjs src="/static/scripts" language="typescript">
 [
 // Name: Action
 // Desc: Trigger an action
@@ -228,5 +224,8 @@ opacity="0.25"
 // Desc: Call a method on the window object
 // Type: [dx: "win", method: string, ...args: any[]];
 ["win", "alert", "Hello World!"],
-]</code></pre>
+]</dx-prismjs>
 </dx-col>
+</dx-col>
+
+

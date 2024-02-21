@@ -41,7 +41,7 @@ export class DomxStyle extends HTMLElement {
         ([bp, prop, val, psuedo]) =>
           `@media (min-width: ${bp}px) { ::slotted${
             psuedo ? `(*:${psuedo})` : "(*)"
-          } { ${prop}:${val} !important; }}`
+          } { ${prop}:${val}; }}`
       )
       .join("\n");
     return `:host { display:inherit; } ` + renderedStyles;

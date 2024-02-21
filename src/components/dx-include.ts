@@ -6,8 +6,16 @@ class DxInclude extends HTMLElement {
     this.attachShadow({ mode: "open" });
   }
 
+  connectedCallback() {
+    const onload = this.getAttribute("onload");
+    if (onload) {
+      const onloadFn = new Function(onload);
+      onloadFn();
+    }
+  }
+
   static get observedAttributes() {
-    return ["src"];
+    return ["src", "onload"];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {

@@ -1,0 +1,57 @@
+<dx-col gap="20px">
+  <dx-text font-size="24px">dx-state</dx-text>
+  <dx-text opacity="0.35"
+    >The state machine component is the core of domx. It makes a fetch to its
+    `src` onload and processes the state machine and exposes its API to the DOM.
+  </dx-text>
+  <!-- prettier-ignore -->
+  <dx-prismjs src="/static/scripts" language="markup">
+&lt;!-- Attributes: 
+- [src]=[/path/to/state.json] 
+--&gt;
+    
+&lt;dx-state id="todo-state" src="/todo-machine.json"&gt; 
+&lt;!-- DOM scope --&gt;
+&lt;/dx-state&gt; 
+
+&lt;!-- Alternatively you can set the state machine from the window object with [obj]=[window-scoped-variable] --&gt;
+  </dx-prismjs>
+  <dx-text opacity="0.35"
+    >Checkout the state machine api for the stoplight machine. Run the following
+    in your development console:
+  </dx-text>
+  <!-- prettier-ignore -->
+  <dx-prismjs src="/static/scripts" language="typescript">const stoplight = document.getElementById('stoplight');
+console.log(Object.keys(stoplight));</dx-prismjs>
+  <dx-text opacity="0.35"
+    >Even though event binding is taken care of by the state machine and complex
+    functionality is to be delegated to web components its still good to have
+    the ability to use the state machine's API directly when you need to:
+  </dx-text>
+  <!-- prettier-ignore -->
+  <dx-prismjs src="/static/scripts" language="typescript">// get a reference to the state machine
+const stoplight = document.getElementById('stoplight');
+
+// dispatch an event
+stoplight.dispatch("changeState"); // try this above alongside the stoplight example
+
+// subscribe to state changeState
+stoplight.sub((state: string, action: string, dx: DX) => { ... })
+
+// run an ad-hoc transformation
+// try this in the console
+stoplight.transform(
+"name-of-your-adhoc-event",
+[
+["attr", "#stoplight__red", "background-color", "blue"],
+["win", "alert", "You changed the red stoplight to blue!"],
+["call", "#stoplight","scrollIntoView"]
+]
+)
+
+// get current state
+console.log(stoplight.state)
+
+// get the state machine config
+console.log(stoplight.config)</dx-prismjs>
+</dx-col>
