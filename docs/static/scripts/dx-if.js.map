@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../src/components/dx-if.ts"],
+  "sourcesContent": ["import { DomxState } from \"./dx-state\";\n\nexport class DomxIf extends HTMLElement {\n  state: string = \"\";\n  is: string = \"\";\n  constructor() {\n    super();\n    this.attachShadow({ mode: \"open\" });\n    this.shadowRoot!.innerHTML = \"<slot></slot>\";\n  }\n  connectedCallback() {\n    const state = this.getAttribute(\"state\");\n    const is = this.getAttribute(\"is\");\n    if (!state || !is) return;\n    (document.querySelector(state) as DomxState).sub((state: string) => {\n      this.style.display = state === is ? \"inherit\" : \"none\";\n    });\n  }\n}\n\ncustomElements.define(\"dx-if\", DomxIf);\n"],
+  "mappings": "mBAEO,IAAMA,EAAN,cAAqB,WAAY,CAGtC,aAAc,CACZ,MAAM,EAHR,WAAgB,GAChB,QAAa,GAGX,KAAK,aAAa,CAAE,KAAM,MAAO,CAAC,EAClC,KAAK,WAAY,UAAY,eAC/B,CACA,mBAAoB,CAClB,IAAMC,EAAQ,KAAK,aAAa,OAAO,EACjCC,EAAK,KAAK,aAAa,IAAI,EAC7B,CAACD,GAAS,CAACC,GACd,SAAS,cAAcD,CAAK,EAAgB,IAAKA,GAAkB,CAClE,KAAK,MAAM,QAAUA,IAAUC,EAAK,UAAY,MAClD,CAAC,CACH,CACF,EAEA,eAAe,OAAO,QAASF,CAAM",
+  "names": ["DomxIf", "state", "is"]
+}

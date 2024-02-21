@@ -1,0 +1,53 @@
+<dx-grid
+  align-items="center"
+  grid-template-columns="1fr"
+  grid-template-columns--960="1fr 1fr"
+  gap="30px"
+  justify-content="center"
+  text-align="center"
+>
+  <dx-col
+    border="2px solid rgba(255,255,255,0.3)"
+    border-radius="20px"
+    padding="20px"
+    box-shadow="rgba(255,255,255,0.3) 20px 20px 0px"
+    align-items="center"
+    justify-content="center"
+    height="max-content"
+  >
+    <dx-text font-size="32px">Why?</dx-text>
+    <dx-text opacity="0.35" padding="20px 0"
+      >I wanted a library of isolated web components to manage DOM states,
+      styles and behaviors from the backend without javascript and having HTMX,
+      Tailwind and XState-like features.</dx-text
+    >
+  </dx-col>
+  <dx-col justify-self="center" padding="20px" gap="20px" width="max-content">
+    <dx-text font-size="32px">Download</dx-text>
+    <dx-text opacity="0.5">(It's safe, link is using unpkg)</dx-text>
+    <dx-style
+      padding="30px"
+      background-color:hover="gold"
+      background-color="transparent"
+      border-radius="5px"
+      border-color="gold"
+      border="2px solid gold"
+      color:hover="black"
+      color="gold"
+      gap="10px"
+      text-decoration="none"
+      transition="all 0.2s ease-in-out"
+    >
+      <a href="https://unpkg.com/@linttrap/domx@latest/dist/domx.zip"
+        >📦 &nbsp; download zip</a
+      >
+    </dx-style>
+    <dx-text font-size="14px" text-align="center" gap="10px" opacity="0.5">
+      Or
+      <a href="https://github.com/linttrapmedia/domx" target="_blank"
+        >install the repo</a
+      >
+      and bundle it yourself</dx-text
+    >
+  </dx-col>
+</dx-grid>

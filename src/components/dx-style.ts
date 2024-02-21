@@ -8,6 +8,7 @@ export class DomxStyle extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.shadowRoot!.innerHTML = "<slot></slot>";
     this.render = this.render.bind(this);
+    this.renderCss = this.renderCss.bind(this);
     this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -23,46 +24,30 @@ export class DomxStyle extends HTMLElement {
   disconnectedCallback() {
     window.removeEventListener("resize", this.render);
   }
-  render() {
-    let slottedStylesList = this.slottedStyles;
-    let psuedoStylesList: Record<string, [string, string][]> = {};
-    this.getAttributeNames().forEach((attributeName) => {
+  renderCss() {
+    let styles: [bp: string, prop: string, val: string, psuedo: string][] = [];
+    const attributes = this.getAttributeNames();
+    for (let i = 0; i < attributes.length; i++) {
+      const attributeName = attributes[i];
       const [attr, psuedo] = attributeName.split(":");
-      const [style, bp] = attr.split("--");
-      const breakpoint = Number(bp ?? 0);
-      if (window.innerWidth < breakpoint) return;
+      const [prop, bp = "0"] = attr.split("--");
       const value = (this as any).getAttribute(attributeName);
-      if (psuedo) {
-        if (!psuedoStylesList[psuedo]) psuedoStylesList[psuedo] = [];
-        psuedoStylesList[psuedo].push([style, value]);
-      } else {
-        slottedStylesList.push([style, value]);
-      }
-    });
-
-    // generate host styles
-    const hostStyles = `:host{ ${this.baseStyles
-      .map(([attr, value]) => `${attr}:${value};`)
-      .join("")}}`;
-
-    // generate host slotted styles
-    const hostSlottedStyles = `::slotted(*){ ${slottedStylesList
-      .map(([attr, value]) => `${attr}:${value} !important;`)
-      .join("")}}`;
-
-    // generate host slotted psuedo styles
-    const hostSlottedPsuedoStyles = Object.entries(psuedoStylesList)
-      .map(([psuedo, styles]) => {
-        const _styles = styles
-          .map(([attr, value]) => `${attr}:${value} !important;`)
-          .join("");
-        return `::slotted(*:${psuedo}) { ${_styles} }`;
-      })
-      .join("");
-
-    this.styleSheet.replace(
-      hostStyles + hostSlottedStyles + hostSlottedPsuedoStyles
-    );
+      styles.push([bp, prop, value, psuedo]);
+    }
+    const renderedStyles = styles
+      .sort((a, b) => (a[3] ? 1 : -1)) // sort by psuedo
+      .sort((a, b) => Number(a[0]) - Number(b[0])) // sort by breakpoint
+      .map(
+        ([bp, prop, val, psuedo]) =>
+          `@media (min-width: ${bp}px) { ::slotted${
+            psuedo ? `(*:${psuedo})` : "(*)"
+          } { ${prop}:${val} !important; }}`
+      )
+      .join("\n");
+    return `:host { display:inherit; } ` + renderedStyles;
+  }
+  render() {
+    this.styleSheet.replace(this.renderCss());
   }
 }
 

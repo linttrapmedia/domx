@@ -1,0 +1,57 @@
+<dx-state id="stoplight" src="/api/stoplight.json">
+  <dx-col
+    id="stoplight"
+    align-items="center"
+    background-color="rgba(255, 255, 255, 0.1)"
+    background-color:hover="rgba(255, 255, 255, 0.05)"
+    cursor="pointer"
+    border-radius="5px"
+    box-sizing="border-box"
+    gap="30px"
+    justify-content="center"
+    padding="50px"
+    width="100%"
+    text-align="center"
+    transition="all 0.2s ease-in-out"
+  >
+    <dx-text font-size="28px"> Click The Stoplight </dx-text>
+    <dx-row gap="20px" pointer-events="none">
+      <dx-box
+        id="stoplight__red"
+        background-color="red"
+        border="2px solid rgba(0,0,0,0.75)"
+        border-radius="50%"
+        height="50px"
+        opacity="0.25"
+        width="50px"
+      ></dx-box>
+      <dx-box
+        id="stoplight__yellow"
+        background-color="yellow"
+        border="2px solid rgba(0,0,0,0.75)"
+        border-radius="50%"
+        height="50px"
+        opacity="0.25"
+        width="50px"
+      ></dx-box>
+      <dx-box
+        id="stoplight__green"
+        background-color="#07e407"
+        border="2px solid rgba(0,0,0,0.75)"
+        border-radius="50%"
+        height="50px"
+        opacity="0.25"
+        width="50px"
+      ></dx-box>
+    </dx-row>
+    <dx-if state="#stoplight" is="red">
+      <dx-text font-size="14px">The stoplight is red</dx-text>
+    </dx-if>
+    <dx-if state="#stoplight" is="yellow">
+      <dx-text font-size="14px">The stoplight is yellow</dx-text>
+    </dx-if>
+    <dx-if state="#stoplight" is="green">
+      <dx-text font-size="14px">The stoplight is green</dx-text>
+    </dx-if>
+  </dx-col>
+</dx-state>

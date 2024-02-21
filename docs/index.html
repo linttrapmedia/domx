@@ -25,6 +25,7 @@
     <script src="/static/scripts/dx-state.js"></script>
     <script src="/static/scripts/dx-style.js"></script>
     <script src="/static/scripts/dx-text.js"></script>
+    <script src="/static/scripts/dx-include.js"></script>
     <!-- Google tag (gtag.js) -->
     <script
       async
@@ -36,7 +37,6 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-
       gtag("config", "G-Y0MV1R2QMP");
     </script>
   </head>
@@ -60,6 +60,11 @@
     </dx-box>
     <dx-col align-items="normal" align-items--960="center">
       <dx-col gap="50px" padding="50px 20px" max-width="960px">
+        <dx-include src="/static/html/header.html"></dx-include>
+        <dx-include src="/static/html/features.html"></dx-include>
+        <dx-include src="/static/html/why.html"></dx-include>
+        <dx-include src="/static/html/example.html"></dx-include>
+        <dx-include src="/static/html/how-it-works.html"></dx-include>
         <!-- header -->
         <dx-col align-items="center" gap="20px">
           <dx-row align-items="flex-start">
