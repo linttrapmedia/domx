@@ -61,7 +61,7 @@ dist: ## Build the project for distribution
 	@zip -r dist/domx.zip dist
 
 docs: ## Build the project documentation
-	@npx esbuild ./src/components/* --outdir=docs/static/scripts --bundle --sourcemap --minify
+	@npx esbuild ./src/components/*.ts --outdir=docs/static/scripts --bundle --sourcemap --minify
 
 install: ## Install the project
 	@echo $(STATUS) Installing...
