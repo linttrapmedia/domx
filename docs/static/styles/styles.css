@@ -45,12 +45,22 @@ body {
   width: 100%;
 }
 
-a {
+a,
+a:link {
   color: white;
 }
 
 a:hover {
   color: gold;
+}
+
+dl > dt {
+  font-size: 1.25rem;
+}
+
+dl > dd {
+  opacity: 0.5;
+  margin: 0 0 10px 0;
 }
 
 code {

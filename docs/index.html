@@ -9,14 +9,14 @@
     />
     <meta name="favicon" content="/static/images/favicon.svg" />
     <link rel="stylesheet" href="/static/styles/styles.css" />
-    <script src="/static/scripts/dx-box.js"></script>
-    <script src="/static/scripts/dx-if.js"></script>
-    <script src="/static/scripts/dx-grid.js"></script>
-    <script src="/static/scripts/dx-state.js"></script>
-    <script src="/static/scripts/dx-style.js"></script>
-    <script src="/static/scripts/dx-text.js"></script>
-    <script src="/static/scripts/dx-include.js"></script>
-    <script src="/static/scripts/dx-prismjs.js"></script>
+    <script defer src="/static/scripts/dx-box.js"></script>
+    <script defer src="/static/scripts/dx-if.js"></script>
+    <script defer src="/static/scripts/dx-grid.js"></script>
+    <script defer src="/static/scripts/dx-state.js"></script>
+    <script defer src="/static/scripts/dx-style.js"></script>
+    <script defer src="/static/scripts/dx-text.js"></script>
+    <script defer src="/static/scripts/dx-include.js"></script>
+    <script defer src="/static/scripts/dx-prismjs.js"></script>
     <!-- Google tag (gtag.js) -->
     <script
       async
@@ -51,190 +51,28 @@
     </dx-box>
     <dx-col align-items="normal" align-items--960="center">
       <dx-col gap="50px" padding="50px 20px" max-width="960px">
+        <dx-text font-size="14px" text-align="center" gap="10px" opacity="0.5">
+          Or
+          <a href="https://github.com/linttrapmedia/domx" target="_blank"
+            >install the repo</a
+          >
+          and bundle it yourself</dx-text
+        >
         <dx-include src="/static/html/header.html"></dx-include>
         <dx-include src="/static/html/features.html"></dx-include>
         <dx-include src="/static/html/why.html"></dx-include>
-        <!-- <dx-include src="/static/html/example.html"></dx-include> -->
+        <dx-include src="/static/html/example.html"></dx-include>
         <dx-include src="/static/html/how-it-works.html"></dx-include>
         <dx-include src="/static/html/web-components.html"></dx-include>
         <dx-include src="/static/html/dx-state.html"></dx-include>
         <dx-include src="/static/html/dx-text.html"></dx-include>
-
-        <!-- DX Box, Row, Col -->
-        <dx-col gap="20px">
-          <dx-text font-size="24px">dx-box, dx-row, dx-col</dx-text>
-          <dx-text opacity="0.35"
-            >The flexbox components make doing responsive styling and layout a
-            snap.</dx-text
-          >
-          <pre><code class="language-markup">&lt;!-- 
-  Attributes:
-  - [prop]=[value]
-  - [css-prop]--[breakpoint]:[psuedo-element]="[css-value]"
---&gt;
-
-&lt;!-- Basic flexbox --&gt;
-&lt;dx-box&gt;Hello World&lt;/dx-box&gt;
-
-&lt;!-- 10px padding with white text that turns red on hover --&gt;
-&lt;dx-box padding="10px" color="white" color:hover="red"&gt;Hello World&lt;/dx-box&gt;
-
-&lt;!-- column on mobile, row at 960px --&gt;
-&lt;dx-box flex-direction="column" flex-direction--960="row"&gt;Hello World&lt;/dx-box&gt;
-
-&lt;!-- Same as dx-box but flex-direction is preset to column --&gt;
-&lt;dx-col&gt;Hello World&lt;/dx-col&gt;
-
-&lt;!-- Same as dx-box but flex-direction is preset to row --&gt;
-&lt;dx-row&gt;Hello World&lt;/dx-row&gt;</code></pre>
-        </dx-col>
-
-        <!-- DX Grid -->
-        <dx-col gap="20px">
-          <dx-text font-size="24px">dx-grid</dx-text>
-          <dx-text opacity="0.35"
-            >The grid component makes doing responsive styling and layout a
-            snap.</dx-text
-          >
-          <pre><code class="language-markup">&lt;!-- 
-  Attributes:
-  - [prop]=[value]
-  - [css-prop]--[breakpoint]:[psuedo-element]="[css-value]"
---&gt;
-
-&lt;!-- 1 column on mobile, 2 columns at 960px --&gt;
-&lt;dx-grid
-  grid-template-columns="1fr"
-  grid-template-columns--960="1fr 1fr"
-  gap="30px"&gt;
-  &lt;div&gt;Cell One&lt;/div&gt;
-  &lt;div&gt;Cell Two&lt;/div&gt;
-&lt;/dx-grid&gt;</code></pre>
-        </dx-col>
-
-        <!-- DX Style -->
-        <dx-col gap="20px">
-          <dx-text font-size="24px">dx-style</dx-text>
-          <dx-text opacity="0.35"
-            >The style component allows you to use domx's component inline style
-            syntax to add style and responsive properties to any
-            element.</dx-text
-          >
-          <pre><code class="language-markup">
-&lt;!-- 
-  Attributes:
-  - [css-prop]--[breakpoint]:[psuedo-element]="[css-value]"
---&gt;
-
-&lt;!-- Font size 32px, 64px at 960px, white in color and red on hover --&gt;
-&lt;dx-style
-  font-size="32px"
-  font-size--960="64px"
-  color="white"
-  color:hover="red"&gt;
-  &lt;style&gt;Some Text&lt;/style&gt;
-&lt;/dx-style&gt;
-
-&lt;!-- It also works on all immediate children --&gt;
-&lt;ul&gt;
-  &lt;dx-style font-size="32px"&gt;
-    &lt;li&gt;All these children will be 32px&lt;/li&gt;
-    &lt;li&gt;All these children will be 32px&lt;/li&gt;
-    &lt;li&gt;All these children will be 32px&lt;/li&gt;
-    &lt;li&gt;All these children will be 32px&lt;/li&gt;
-  &lt;/dx-style&gt;
-&lt;/ul&gt;</code></pre>
-        </dx-col>
-
-        <!-- DX Style -->
-        <dx-col gap="20px">
-          <dx-text font-size="24px">dx-if</dx-text>
-          <dx-text opacity="0.35"
-            >The if component will show/hide its contents based on the state of
-            the dx-state object</dx-text
-          >
-          <pre><code class="language-markup">
-&lt;!-- 
-  Attributes:
-  - [state]:[selector of the dx-state object to watch]
-  - [is]:[state value to test]
---&gt;
-
-&lt;dx-if state="stoplight" is="red" &gt;
-  &lt;div&gt;The stoplight is red&lt;/div&gt;
-&lt;/dx-if&gt;
-
-</code></pre>
-        </dx-col>
-
-        <!-- DX Template -->
-        <dx-col gap="20px">
-          <dx-text font-size="24px">dx-image</dx-text>
-          <dx-text opacity="0.35"
-            >The image component makes it easy to handle images. Provide a small
-            placeholder image for the initial load and a larger image for lazy
-            loading once the image is in the viewport.
-          </dx-text>
-          <pre><code class="language-markup">
-&lt;!-- 
-  Attributes:
-  - [src]: [path to image]
-  - [lazy-src]: [path to image]
---&gt;
-
-&lt;dx-image lazy-src="/path/to/lazy-loaded-image.jpg" src="/path/to/placeholder-image.jpg" /&gt;
-              
-              </code></pre>
-        </dx-col>
-
-        <!-- Coming soon -->
-        <dx-col gap="20px">
-          <dx-text font-size="24px">Coming Soon</dx-text>
-          <dx-text opacity="0.35"
-            >I have a handful of other components and features on deck
-            including: state maching debugger (graph and output), images,
-            tables, tabs, drawers, dialogs and notification components,
-            etc.</dx-text
-          >
-        </dx-col>
-
-        <!-- Footer -->
-        <dx-col text-align="center" gap="20px">
-          <dx-col>
-            <dx-text font-family="Splash" color="gold" font-size="32px"
-              >domx</dx-text
-            >
-            <dx-text opacity="0.35" padding="20px 0"
-              >©Copyright 2024 All rights reserved. Made in the USA 🇺🇸 by
-              <a href="https://kevinlint.com" target="_blank">Kevin Lint</a> as
-              a product of
-              <a href="https://linttrap.media" target="_blank"
-                >Lint Trap Media</a
-              >.
-            </dx-text></dx-col
-          >
-        </dx-col>
-
-        <!-- demo -->
-        <!-- <dx-tabs active="1">
-          <dx-tab-btn panel="tab-panel-1" active> Demo </dx-tab-btn>
-          <dx-tab-btn panel="tab-panel-2">demo.html</dx-tab-btn>
-          <dx-tab-btn panel="tab-panel-3">demo.json</dx-tab-btn>
-          <dx-tab-panel id="tab-panel-1" active>
-            <dx-col background-color="#222222" padding="20px">
-              <dx-state id="todo" src="/static/dx/todo.json">
-                <form id="todo__form">
-                  <input id="todo__input" autofocus type="text" value="" />
-                  <div id="todo__input__error" style="color: red"></div>
-                  <button id="todo__btn" type="button">Add</button>
-                </form>
-                <div id="todo__list">Loading Items</div>
-              </dx-state>
-            </dx-col>
-          </dx-tab-panel>
-          <dx-tab-panel id="tab-panel-2">Panel 2</dx-tab-panel>
-          <dx-tab-panel id="tab-panel-3">Panel 3</dx-tab-panel>
-        </dx-tabs> -->
+        <dx-include src="/static/html/dx-box.html"></dx-include>
+        <dx-include src="/static/html/dx-grid.html"></dx-include>
+        <dx-include src="/static/html/dx-style.html"></dx-include>
+        <dx-include src="/static/html/dx-if.html"></dx-include>
+        <dx-include src="/static/html/dx-image.html"></dx-include>
+        <dx-include src="/static/html/coming-soon.html"></dx-include>
+        <dx-include src="/static/html/footer.html"></dx-include>
       </dx-col>
     </dx-col>
   </body>

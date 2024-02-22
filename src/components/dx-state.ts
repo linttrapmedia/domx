@@ -60,7 +60,7 @@ export class DomxState extends HTMLElement {
     states: {},
   };
   subs: ((state: string, evt: string, dx: DX) => void)[] = [];
-  timeouts: Record<string, number> = {};
+  timeouts: Record<string, NodeJS.Timeout> = {};
   constructor() {
     super();
     this.handleEvent = this.handleEvent.bind(this);
