@@ -62,6 +62,7 @@ dist: ## Build the project for distribution
 
 docs: ## Build the project documentation
 	@npx esbuild ./src/components/*.ts --outdir=docs/static/scripts --bundle --sourcemap --minify
+	@sed -i '' -E "s/[0-9]+\.[0-9]+\.[0-9]+/$$(jq -r '.version' package.json)/g" ./docs/static/html/header.html
 
 install: ## Install the project
 	@echo $(STATUS) Installing...
