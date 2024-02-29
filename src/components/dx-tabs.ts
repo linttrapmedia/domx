@@ -1,177 +1,205 @@
-type Tab = {
-  label: string;
-  name: string;
-  icon: string;
-  content: HTMLElement;
-};
-
 export class DomxTabs extends HTMLElement {
-  behaviorAttributeNames: string[] = [];
+  behaviorAttributeNames: string[] = ["value"];
   styleSheet: CSSStyleSheet = new CSSStyleSheet();
-  tabs: Record<string, Tab> = {};
-  tabsContainer: HTMLDivElement = document.createElement("div");
-  panelsContainer: HTMLDivElement = document.createElement("div");
-  constructor() {
-    super();
-    this.attachShadow({ mode: "open" });
-    this.render = this.render.bind(this);
-    this.renderCss = this.renderCss.bind(this);
-    this.addTab = this.addTab.bind(this);
-    this.updateActiveTab = this.updateActiveTab.bind(this);
-    this.updateTab = this.updateTab.bind(this);
-    this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (
-          mutation.type === "attributes" &&
-          mutation.attributeName === "selected" &&
-          mutation.target instanceof DomxTabs
-        ) {
-          this.updateActiveTab();
-        }
-      });
-    });
-    observer.observe(this, { attributes: true });
-  }
-  addTab(tab: Tab) {
-    this.tabs[tab.name] = tab;
-    const tabButton = document.createElement("button");
-    tabButton.setAttribute("name", tab.name);
-    tabButton.innerText = tab.label;
-    tabButton.classList.add("tab");
-    tabButton.onclick = () => {
-      this.setAttribute("selected", tab.name);
-      this.updateActiveTab();
-    };
-    this.tabsContainer.appendChild(tabButton);
-    const tabPanel = document.createElement("div");
-    tabPanel.setAttribute("name", tab.name);
-    tabPanel.appendChild(tab.content);
-    tabPanel.classList.add("panel");
-    this.panelsContainer.appendChild(tabPanel);
-
-    const selected = this.getAttribute("selected");
-    if (selected === tab.name) tabPanel.classList.add("panel--active");
-    if (selected === tab.name) tabButton.classList.add("tab--active");
-  }
-  updateActiveTab() {
-    const tabName = this.getAttribute("selected");
-
-    const tabs = this.tabsContainer.querySelectorAll(".tab");
-    tabs.forEach((tab) => tab.classList.remove("tab--active"));
-    const selectedTab = this.tabsContainer.querySelector(`[name=${tabName}]`);
-    if (selectedTab) selectedTab.classList.add("tab--active");
-
-    const panels = this.panelsContainer.querySelectorAll(".panel");
-    panels.forEach((panel) => panel.classList.remove("panel--active"));
-    const selectedPanel = this.panelsContainer.querySelector(
-      `[name=${tabName}]`
-    );
-    if (selectedPanel) selectedPanel.classList.add("panel--active");
-  }
-  connectedCallback() {
-    this.render();
-  }
-  renderCss() {
-    return `
-        .tabs-container {
-            display: flex;
-            flex-direction: row;
-            border-bottom: 2px solid rgba(255,255,255,0.2);
-        }
-        .tab {
-            background-color: transparent;
-            border-left: none;
-            border-right: none;
-            border-top: none;
-            border-bottom: 2px solid transparent;
-            color: white;
-            padding: 10px;
-            cursor: pointer;
-            margin-bottom:-2px;
-        }
-        .tab--active {
-            border-bottom: 2px solid white;
-        }
-        .panels-container {
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-        }
-        .panel {
-            display: none;
-            padding: 20px 0;
-        }
-        .panel--active {
-            display: block;
-        }
-    `;
-  }
-  render() {
-    this.tabsContainer.classList.add("tabs-container");
-    this.panelsContainer.classList.add("panels-container");
-    this.shadowRoot!.appendChild(this.tabsContainer);
-    this.shadowRoot!.appendChild(this.panelsContainer);
-    this.styleSheet.replace(this.renderCss());
-    this.dispatchEvent(new CustomEvent("rendered"));
-  }
-  updateTab(tab: Tab) {
-    this.tabs[tab.name] = tab;
-    const tabButton = this.tabsContainer.querySelector(`[name=${tab.name}]`);
-    if (tabButton) (tabButton as HTMLElement).innerText = tab.label;
-    const tabPanel = this.panelsContainer.querySelector(`[name=${tab.name}]`);
-    if (tabPanel) tabPanel.replaceWith(tab.content);
-  }
-}
-
-customElements.define("dx-tabs", DomxTabs);
-
-export class DomxTab extends HTMLElement {
-  behaviorAttributeNames: string[] = ["label", "icon"];
-  styleSheet: CSSStyleSheet = new CSSStyleSheet();
-  addedToTabs: boolean = false;
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
     this.shadowRoot!.innerHTML = "<slot></slot>";
     this.render = this.render.bind(this);
+    this.renderCss = this.renderCss.bind(this);
+    this.setActiveTab = this.setActiveTab.bind(this);
     this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === "attributes") this.render();
-      });
-    });
-    observer.observe(this, { attributes: true });
   }
   connectedCallback() {
     this.render();
   }
+  renderCss() {
+    return `:host {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }`;
+  }
   render() {
-    const parentTabs = this.parentElement as DomxTabs;
-    if (!this.addedToTabs) {
-      if (parentTabs instanceof DomxTabs) {
-        parentTabs.addTab({
-          label: this.getAttribute("label") || "",
-          name: this.getAttribute("name") || "",
-          icon: this.getAttribute("icon") || "",
-          content: this.shadowRoot!.querySelector(
-            "slot"
-          )?.assignedNodes()[0] as HTMLElement,
-        });
-        this.addedToTabs = true;
-      }
-    } else {
-      parentTabs.updateTab({
-        label: this.getAttribute("label") || "",
-        name: this.getAttribute("name") || "",
-        icon: this.getAttribute("icon") || "",
-        content: this.shadowRoot!.querySelector(
-          "slot"
-        )?.assignedNodes()[0] as HTMLElement,
-      });
-    }
+    this.styleSheet.replace(this.renderCss());
+    this.dispatchEvent(new CustomEvent("rendered"));
+    this.setActiveTab(this.getAttribute("value") || "");
+  }
+  setActiveTab(value: string) {
+    const buttons = this.querySelectorAll("dx-tab-button");
+    buttons.forEach((button) => button.classList.remove("active"));
+    const panels = this?.querySelectorAll("dx-tab-panel");
+    panels.forEach((panel) => panel.classList.remove("active"));
+    const button = this.querySelector(`dx-tab-button[value="${value}"]`);
+    if (button) button.classList.add("active");
+    const panel = this.querySelector(`dx-tab-panel[value="${value}"]`);
+    if (panel) panel.classList.add("active");
+    this.setAttribute("value", value);
+  }
+}
+
+customElements.define("dx-tabs", DomxTabs);
+
+export class DomxTabButtons extends HTMLElement {
+  styleSheet: CSSStyleSheet = new CSSStyleSheet();
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot!.innerHTML = "<slot></slot>";
+    this.render = this.render.bind(this);
+    this.renderCss = this.renderCss.bind(this);
+    this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
+  }
+  connectedCallback() {
+    this.render();
+  }
+  renderCss() {
+    const parent = this.closest("dx-tabs");
+    const accentColor = parent
+      ? parent.getAttribute("accent-color")
+      : "rgba(255,255,255,0.5)";
+    return `:host {
+      box-sizing: border-box;
+      border-bottom: 3px solid ${accentColor};
+      display: flex;
+      flex-direction: row;
+    }`;
+  }
+  render() {
+    this.styleSheet.replace(this.renderCss());
     this.dispatchEvent(new CustomEvent("rendered"));
   }
 }
 
-customElements.define("dx-tab", DomxTab);
+customElements.define("dx-tab-buttons", DomxTabButtons);
+
+export class DomxTabButton extends HTMLElement {
+  styleSheet: CSSStyleSheet = new CSSStyleSheet();
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot!.innerHTML = "<slot></slot>";
+    this.render = this.render.bind(this);
+    this.renderCss = this.renderCss.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
+    this.addEventListener("click", this.handleClick);
+  }
+  connectedCallback() {
+    this.render();
+  }
+  handleClick() {
+    const parent = this.closest("dx-tabs") as DomxTabs;
+    if (parent) parent.setActiveTab(this.getAttribute("value") || "");
+  }
+  renderCss() {
+    const parent = this.closest("dx-tabs");
+    const bgColor = parent ? parent.getAttribute("bg-color") : "#fff";
+    const bgColorHover = parent
+      ? parent.getAttribute("bg-color:hover")
+      : "#f0f0f0";
+    const fgColor = parent ? parent.getAttribute("fg-color") : "#000";
+    const fgColorHover = parent
+      ? parent.getAttribute("fg-color:hover")
+      : "#000";
+    const accentColor = parent
+      ? parent.getAttribute("accent-color")
+      : "rgba(255,255,255,0.5)";
+    const accentColorHover = parent
+      ? parent.getAttribute("accent-color:hover")
+      : "rgba(255,255,255,0.5)";
+    return `:host {
+      background-color: ${bgColor};
+      box-sizing: border-box;
+      color: ${fgColor};
+      cursor: pointer;
+      border-bottom: 3px solid ${accentColor};
+      display: flex;
+      flex-direction: row;
+      padding:1em;
+      margin-bottom: -3px;
+    }
+    :host(:hover) {
+      background-color: ${bgColorHover};
+      color: ${fgColorHover};
+    }
+    
+    :host(.active) {
+      background-color: ${bgColorHover};
+      color: ${fgColorHover};
+      border-bottom: 3px solid ${accentColorHover};
+    }
+    `;
+  }
+  render() {
+    this.classList.add("tab-button");
+    this.styleSheet.replace(this.renderCss());
+    this.dispatchEvent(new CustomEvent("rendered"));
+  }
+}
+
+customElements.define("dx-tab-button", DomxTabButton);
+
+export class DomxTabPanels extends HTMLElement {
+  styleSheet: CSSStyleSheet = new CSSStyleSheet();
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot!.innerHTML = "<slot></slot>";
+    this.render = this.render.bind(this);
+    this.renderCss = this.renderCss.bind(this);
+    this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
+  }
+  connectedCallback() {
+    this.render();
+  }
+  renderCss() {
+    return `:host {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }`;
+  }
+  render() {
+    this.styleSheet.replace(this.renderCss());
+    this.dispatchEvent(new CustomEvent("rendered"));
+  }
+}
+
+customElements.define("dx-tab-panels", DomxTabPanels);
+
+export class DomxTabPanel extends HTMLElement {
+  styleSheet: CSSStyleSheet = new CSSStyleSheet();
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot!.innerHTML = "<slot></slot>";
+    this.render = this.render.bind(this);
+    this.renderCss = this.renderCss.bind(this);
+    this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
+  }
+  connectedCallback() {
+    this.render();
+  }
+  renderCss() {
+    return `:host {
+      box-sizing: border-box;
+      position: absolute;
+      display: none;
+      padding: 1em;
+    }
+    :host(.active) {
+      display: block;
+      position: static;
+    }
+    `;
+  }
+  render() {
+    this.styleSheet.replace(this.renderCss());
+    this.dispatchEvent(new CustomEvent("rendered"));
+  }
+}
+
+customElements.define("dx-tab-panel", DomxTabPanel);

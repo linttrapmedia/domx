@@ -8,7 +8,12 @@
     justify-content="center"
     justify-content--960="space-between"
   >
-    <dx-text font-size="24px">dx-tabs, dx-tab</dx-text>
+    <dx-col>
+      <dx-text font-size="24px">dx-tabs</dx-text>
+      <dx-text font-size="18px" opacity="0.35"
+        >dx-tab-buttons, dx-tab-button, dx-tab-panels, dx-tab-panel</dx-text
+      >
+    </dx-col>
     <dx-anchor
       color="gold"
       color:hover="black"
@@ -27,16 +32,36 @@
     time.</dx-text
   >
 
-  <dx-tabs selected="docs">
-    <dx-tab name="example" label="example">Example1</dx-tab>
-    <dx-tab name="docs" label="docs">Example2</dx-tab>
-    <dx-tab name="source" label="source">Example3</dx-tab>
+  <dx-tabs
+    value="usage"
+    bg-color="transparent"
+    bg-color:hover="transparent"
+    fg-color="white"
+    fg-color:hover="gold"
+    accent-color="#222222"
+    accent-color:hover="gold"
+  >
+    <dx-tab-buttons>
+      <dx-tab-button value="usage">usage</dx-tab-button>
+      <dx-tab-button value="docs">docs</dx-tab-button>
+      <dx-tab-button value="source">source</dx-tab-button>
+    </dx-tab-buttons>
+    <dx-tab-panels>
+      <dx-tab-panel value="usage"
+        ><!-- prettier-ignore -->
+        <dx-prismjs src="/static/scripts" language="markup">&lt;dx-tabs value="example"&gt;
+  &lt;dx-tab-buttons&gt;
+    &lt;dx-tab-button value="tab-1"&gt;Tab one&lt;/dx-tab-button&gt;
+    &lt;dx-tab-button value="tab-2"&gt;Tab two&lt;/dx-tab-button&gt;
+  &lt;/dx-tab-buttons&gt;
+  &lt;dx-tab-panels&gt;
+    &lt;dx-tab-panel value="tab-1"&gt;Panel one&lt;/dx-tab-panel&gt;
+    &lt;dx-tab-panel value="tab-2"&gt;Panel two&lt;/dx-tab-panel&gt;
+    &lt;/dx-tab-panels&gt;
+&lt;/dx-tabs&gt;</dx-prismjs>
+      </dx-tab-panel>
+      <dx-tab-panel value="docs">Docs</dx-tab-panel>
+      <dx-tab-panel value="source">Source</dx-tab-panel>
+    </dx-tab-panels>
   </dx-tabs>
-
-  <!-- prettier-ignore -->
-  <dx-prismjs src="/static/scripts" language="markup">&lt;!-- 
-  Attributes:
-  - [prop]=[value]
-  --&gt;
-  </dx-prismjs>
 </dx-col>
