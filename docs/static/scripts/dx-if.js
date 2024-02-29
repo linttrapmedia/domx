@@ -1,2 +1,0 @@
-"use strict";(()=>{var t=class extends HTMLElement{constructor(){super();this.state="";this.is="";this.attachShadow({mode:"open"}),this.shadowRoot.innerHTML="<slot></slot>"}connectedCallback(){let e=this.getAttribute("state"),s=this.getAttribute("is");!e||!s||document.querySelector(e).sub(i=>{this.style.display=i===s?"inherit":"none"})}};customElements.define("dx-if",t);})();
-//# sourceMappingURL=dx-if.js.map

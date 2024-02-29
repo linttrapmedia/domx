@@ -37,7 +37,7 @@ export class DomxGrid extends HTMLElement {
       .map(
         ([bp, prop, val, psuedo]) =>
           `@media (min-width: ${bp}px) { :host${
-            psuedo ? `(:${psuedo})` : ""
+            psuedo ? `:${psuedo}` : ""
           } { ${prop}:${val}; }}`
       )
       .join("\n");

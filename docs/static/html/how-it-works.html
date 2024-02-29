@@ -1,7 +1,10 @@
 <dx-col id="how-it-works" text-align="center" gap="20px">
-  <dx-col>
-    <dx-text color="gold" font-size="32px">How It Works</dx-text>
-    <dx-text opacity="0.35" padding="20px 0"
+  <dx-col gap="30px">
+    <dx-col>
+      <dx-text color="gold" font-size="32px">How It Works</dx-text>
+      <dx-text font-size="21px">Model Your Glue Code</dx-text>
+    </dx-col>
+    <dx-text opacity="0.35"
       >domx works by introducing the idea of modeling DOM transformations in a
       simple state machine on the backend in a JSON configuration object. The
       state machine is then loaded into the <code>dx-state</code> component
@@ -56,38 +59,46 @@
           width="50px"
         ></dx-box>
       </dx-row>
-      <dx-if state="#stoplight" is="red">
+      <dx-state-if state="#stoplight" is="red">
         <dx-text font-size="14px">The stoplight is red</dx-text>
-      </dx-if>
-      <dx-if state="#stoplight" is="yellow">
+      </dx-state-if>
+      <dx-state-if state="#stoplight" is="yellow">
         <dx-text font-size="14px">The stoplight is yellow</dx-text>
-      </dx-if>
-      <dx-if state="#stoplight" is="green">
+      </dx-state-if>
+      <dx-state-if state="#stoplight" is="green">
         <dx-text font-size="14px">The stoplight is green</dx-text>
-      </dx-if>
+      </dx-state-if>
     </dx-col>
   </dx-state>
-  
 
-<dx-box
-align-items="flex-start"
-flex-direction="column"
-flex-direction--960="row"
-justify-content="space-between"
-text-align="center"
-gap="20px"
->
-<dx-col
-  gap="10px"
-  justify-content="center"
-  height="100%"
-  width="100%"
-  width--960="50%"
-  ><dx-text>Step 1: Define the state machine on the server</dx-text>
-  <!-- prettier-ignore -->
-  <dx-prismjs src="/static/scripts" language="typescript">
+  <dx-col
+    align-items="flex-start"
+    justify-content="space-between"
+    text-align="center"
+    gap="20px"
+  >
+    <dx-col gap="10px" justify-content="center" width="100%"
+      ><dx-text
+        >Step 1: Wrap markup with the <code>dx-state</code> component and
+        provide the path to the state machine</dx-text
+      >
+      <!-- prettier-ignore -->
+      <dx-prismjs src="/static/scripts" language="markup">
+&lt;-- Some styles omitted for brevity --&gt;
+&lt;dx-state src="/api/stoplight.json"&gt;
+  &lt;dx-row id="stoplight"&gt;
+    &lt;dx-box id="stoplight__red" background-color="red"&gt;&lt;/dx-box&gt;
+    &lt;dx-box id="stoplight__yellow" background-color="yellow"&gt;&lt;/dx-box&gt;
+    &lt;dx-box id="stoplight__green" background-color="green"&gt;&lt;/dx-box&gt;
+  &lt;/dx-row&gt;
+&lt;/dx-state&gt;
+   </dx-prismjs>
+    </dx-col>
+    <dx-col gap="10px" justify-content="center" height="100%" width="100%"
+      ><dx-text>Step 2: Define the state machine</dx-text>
+      <!-- prettier-ignore -->
+      <dx-prismjs src="/static/scripts" language="typescript">
 {
-"$schema": "domx.json",
 "initialState": "red",
 "listeners": [["#stoplight", "click", "changeState"]],
 "actions": {
@@ -123,168 +134,34 @@ gap="20px"
     "changeState": [["state", "red"]]
   }
 }
-}</dx-code>
-</dx-col>
-<dx-col
-  gap="10px"
-  justify-content="center"
-  height="100%"
-  width="100%"
-  width--960="50%"
-  ><dx-text
-    >Step 2: Wrap markup with the <code>dx-state</code> component</dx-text
-  >
-   <!-- prettier-ignore -->
-   <dx-prismjs src="/static/scripts" language="markup">
-&lt;-- Some styles omitted for brevity --&gt;
-&lt;dx-state src="/api/stoplight.json"&gt;
-&lt;dx-row&gt;
-  &lt;dx-box
-    id="stoplight__red"
-    background-color="red"
-    opacity="0.25"
-  &gt;&lt;/dx-box&gt;
-  &lt;dx-box
-    id="stoplight__yellow"
-    background-color="yellow"
-    opacity="0.25"
-  &gt;&lt;/dx-box&gt;
-  &lt;dx-box
-    id="stoplight__green"
-    background-color="#07e407"
-    opacity="0.25"
-  &gt;&lt;/dx-box&gt;
-&lt;/dx-row&gt;
-&lt;/dx-state&gt;
-   </dx-prismjs>
-</dx-col>
-</dx-box>
-
-<!-- state machine -->
-<dx-col gap="20px">
-<dx-text font-size="24px">The State Machine</dx-text>
-<dx-text opacity="0.35"
-  >The state machine is an XState inspired JSON configration object which
-  takes the following format:</dx-text
->
- <!-- prettier-ignore -->
- <dx-prismjs src="/static/scripts" language="typescript">
-{
-// the domx schema
-"$schema": "domx.json",
-// an initial state
-"initialState": "red",
-// list of event listeners to attach
-"listeners": [
-  // selector, event, event name
-  ["#some-btn",'click','handleClick']
-],
-// common transformation objects
-"actions": {
-  // action name
-  "reset": TRANSFORMATION_OBJECT
-},
-// state machine
-"states": {
-  // current state
-  "red": {
-    // automatically run when state is entered
-    "entry": TRANSFORMATION_OBJECT,
-    // run when the "changeState" event is dispatched
-    "changeState": TRANSFORMATION_OBJECT,
-    // automatically run when state is exited
-    "exit": TRANSFORMATION_OBJECT
-  },
-// ...more states
-}
 }</dx-prismjs>
+    </dx-col>
+  </dx-col>
+  <dx-col
+    order-radius="10px"
+    font-size="13px"
+    font-size--960="15px"
+    gap="20px"
+    opacity="0.5"
+    padding="20px"
+  >
+    <dx-text font-size="1.2em">Important Note: </dx-text>
+    <dx-text
+      ><strong></strong>Most web application code is "glue code" we introduce to
+      keep everything in check. We use a disparate set of libraries to solve
+      such things as manipulating the DOM (ui frameworks) in response to various
+      events and state changes (state management frameworks) an try to keep
+      everything looking good (css frameworks).
+    </dx-text>
+
+    <dx-text
+      >The <code>dx-state</code> component is not required to use domx but it
+      keeps all that glue code from becoming a sticky mess by solving it in a
+      one simple backend language-agnostic configuration object. This means the
+      backend can control frontend state by reading and reacting to events being
+      emitted from the frontend. Docs for the
+      <dx-anchor color="gold" href="#dx-state">dx-state</dx-anchor> component
+      are below.</dx-text
+    >
+  </dx-col>
 </dx-col>
-
-<!-- transformation object -->
-<dx-col gap="20px">
-<dx-text font-size="24px">The Transformation Object</dx-text>
-<dx-text opacity="0.35"
-  >When a state machine event is triggered, the [current state] -> [event
-  name] transformation object is processed. Each item in the transformation
-  object is responsible for a specific transformation which is called a
-  "trait". Here are examples of all the traits:</dx-text
->
- <!-- prettier-ignore -->
- <dx-prismjs src="/static/scripts" language="typescript">
-[
-// Name: Action
-// Desc: Trigger an action
-// Type: [dx: "action", action: string];
-["action", "reset"],
-
-// Name: Append
-// Desc: Append to element
-// Type: [dx: "append", selector: string, html: string];
-["append", "#list", "&lt;li&gt;new item&lt;/li&gt;"],
-
-// Name: Attr
-// Desc: Set an attribute
-// Type: [dx: "attr", selector: string, attr: string, value: string];
-["attr", "#dialog", "open", "true"],
-
-// Name: Call
-// Desc: Call a method on an object
-// Type: [dx: "call", selector: string, method: string, ...args: any[]];
-["call", "#custom-drawer-component", "toggle"],
-
-// Name: Click
-// Desc: Attach a click handler to trigger an action
-// Type: [dx: "click", selector: string, action: string];
-["click", "#btn", "reset"],
-
-// Name: Dispatch
-// Desc: Dispatch an action
-// Type: [dx: "dispatch", action: string, delay?: number];
-["dispatch", "reset", 2000],
-
-// Name: Get
-// Desc: Trigger a get request and process the result (a transformation object)
-// Type: [dx: "get", url: string, ...args: any[]];
-["get", "/some/endpoint"],
-
-// Name: History
-// Desc: Update the browser history
-// Type: [dx: "history", method: string, ...args: (string | number)[]];
-["history", "pushState", {}, "Record List", "/records/list"],
-
-// Name: Post
-// Desc: Post selected data to endpoint and process the result (a transformation object)
-// Type: [dx: "post", url: string, ...data: [key: string, selector: string, val: "value" | "dataset" | "formData"][]];
-["post", "/some/endpoint", [
-["form-data", "#todoForm", "formData"]
-]],
-
-// Name: Replace
-// Desc: Replace an element
-// Type: [dx: "replace", selector: string, html: string];
-["replace", "#list", "&lt;li&gt;updated item&lt;/li&gt;"],
-
-// Name: State
-// Desc: Change current state
-// Type: [dx: "state", state: string];
-["state", "processing"],
-
-// Name: Text
-// Desc: Update text
-// Type: [dx: "text", selector: string, text: string];
-["text", "#msg", "Hello World"],
-
-// Name: Wait
-// Desc: Add a wait between transformations
-// Type: [dx: "wait", ms: number];
-["wait", 2000],
-
-// Name: Win
-// Desc: Call a method on the window object
-// Type: [dx: "win", method: string, ...args: any[]];
-["win", "alert", "Hello World!"],
-]</dx-prismjs>
-</dx-col>
-</dx-col>
-
-
