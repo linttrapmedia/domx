@@ -20,7 +20,9 @@ export class DomxGrid extends HTMLElement {
     this.render();
   }
   renderCss() {
-    let styles: [bp: string, prop: string, val: string, psuedo: string][] = [];
+    let styles: [bp: string, prop: string, val: string, psuedo: string][] = [
+      ["0", "box-sizing", "border-box", ""],
+    ];
     const attributes = this.getAttributeNames();
     for (let i = 0; i < attributes.length; i++) {
       const attributeName = attributes[i];
