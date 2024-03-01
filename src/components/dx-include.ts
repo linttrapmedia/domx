@@ -1,6 +1,6 @@
 import * as DOMPurify from "dompurify";
 
-class DxInclude extends HTMLElement {
+export class DomxInclude extends HTMLElement {
   constructor() {
     super();
   }
@@ -30,12 +30,12 @@ class DxInclude extends HTMLElement {
   sanitizeHTML(html: string) {
     return DOMPurify.sanitize(html, {
       CUSTOM_ELEMENT_HANDLING: {
-        tagNameCheck: /^dx-/, // only allow dx tags
-        attributeNameCheck: /./, // allow all attributes containing "baz"
-        allowCustomizedBuiltInElements: true, // customized built-ins are allowed
+        tagNameCheck: /^dx-/, // Only allow custom elements starting with dx-
+        attributeNameCheck: /./, // Allow all attributes
+        allowCustomizedBuiltInElements: true, // Customized built-ins are allowed
       },
     });
   }
 }
 
-customElements.define("dx-include", DxInclude);
+customElements.define("dx-include", DomxInclude);

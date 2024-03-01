@@ -1,3 +1,4 @@
+- [ ] address mutation observers to prevent infinite redraws
 - [ ] dx-include
 - [ ] dx-code
 - [ ] update url trait

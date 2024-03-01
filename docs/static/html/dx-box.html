@@ -7,8 +7,14 @@
     gap="10px"
     justify-content="center"
     justify-content--960="space-between"
+    text-align="center"
+    text-align--960="left"
   >
-    <dx-text font-size="24px">dx-box, dx-box, dx-col</dx-text>
+    <dx-col>
+      <dx-text font-size="24px">dx-box</dx-text>
+      <dx-text font-size="18px" opacity="0.35">dx-col, dx-row</dx-text>
+    </dx-col>
+
     <dx-anchor
       color="gold"
       color:hover="black"
@@ -22,6 +28,141 @@
       >dx-box.min.js &nbsp; (↓)</dx-anchor
     >
   </dx-box>
+  <dx-text opacity="0.35" text-align="center" text-align--960="left">
+    The flexbox components make doing responsive styling and layout a
+    snap.</dx-text
+  >
+  <dx-tabs
+    value="source"
+    bg-color="transparent"
+    bg-color:hover="transparent"
+    fg-color="white"
+    fg-color:hover="gold"
+    accent-color="#222222"
+    accent-color:hover="gold"
+  >
+    <dx-tab-buttons>
+      <dx-tab-button value="preview">Preview</dx-tab-button>
+      <dx-tab-button value="usage">Usage</dx-tab-button>
+      <dx-tab-button value="props">Props</dx-tab-button>
+      <dx-tab-button value="source">Source</dx-tab-button>
+    </dx-tab-buttons>
+    <dx-tab-panels>
+      <dx-tab-panel value="preview">
+        <dx-box
+          align-items="center"
+          border="1px solid white"
+          flex-direction="column"
+          flex-direction--960="row"
+          gap="20px"
+          padding="20px"
+          justify-content="space-evenly"
+        >
+          <dx-text color="gold">Responsive Box</dx-text>
+          <dx-row border="1px solid white" gap="20px" padding="20px">
+            <dx-text color="gold">Row Box</dx-text>
+            <div>Item 1</div>
+            <div>Item 2</div>
+          </dx-row>
+          <dx-col border="1px solid white" gap="20px" padding="20px">
+            <dx-text color="gold">Column Box</dx-text>
+            <div>Item 1</div>
+            <div>Item 2</div>
+          </dx-col>
+        </dx-box>
+      </dx-tab-panel>
+      <dx-tab-panel value="usage"
+        ><!-- prettier-ignore -->
+        <dx-prismjs src="/static/scripts" language="markup">
+&lt;dx-box flex-direction="column" flex-direction--960="row"&gt;
+  &lt;dx-text&gt;Responsive Box&lt;/dx-text&gt;
+  &lt;dx-row&gt;
+    &lt;dx-text&gt;Row Box&lt;/dx-text&gt;
+    &lt;div&gt;Item 1&lt;/div&gt;
+    &lt;div&gt;Item 2&lt;/div&gt;
+  &lt;/dx-row&gt;
+  &lt;dx-col&gt;
+    &lt;dx-text&gt;Column Box&lt;/dx-text&gt;
+    &lt;div&gt;Item 1&lt;/div&gt;
+    &lt;div&gt;Item 2&lt;/div&gt;
+  &lt;/dx-col&gt;
+&lt;/dx-box&gt;
+      </dx-prismjs>
+      </dx-tab-panel>
+      <dx-tab-panel value="props">
+        <dx-col gap="20px">
+          <dx-col
+            ><dx-text color="gold">Elements</dx-text>
+            <dx-text>dx-box, dx-col, dx-row</dx-text></dx-col
+          >
+
+          <dx-row overflow-x="auto" padding-bottom="10px">
+            <dx-grid grid-template-columns="auto auto auto" column-gap="30px">
+              <dx-text color="gold">Attributes</dx-text>
+              <dx-text color="gold">Desc</dx-text>
+              <dx-text color="gold">Example</dx-text>
+              <dx-text white-space="nowrap">[any-css-style]="value"</dx-text>
+              <dx-text white-space="nowrap">Applies styling</dx-text>
+              <dx-text white-space="nowrap">flex-direction="column"</dx-text>
+              <dx-text white-space="nowrap"
+                >[any-css-style]--[breakpoint]="value"</dx-text
+              >
+              <dx-text white-space="nowrap"
+                >Applies styling at breakpoint</dx-text
+              >
+              <dx-text white-space="nowrap">flex-direction--960="row"</dx-text>
+              <dx-text white-space="nowrap"
+                >[any-css-style]:[psuedo]="value"</dx-text
+              >
+              <dx-text white-space="nowrap"
+                >Applies psuedo selector behavior</dx-text
+              >
+              <dx-text white-space="nowrap"
+                >border:hover="1px solid red"</dx-text
+              >
+            </dx-grid>
+          </dx-row>
+        </dx-col>
+      </dx-tab-panel>
+      <dx-tab-panel value="source">
+        <dx-col gap="20px">
+          <dx-box flex-direction="column" flex-direction--960="row" gap="20px">
+            <dx-anchor
+              color="gold"
+              color:hover="black"
+              background-color:hover="gold"
+              border="1px solid gold"
+              border-radius="5px"
+              padding="5px 10px"
+              text-decoration="none"
+              href="https://unpkg.com/@linttrap/domx@latest/dist/dx-box.min.js"
+              target="_blank"
+              >dx-box.min.js &nbsp; (↓)</dx-anchor
+            >
+            <dx-anchor
+              color="gold"
+              color:hover="black"
+              background-color:hover="gold"
+              border="1px solid gold"
+              border-radius="5px"
+              padding="5px 10px"
+              text-decoration="none"
+              href="https://unpkg.com/@linttrap/domx@latest/dist/dx-box.min.js.map"
+              target="_blank"
+              >dx-box.min.js.map &nbsp; (↓)</dx-anchor
+            >
+          </dx-box>
+          <dx-frame
+            border="1px solid white"
+            src="/static/scripts/dx-box.js"
+            height="200px"
+            opacity="0.5"
+          ></dx-frame>
+        </dx-col>
+      </dx-tab-panel>
+    </dx-tab-panels>
+  </dx-tabs>
+
   <dx-text opacity="0.35"
     >The flexbox components make doing responsive styling and layout a
     snap.</dx-text
