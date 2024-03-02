@@ -33,7 +33,6 @@ export class DomxFrame extends HTMLElement {
           } { ${prop}:${val}; }}`
       )
       .join("\n");
-    console.log(renderedStyles);
     return this.baseStyles + renderedStyles;
   }
   render() {
@@ -50,7 +49,6 @@ export class DomxFrame extends HTMLElement {
       (attr) => !this.behaviorAttributeNames.includes(attr)
     );
     this.styleSheet.replace(this.renderCss(styleAttributes));
-    console.log(this.renderCss(styleAttributes));
   }
 }
 

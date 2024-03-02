@@ -1,3 +1,11 @@
+type Style = [
+  bp: string,
+  prop: string,
+  val: string,
+  psuedo?: string,
+  subSelector?: string
+];
+
 export class DomxTabs extends HTMLElement {
   behaviorAttributeNames: string[] = ["value"];
   styleSheet: CSSStyleSheet = new CSSStyleSheet();
@@ -49,12 +57,13 @@ export class DomxTabButtons extends HTMLElement {
     this.shadowRoot!.innerHTML = "<slot></slot>";
     this.render = this.render.bind(this);
     this.renderCss = this.renderCss.bind(this);
+    this.renderBaseCss = this.renderBaseCss.bind(this);
     this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
   }
   connectedCallback() {
     this.render();
   }
-  renderCss() {
+  renderBaseCss() {
     const parent = this.closest("dx-tabs");
     const accentColor = parent
       ? parent.getAttribute("accent-color")
@@ -66,8 +75,31 @@ export class DomxTabButtons extends HTMLElement {
       flex-direction: row;
     }`;
   }
+  renderCss(styles: Style[]) {
+    const renderedStyles = styles
+      .sort((a) => (a[3] ? 1 : -1)) // sort by psuedo
+      .sort((a, b) => Number(a[0]) - Number(b[0])) // sort by breakpoint
+      .map(([bp, prop, val, psuedo, subSelector = null]) => {
+        return `@media (min-width: ${bp}px) { :host${
+          psuedo
+            ? `(:${psuedo}) ${
+                subSelector !== null ? `::slotted(${subSelector})` : ""
+              }`
+            : ` ${subSelector !== null ? `::slotted(${subSelector})` : ""}`
+        } { ${prop}:${val}; }}`;
+      })
+      .join("\n");
+    return renderedStyles;
+  }
   render() {
-    this.styleSheet.replace(this.renderCss());
+    const styles: Style[] = this.getAttributeNames().map((attributeName) => {
+      const [attr, psuedo] = attributeName.split(":");
+      const [prop, bp = "0"] = attr.split("--");
+      const value = (this as any).getAttribute(attributeName);
+      return [bp, prop, value, psuedo, undefined];
+    });
+
+    this.styleSheet.replace(this.renderBaseCss() + this.renderCss(styles));
     this.dispatchEvent(new CustomEvent("rendered"));
   }
 }
@@ -81,6 +113,7 @@ export class DomxTabButton extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.shadowRoot!.innerHTML = "<slot></slot>";
     this.render = this.render.bind(this);
+    this.renderBaseCss = this.renderBaseCss.bind(this);
     this.renderCss = this.renderCss.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
@@ -93,7 +126,7 @@ export class DomxTabButton extends HTMLElement {
     const parent = this.closest("dx-tabs") as DomxTabs;
     if (parent) parent.setActiveTab(this.getAttribute("value") || "");
   }
-  renderCss() {
+  renderBaseCss() {
     const parent = this.closest("dx-tabs");
     const bgColor = parent ? parent.getAttribute("bg-color") : "#fff";
     const bgColorHover = parent
@@ -132,9 +165,31 @@ export class DomxTabButton extends HTMLElement {
     }
     `;
   }
+  renderCss(styles: Style[]) {
+    const renderedStyles = styles
+      .sort((a) => (a[3] ? 1 : -1)) // sort by psuedo
+      .sort((a, b) => Number(a[0]) - Number(b[0])) // sort by breakpoint
+      .map(([bp, prop, val, psuedo, subSelector = null]) => {
+        return `@media (min-width: ${bp}px) { :host${
+          psuedo
+            ? `(:${psuedo}) ${
+                subSelector !== null ? `::slotted(${subSelector})` : ""
+              }`
+            : ` ${subSelector !== null ? `::slotted(${subSelector})` : ""}`
+        } { ${prop}:${val}; }}`;
+      })
+      .join("\n");
+    return renderedStyles;
+  }
   render() {
     this.classList.add("tab-button");
-    this.styleSheet.replace(this.renderCss());
+    const styles: Style[] = this.getAttributeNames().map((attributeName) => {
+      const [attr, psuedo] = attributeName.split(":");
+      const [prop, bp = "0"] = attr.split("--");
+      const value = (this as any).getAttribute(attributeName);
+      return [bp, prop, value, psuedo, undefined];
+    });
+    this.styleSheet.replace(this.renderBaseCss() + this.renderCss(styles));
     this.dispatchEvent(new CustomEvent("rendered"));
   }
 }
@@ -188,7 +243,6 @@ export class DomxTabPanel extends HTMLElement {
       box-sizing: border-box;
       position: absolute;
       display: none;
-      padding: 1em;
     }
     :host(.active) {
       display: block;
