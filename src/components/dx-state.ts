@@ -87,7 +87,7 @@ export class DomxState extends HTMLElement {
   }
   applyAction(transformation: DxEvent) {
     const [, action] = transformation;
-    this.config.actions[action].forEach((t) => this.handleEvent(action, [t]));
+    this.config.actions[action].forEach((t) => this.handleEvent(action, t));
   }
   applyAppend(transformation: DxAppend) {
     const [, selector, html] = transformation;
@@ -168,7 +168,7 @@ export class DomxState extends HTMLElement {
   applyState(transformation: DxState) {
     const [, state] = transformation;
     const hasEntry = this.config.states[state].entry;
-    if (hasEntry) this.handleEvent("entry", this.config.states[state].entry);
+    if (hasEntry) this.handleEvent("entry", ...this.config.states[state].entry);
     this.state = state;
   }
   applyText(transformation: DxText) {
@@ -203,7 +203,7 @@ export class DomxState extends HTMLElement {
    * @param evt name of evt to dispatch
    */
   handleClientEvent(evt: string) {
-    this.handleEvent(evt, this.config.states[this.state][evt] as DX[]);
+    this.handleEvent(evt, ...(this.config.states[this.state][evt] as DX[]));
   }
   /**
    * Handle a server event
@@ -215,14 +215,14 @@ export class DomxState extends HTMLElement {
       (acc, t) => [...acc, t],
       [] as DX[]
     );
-    this.handleEvent(evt, transformations);
+    this.handleEvent(evt, ...transformations);
   }
   /**
    * Transform the state machine
    * @param evt name of application to run
    * @param transformations transformations to apply
    */
-  handleEvent(evt: string, transformations: DX[]) {
+  handleEvent(evt: string, ...transformations: DX[]) {
     if (!transformations) return;
     for (let i = 0; i < transformations.length; i++) {
       const transformation = transformations[i];
@@ -291,13 +291,13 @@ export class DomxState extends HTMLElement {
     // Apply initial state
     const initState = config.states[config.initialState];
     this.state = config.initialState;
-    if (initState.entry) this.handleEvent("entry", initState.entry);
+    if (initState.entry) this.handleEvent("entry", ...initState.entry);
   }
   sub(s: (state: string, evt: string, dx: DX) => void) {
     this.subs.push(s);
   }
-  transform(evt: string, transformations: DX[]) {
-    this.handleEvent(evt, transformations);
+  transform(evt: string, ...transformations: DX[]) {
+    this.handleEvent(evt, ...transformations);
   }
 }
 
@@ -315,9 +315,11 @@ export class DomxStateIf extends HTMLElement {
     const state = this.getAttribute("state");
     const is = this.getAttribute("is");
     if (!state || !is) return;
-    (document.querySelector(state) as DomxState).sub((state: string) => {
-      this.style.display = state === is ? "inherit" : "none";
-    });
+    (document.querySelector(`dx-state[name="${state}"]`) as DomxState).sub(
+      (state: string) => {
+        this.style.display = state === is ? "inherit" : "none";
+      }
+    );
   }
 }
 

@@ -57,7 +57,11 @@
             </dx-tab-buttons>
             <dx-tab-panels>
               <dx-tab-panel value="demo">
-                <dx-state id="stoplight" src="/api/stoplight.json">
+                <dx-state
+                  id="#stoplight"
+                  name="stoplight"
+                  src="/api/stoplight.json"
+                >
                   <dx-col
                     id="stoplight"
                     align-items="center"
@@ -106,15 +110,15 @@
                         width="50px"
                       ></dx-box>
                     </dx-row>
-                    <dx-state-if state="#stoplight" is="red">
+                    <dx-state-if state="stoplight" is="red">
                       <dx-text font-size="14px">The stoplight is red</dx-text>
                     </dx-state-if>
-                    <dx-state-if state="#stoplight" is="yellow">
+                    <dx-state-if state="stoplight" is="yellow">
                       <dx-text font-size="14px"
                         >The stoplight is yellow</dx-text
                       >
                     </dx-state-if>
-                    <dx-state-if state="#stoplight" is="green">
+                    <dx-state-if state="stoplight" is="green">
                       <dx-text font-size="14px">The stoplight is green</dx-text>
                     </dx-state-if>
                   </dx-col>
@@ -136,13 +140,13 @@
     &lt;dx-box id="stoplight__yellow" background-color="yellow"&gt;&lt;/dx-box&gt;
     &lt;dx-box id="stoplight__green" background-color="green"&gt;&lt;/dx-box&gt;
   &lt;/dx-row&gt;
-  &lt;dx-state-if state="#stoplight" is="red"&gt;
+  &lt;dx-state-if state="stoplight" is="red"&gt;
     &lt;dx-text font-size="14px"&gt;The stoplight is red&lt;/dx-text&gt;
   &lt;/dx-state-if&gt;
-  &lt;dx-state-if state="#stoplight" is="yellow"&gt;
+  &lt;dx-state-if state="stoplight" is="yellow"&gt;
     &lt;dx-text font-size="14px"&gt;The stoplight is yellow&lt;/dx-text&gt;
   &lt;/dx-state-if&gt;
-  &lt;dx-state-if state="#stoplight" is="green"&gt;
+  &lt;dx-state-if state="stoplight" is="green"&gt;
     &lt;dx-text font-size="14px"&gt;The stoplight is green&lt;/dx-text&gt;
   &lt;/dx-state-if&gt;
 &lt;/dx-state&gt;

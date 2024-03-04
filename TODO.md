@@ -1,4 +1,6 @@
 - [ ] address mutation observers to prevent infinite redraws
+- [ ] fix state.transform function so it can be called from a button
+- [ ] use new button component implementation on tabs`
 - [ ] dx-include
 - [ ] dx-code
 - [ ] update url trait
