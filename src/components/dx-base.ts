@@ -1,10 +1,4 @@
-export type DxStyle = [
-  bp: string,
-  prop: string,
-  val: string,
-  psuedo?: string,
-  subSelector?: string
-];
+export type DxStyle = [bp: string, prop: string, val: string, psuedo?: string, subSelector?: string];
 
 export class DomxBase extends HTMLElement {
   baseStyles: DxStyle[] = [];
@@ -39,17 +33,15 @@ export class DomxBase extends HTMLElement {
     return renderedStyles;
   }
   getStylesFromEl(el: HTMLElement, subSelector?: string): DxStyle[] {
-    const inlineStyles: DxStyle[] = el
+    return el
       .getAttributeNames()
-      .filter((attr) => !this.props.includes(attr))
+      .filter((attr) => !this.props.includes(attr) && !attr.includes("onclick:"))
       .map((attributeName) => {
         const [attr, psuedo] = attributeName.split(":");
         const [prop, bp] = attr.split("--");
         const value = el.getAttribute(attributeName) ?? "";
         return [bp, prop, value, psuedo, subSelector];
       });
-
-    return [...this.baseStyles, ...inlineStyles];
   }
-  render() {}
+  async render() {}
 }

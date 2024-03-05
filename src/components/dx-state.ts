@@ -2,12 +2,7 @@ type DxEvent = [dx: "evt", evt: string];
 type DxAppend = [dx: "append", selector: string, html: string];
 type DxAttr = [dx: "attr", selector: string, attr: string, value: string];
 type DxClick = [dx: "click", selector: string, evt: string];
-type DxCall = [
-  dx: "call",
-  selector: string,
-  method: string,
-  ...args: (string | number)[]
-];
+type DxCall = [dx: "call", selector: string, method: string, ...args: (string | number)[]];
 type DxDispatch = [dx: "dispatch", evt: string, timeout?: number];
 type DxGet = [dx: "get", url: string];
 type DxHistory = [dx: "history", method: string, ...args: (string | number)[]];
@@ -15,11 +10,7 @@ type DxWin = [dx: "win", method: string, ...args: (string | number)[]];
 type DxPost = [
   dx: "post",
   url: string,
-  ...data: [
-    key: string,
-    selector: string,
-    val: "value" | "dataset" | "formData"
-  ][]
+  ...data: [key: string, selector: string, val: "value" | "dataset" | "formData"][]
 ];
 type DxReplace = [dx: "replace", selector: string, content: string];
 type DxServer = [dx: "server", key: string];
@@ -63,23 +54,23 @@ export class DomxState extends HTMLElement {
   timeouts: Record<string, NodeJS.Timeout> = {};
   constructor() {
     super();
-    this.handleEvent = this.handleEvent.bind(this);
     this.applyAction = this.applyAction.bind(this);
     this.applyAppend = this.applyAppend.bind(this);
     this.applyAttr = this.applyAttr.bind(this);
     this.applyCall = this.applyCall.bind(this);
-    this.applyEventListener = this.applyEventListener.bind(this);
     this.applyDispatch = this.applyDispatch.bind(this);
+    this.applyEventListener = this.applyEventListener.bind(this);
     this.applyGet = this.applyGet.bind(this);
     this.applyHistory = this.applyHistory.bind(this);
-    this.applyWin = this.applyWin.bind(this);
     this.applyPost = this.applyPost.bind(this);
     this.applyReplace = this.applyReplace.bind(this);
     this.applyState = this.applyState.bind(this);
     this.applyText = this.applyText.bind(this);
     this.applyWait = this.applyWait.bind(this);
+    this.applyWin = this.applyWin.bind(this);
     this.dispatch = this.dispatch.bind(this);
     this.handleClientEvent = this.handleClientEvent.bind(this);
+    this.handleEvent = this.handleEvent.bind(this);
     this.handleServerEvent = this.handleServerEvent.bind(this);
     this.init = this.init.bind(this);
     this.sub = this.sub.bind(this);
@@ -211,10 +202,7 @@ export class DomxState extends HTMLElement {
    */
   handleServerEvent(se: { evt: string } & any) {
     const { evt } = se;
-    const transformations = this.config.states[this.state][evt].reduce(
-      (acc, t) => [...acc, t],
-      [] as DX[]
-    );
+    const transformations = this.config.states[this.state][evt].reduce((acc, t) => [...acc, t], [] as DX[]);
     this.handleEvent(evt, ...transformations);
   }
   /**
@@ -227,24 +215,7 @@ export class DomxState extends HTMLElement {
     for (let i = 0; i < transformations.length; i++) {
       const transformation = transformations[i];
       const [trait] = transformation;
-      const traitMap = {
-        action: this.applyAction,
-        append: this.applyAppend,
-        attr: this.applyAttr,
-        call: this.applyCall,
-        click: this.applyEventListener,
-        dispatch: this.applyDispatch,
-        get: this.applyGet,
-        history: this.applyHistory,
-        post: this.applyPost,
-        replace: this.applyReplace,
-        state: this.applyState,
-        submit: this.applyEventListener,
-        text: this.applyText,
-        wait: this.applyWait,
-        win: this.applyWin,
-      };
-      (traitMap as any)[trait](transformation);
+      this.transform(trait, transformation);
       this.subs.forEach((s) => s(this.state, evt, transformation));
     }
   }
@@ -258,9 +229,7 @@ export class DomxState extends HTMLElement {
       for (let i = 0; i < listeners.length; i++) {
         const [selector, event, evt] = listeners[i];
         const selectorIfNotRegistered = `${selector}:not([data-dx-state="registered"])`;
-        const els = this.querySelectorAll(
-          selectorIfNotRegistered
-        ) as NodeListOf<HTMLElement>;
+        const els = this.querySelectorAll(selectorIfNotRegistered) as NodeListOf<HTMLElement>;
         for (let j = 0; j < els.length; j++) {
           const el = els[j];
           const cb = (e: any) => {
@@ -296,8 +265,26 @@ export class DomxState extends HTMLElement {
   sub(s: (state: string, evt: string, dx: DX) => void) {
     this.subs.push(s);
   }
-  transform(evt: string, ...transformations: DX[]) {
-    this.handleEvent(evt, ...transformations);
+  transform(trait: string, transformation: DX) {
+    const traitMap = {
+      action: this.applyAction,
+      append: this.applyAppend,
+      attr: this.applyAttr,
+      call: this.applyCall,
+      click: this.applyEventListener,
+      dispatch: this.applyDispatch,
+      get: this.applyGet,
+      history: this.applyHistory,
+      post: this.applyPost,
+      replace: this.applyReplace,
+      server: () => {},
+      state: this.applyState,
+      submit: this.applyEventListener,
+      text: this.applyText,
+      wait: this.applyWait,
+      win: this.applyWin,
+    };
+    (traitMap as any)[trait](transformation);
   }
 }
 
@@ -315,11 +302,9 @@ export class DomxStateIf extends HTMLElement {
     const state = this.getAttribute("state");
     const is = this.getAttribute("is");
     if (!state || !is) return;
-    (document.querySelector(`dx-state[name="${state}"]`) as DomxState).sub(
-      (state: string) => {
-        this.style.display = state === is ? "inherit" : "none";
-      }
-    );
+    (document.querySelector(`dx-state[name="${state}"]`) as DomxState).sub((state: string) => {
+      this.style.display = state === is ? "inherit" : "none";
+    });
   }
 }
 

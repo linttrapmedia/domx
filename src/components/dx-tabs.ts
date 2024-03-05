@@ -1,10 +1,4 @@
-type Style = [
-  bp: string,
-  prop: string,
-  val: string,
-  psuedo?: string,
-  subSelector?: string
-];
+type Style = [bp: string, prop: string, val: string, psuedo?: string, subSelector?: string];
 
 export class DomxTabs extends HTMLElement {
   behaviorAttributeNames: string[] = ["value"];
@@ -34,10 +28,12 @@ export class DomxTabs extends HTMLElement {
     this.dispatchEvent(new CustomEvent("rendered"));
     this.setActiveTab(this.getAttribute("value") || "");
   }
-  setActiveTab(value: string) {
+  async setActiveTab(value: string) {
     const buttons = this.querySelectorAll("dx-tab-button");
+    await customElements.whenDefined("dx-tab-button");
     buttons.forEach((button) => button.classList.remove("active"));
     const panels = this?.querySelectorAll("dx-tab-panel");
+    await customElements.whenDefined("dx-tab-panel");
     panels.forEach((panel) => panel.classList.remove("active"));
     const button = this.querySelector(`dx-tab-button[value="${value}"]`);
     if (button) button.classList.add("active");
@@ -65,14 +61,13 @@ export class DomxTabButtons extends HTMLElement {
   }
   renderBaseCss() {
     const parent = this.closest("dx-tabs");
-    const accentColor = parent
-      ? parent.getAttribute("accent-color")
-      : "rgba(255,255,255,0.5)";
     return `:host {
       box-sizing: border-box;
-      border-bottom: 3px solid ${accentColor};
       display: flex;
       flex-direction: row;
+      overflow-x: auto;
+      overflow-y: hidden;
+      margin-bottom: -3px;
     }`;
   }
   renderCss(styles: Style[]) {
@@ -82,9 +77,7 @@ export class DomxTabButtons extends HTMLElement {
       .map(([bp, prop, val, psuedo, subSelector = null]) => {
         return `@media (min-width: ${bp}px) { :host${
           psuedo
-            ? `(:${psuedo}) ${
-                subSelector !== null ? `::slotted(${subSelector})` : ""
-              }`
+            ? `(:${psuedo}) ${subSelector !== null ? `::slotted(${subSelector})` : ""}`
             : ` ${subSelector !== null ? `::slotted(${subSelector})` : ""}`
         } { ${prop}:${val}; }}`;
       })
@@ -129,19 +122,11 @@ export class DomxTabButton extends HTMLElement {
   renderBaseCss() {
     const parent = this.closest("dx-tabs");
     const bgColor = parent ? parent.getAttribute("bg-color") : "#fff";
-    const bgColorHover = parent
-      ? parent.getAttribute("bg-color:hover")
-      : "#f0f0f0";
+    const bgColorHover = parent ? parent.getAttribute("bg-color:hover") : "#f0f0f0";
     const fgColor = parent ? parent.getAttribute("fg-color") : "#000";
-    const fgColorHover = parent
-      ? parent.getAttribute("fg-color:hover")
-      : "#000";
-    const accentColor = parent
-      ? parent.getAttribute("accent-color")
-      : "rgba(255,255,255,0.5)";
-    const accentColorHover = parent
-      ? parent.getAttribute("accent-color:hover")
-      : "rgba(255,255,255,0.5)";
+    const fgColorHover = parent ? parent.getAttribute("fg-color:hover") : "#000";
+    const accentColor = parent ? parent.getAttribute("accent-color") : "rgba(255,255,255,0.5)";
+    const accentColorHover = parent ? parent.getAttribute("accent-color:hover") : "rgba(255,255,255,0.5)";
     return `:host {
       background-color: ${bgColor};
       box-sizing: border-box;
@@ -151,7 +136,7 @@ export class DomxTabButton extends HTMLElement {
       display: flex;
       flex-direction: row;
       padding:1em;
-      margin-bottom: -3px;
+      text-wrap: nowrap;
     }
     :host(:hover) {
       background-color: ${bgColorHover};
@@ -172,9 +157,7 @@ export class DomxTabButton extends HTMLElement {
       .map(([bp, prop, val, psuedo, subSelector = null]) => {
         return `@media (min-width: ${bp}px) { :host${
           psuedo
-            ? `(:${psuedo}) ${
-                subSelector !== null ? `::slotted(${subSelector})` : ""
-              }`
+            ? `(:${psuedo}) ${subSelector !== null ? `::slotted(${subSelector})` : ""}`
             : ` ${subSelector !== null ? `::slotted(${subSelector})` : ""}`
         } { ${prop}:${val}; }}`;
       })

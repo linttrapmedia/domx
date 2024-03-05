@@ -11,44 +11,34 @@ export class DomxButton extends DomxBase {
   props: string[] = ["id", "oclick"];
   constructor() {
     super();
+    this.registerEvents = this.registerEvents.bind(this);
   }
-  render() {
-    if (this.rendered) return;
-
-    const onclick = this.getAttribute("onclick") ?? "";
-    const isDxStateOnClick = !onclick.startsWith("javascript");
-    if (isDxStateOnClick) {
-      this.removeAttribute("onclick");
+  registerEvents() {
+    const DxStateOnClicks = this.getAttributeNames().filter((attr) => attr.startsWith("onclick:"));
+    DxStateOnClicks.forEach((attr) => {
+      const value = this.getAttribute(attr) ?? "";
       this.addEventListener("click", () => {
-        const [stateName, transformations] = onclick.split(":");
-        const state = document.querySelector(
-          `dx-state[name=${stateName}]`
-        ) as any;
-        const txs = transformations.split("|").map((tx) => tx.split(","));
-        txs.forEach((tx) => {
-          const [func, ...args] = tx;
-          switch (func) {
-            case "dispatch":
-              state.dispatch(...args);
-              break;
-            case "transform":
-              const [evt, ...rest] = args;
-              state.transform();
-              break;
-          }
-        });
+        const [_, state] = attr.split(":");
+        const transformation = value.split(",");
+        const stateEl = document.querySelector(`dx-state[name=${state}]`) as any;
+        const [trait] = transformation;
+        stateEl.transform(trait, transformation);
       });
-    }
-
+    });
+  }
+  async render() {
+    if (this.rendered) return;
+    this.registerEvents();
+    const baseStyles = this.renderCss(this.baseStyles);
     const buttonStyles = this.renderCss(this.getStylesFromEl(this));
-    const buttonLabel = document.querySelector("dx-button-label");
-    const buttonLabelStyleList = this.getStylesFromEl(
-      buttonLabel as HTMLButtonElement,
-      "dx-button-label"
-    );
-    const buttonLabelStyles = this.renderCss(buttonLabelStyleList);
-    console.log(buttonLabelStyles);
-    this.styleSheet.replace(buttonStyles + buttonLabelStyles);
+    const buttonLabel = this.querySelector("dx-button-label") as DomxButtonLabel;
+    let buttonLabelStyles = "";
+    if (buttonLabel) {
+      await customElements.whenDefined("dx-button-label");
+      const buttonLabelStyleList = [...this.getStylesFromEl(buttonLabel)];
+      buttonLabelStyles = this.renderCss(buttonLabelStyleList);
+    }
+    this.styleSheet.replace(baseStyles + buttonStyles + buttonLabelStyles);
   }
 }
 
