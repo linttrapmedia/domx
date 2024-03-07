@@ -1,2 +1,258 @@
-"use strict";(()=>{var c=class extends HTMLElement{constructor(){super();this.state="";this.config={actions:{},initialState:"",listeners:[],states:{}};this.subs=[];this.timeouts={};this.applyAction=this.applyAction.bind(this),this.applyAppend=this.applyAppend.bind(this),this.applyAttr=this.applyAttr.bind(this),this.applyCall=this.applyCall.bind(this),this.applyDispatch=this.applyDispatch.bind(this),this.applyEventListener=this.applyEventListener.bind(this),this.applyGet=this.applyGet.bind(this),this.applyHistory=this.applyHistory.bind(this),this.applyPost=this.applyPost.bind(this),this.applyReplace=this.applyReplace.bind(this),this.applyState=this.applyState.bind(this),this.applyText=this.applyText.bind(this),this.applyWait=this.applyWait.bind(this),this.applyWin=this.applyWin.bind(this),this.dispatch=this.dispatch.bind(this),this.handleClientEvent=this.handleClientEvent.bind(this),this.handleEvent=this.handleEvent.bind(this),this.handleServerEvent=this.handleServerEvent.bind(this),this.init=this.init.bind(this),this.sub=this.sub.bind(this),this.transform=this.transform.bind(this)}applyAction(t){let[,e]=t;this.config.actions[e].forEach(s=>this.handleEvent(e,s))}applyAppend(t){let[,e,s]=t,i=this.querySelector(e);if(!i)return;let n=document.createElement("template");n.innerHTML=decodeURIComponent(s),i.append(n.content)}applyAttr(t){let[,e,s,i]=t;this.querySelectorAll(e).forEach(r=>{if(i===null)return r.removeAttribute(s);r.setAttribute(s,i)})}applyCall(t){let[,e,s,...i]=t,n=this.querySelector(e);!n||n[s](...i)}applyEventListener(t){let[e,s,i]=t,n=this.querySelectorAll(s);for(let r=0;r<n.length;r++){let a=n[r],l=o=>{o.preventDefault(),this.handleClientEvent(i)};a.removeEventListener(e,l),a.addEventListener(e,l)}}applyDispatch(t){let[,e,s=0]=t;clearTimeout(this.timeouts[e]),this.timeouts[e]=setTimeout(()=>this.handleClientEvent(e),s)}applyGet(t){let[,e]=t;fetch(e,{method:"GET"}).then(s=>s.json().then(i=>this.handleEvent("entry",i)))}applyHistory(t){let[,e,...s]=t;history[e](...s)}applyWin(t){let[,e,...s]=t;window[e](...s)}applyPost(t){let[,e,...s]=t,i={};for(let n=0;n<s.length;n++){let[r,a,l]=s[n],o=this.querySelector(a);if(!o)return;i[r]=o[l]}fetch(e,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(i)}).then(n=>n.json().then(r=>this.handleEvent("entry",r)))}applyReplace(t){let[,e,s]=t,i=this.querySelector(e);!i||(i.innerHTML="",i.innerHTML=decodeURIComponent(s))}applyState(t){let[,e]=t;this.config.states[e].entry&&this.handleEvent("entry",...this.config.states[e].entry),this.state=e}applyText(t){let[,e,s]=t;this.querySelectorAll(e).forEach(n=>n.textContent=s)}applyWait(t){let[,e,s]=t,i=new Date().getTime();for(;new Date().getTime()-i<e;);s&&this.handleClientEvent(s)}connectedCallback(){let t=this.getAttribute("src");if(t)return fetch(t).then(s=>s.json().then(this.init));let e=this.getAttribute("obj");if(e)return this.init(window[e])}dispatch(t){this.handleClientEvent(t)}handleClientEvent(t){this.handleEvent(t,...this.config.states[this.state][t])}handleServerEvent(t){let{evt:e}=t,s=this.config.states[this.state][e].reduce((i,n)=>[...i,n],[]);this.handleEvent(e,...s)}handleEvent(t,...e){if(!!e)for(let s=0;s<e.length;s++){let i=e[s],[n]=i;this.transform(n,i),this.subs.forEach(r=>r(this.state,t,i))}}init(t){this.config=t;let e=this.config.listeners??[],s=()=>{for(let r=0;r<e.length;r++){let[a,l,o]=e[r],v=`${a}:not([data-dx-state="registered"])`,y=this.querySelectorAll(v);for(let h=0;h<y.length;h++){let p=y[h],D=g=>{g.preventDefault(),g.target===p&&this.handleClientEvent(o)};p.addEventListener(l,D),p.dataset.dxState="registered"}}};new MutationObserver(r=>{r.forEach(a=>{a.type==="childList"&&a.addedNodes&&s()})}).observe(this,{attributes:!0,childList:!0,subtree:!0}),s();let n=t.states[t.initialState];this.state=t.initialState,n.entry&&this.handleEvent("entry",...n.entry)}sub(t){this.subs.push(t)}transform(t,e){({action:this.applyAction,append:this.applyAppend,attr:this.applyAttr,call:this.applyCall,click:this.applyEventListener,dispatch:this.applyDispatch,get:this.applyGet,history:this.applyHistory,post:this.applyPost,replace:this.applyReplace,server:()=>{},state:this.applyState,submit:this.applyEventListener,text:this.applyText,wait:this.applyWait,win:this.applyWin})[t](e)}};customElements.define("dx-state",c);var d=class extends HTMLElement{constructor(){super();this.state="";this.is="";this.attachShadow({mode:"open"}),this.shadowRoot.innerHTML="<slot></slot>"}connectedCallback(){let t=this.getAttribute("state"),e=this.getAttribute("is");!t||!e||document.querySelector(`dx-state[name="${t}"]`).sub(s=>{this.style.display=s===e?"inherit":"none"})}};customElements.define("dx-state-if",d);})();
+"use strict";
+(() => {
+  // src/components/dx-state.ts
+  var DomxState = class extends HTMLElement {
+    constructor() {
+      super();
+      this.state = "";
+      this.config = {
+        actions: {},
+        initialState: "",
+        listeners: [],
+        states: {}
+      };
+      this.subs = [];
+      this.timeouts = {};
+      this.applyAction = this.applyAction.bind(this);
+      this.applyAppend = this.applyAppend.bind(this);
+      this.applyAttr = this.applyAttr.bind(this);
+      this.applyCall = this.applyCall.bind(this);
+      this.applyDispatch = this.applyDispatch.bind(this);
+      this.applyEventListener = this.applyEventListener.bind(this);
+      this.applyGet = this.applyGet.bind(this);
+      this.applyHistory = this.applyHistory.bind(this);
+      this.applyPost = this.applyPost.bind(this);
+      this.applyReplace = this.applyReplace.bind(this);
+      this.applyState = this.applyState.bind(this);
+      this.applyText = this.applyText.bind(this);
+      this.applyWait = this.applyWait.bind(this);
+      this.applyWin = this.applyWin.bind(this);
+      this.dispatch = this.dispatch.bind(this);
+      this.handleClientEvent = this.handleClientEvent.bind(this);
+      this.handleEvent = this.handleEvent.bind(this);
+      this.handleServerEvent = this.handleServerEvent.bind(this);
+      this.init = this.init.bind(this);
+      this.sub = this.sub.bind(this);
+      this.transform = this.transform.bind(this);
+    }
+    applyAction(transformation) {
+      const [, action] = transformation;
+      this.config.actions[action].forEach((t) => this.handleEvent(action, t));
+    }
+    applyAppend(transformation) {
+      const [, selector, html] = transformation;
+      const el = this.querySelector(selector);
+      if (!el)
+        return;
+      const tmpl = document.createElement("template");
+      tmpl.innerHTML = decodeURIComponent(html);
+      el.append(tmpl.content);
+    }
+    applyAttr(transformation) {
+      const [, selector, attr, value] = transformation;
+      const els = this.querySelectorAll(selector);
+      els.forEach((el) => {
+        if (value === null)
+          return el.removeAttribute(attr);
+        el.setAttribute(attr, value);
+      });
+    }
+    applyCall(transformation) {
+      const [, selector, method, ...args] = transformation;
+      const el = this.querySelector(selector);
+      if (!el)
+        return;
+      el[method](...args);
+    }
+    applyEventListener(transformation) {
+      const [event, selector, evt] = transformation;
+      const els = this.querySelectorAll(selector);
+      for (let i = 0; i < els.length; i++) {
+        const el = els[i];
+        const cb = (e) => {
+          e.preventDefault();
+          this.handleClientEvent(evt);
+        };
+        el.removeEventListener(event, cb);
+        el.addEventListener(event, cb);
+      }
+    }
+    applyDispatch(transformation) {
+      const [, evt, timeout = 0] = transformation;
+      clearTimeout(this.timeouts[evt]);
+      this.timeouts[evt] = setTimeout(() => this.handleClientEvent(evt), timeout);
+    }
+    applyGet(transformation) {
+      const [, url] = transformation;
+      fetch(url, {
+        method: "GET"
+      }).then((r) => r.json().then((d) => this.handleEvent("entry", d)));
+    }
+    applyHistory(transformation) {
+      const [, method, ...args] = transformation;
+      history[method](...args);
+    }
+    applyWin(transformation) {
+      const [, method, ...args] = transformation;
+      window[method](...args);
+    }
+    applyPost(transformation) {
+      const [, url, ...data] = transformation;
+      const body = {};
+      for (let i = 0; i < data.length; i++) {
+        const [key, selector, val] = data[i];
+        const el = this.querySelector(selector);
+        if (!el)
+          return;
+        body[key] = el[val];
+      }
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }).then((r) => r.json().then((d) => this.handleEvent("entry", d)));
+    }
+    applyReplace(transformation) {
+      const [, selector, content] = transformation;
+      const el = this.querySelector(selector);
+      if (!el)
+        return;
+      el.innerHTML = "";
+      el.innerHTML = decodeURIComponent(content);
+    }
+    applyState(transformation) {
+      const [, state] = transformation;
+      const hasEntry = this.config.states[state].entry;
+      if (hasEntry)
+        this.handleEvent("entry", ...this.config.states[state].entry);
+      this.state = state;
+    }
+    applyText(transformation) {
+      const [, selector, text] = transformation;
+      const els = this.querySelectorAll(selector);
+      els.forEach((el) => el.textContent = text);
+    }
+    applyWait(transformation) {
+      const [, timeInSeconds, evt] = transformation;
+      const startTime = new Date().getTime();
+      while (new Date().getTime() - startTime < timeInSeconds) {
+      }
+      if (evt)
+        this.handleClientEvent(evt);
+    }
+    connectedCallback() {
+      const src = this.getAttribute("src");
+      if (src)
+        return fetch(src).then((r) => r.json().then(this.init));
+      const obj = this.getAttribute("obj");
+      if (obj)
+        return this.init(window[obj]);
+      return;
+    }
+    dispatch(evt) {
+      this.handleClientEvent(evt);
+    }
+    handleClientEvent(evt) {
+      this.handleEvent(evt, ...this.config.states[this.state][evt]);
+    }
+    handleServerEvent(se) {
+      const { evt } = se;
+      const transformations = this.config.states[this.state][evt].reduce((acc, t) => [...acc, t], []);
+      this.handleEvent(evt, ...transformations);
+    }
+    handleEvent(evt, ...transformations) {
+      if (!transformations)
+        return;
+      for (let i = 0; i < transformations.length; i++) {
+        const transformation = transformations[i];
+        const [trait] = transformation;
+        this.transform(trait, transformation);
+        this.subs.forEach((s) => s(this.state, evt, transformation));
+      }
+    }
+    init(config) {
+      this.config = config;
+      const listeners = this.config.listeners ?? [];
+      const register = () => {
+        for (let i = 0; i < listeners.length; i++) {
+          const [selector, event, evt] = listeners[i];
+          const selectorIfNotRegistered = `${selector}:not([data-dx-state="registered"])`;
+          const els = this.querySelectorAll(selectorIfNotRegistered);
+          for (let j = 0; j < els.length; j++) {
+            const el = els[j];
+            const cb = (e) => {
+              e.preventDefault();
+              if (e.target !== el)
+                return;
+              this.handleClientEvent(evt);
+            };
+            el.addEventListener(event, cb);
+            el.dataset.dxState = "registered";
+          }
+        }
+      };
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "childList" && mutation.addedNodes)
+            register();
+        });
+      });
+      observer.observe(this, {
+        attributes: true,
+        childList: true,
+        subtree: true
+      });
+      register();
+      const initState = config.states[config.initialState];
+      this.state = config.initialState;
+      if (initState.entry)
+        this.handleEvent("entry", ...initState.entry);
+    }
+    sub(s) {
+      this.subs.push(s);
+    }
+    transform(trait, transformation) {
+      const traitMap = {
+        action: this.applyAction,
+        append: this.applyAppend,
+        attr: this.applyAttr,
+        call: this.applyCall,
+        click: this.applyEventListener,
+        dispatch: this.applyDispatch,
+        get: this.applyGet,
+        history: this.applyHistory,
+        post: this.applyPost,
+        replace: this.applyReplace,
+        server: () => {
+        },
+        state: this.applyState,
+        submit: this.applyEventListener,
+        text: this.applyText,
+        wait: this.applyWait,
+        win: this.applyWin
+      };
+      traitMap[trait](transformation);
+    }
+  };
+  customElements.define("dx-state", DomxState);
+  var DomxStateIf = class extends HTMLElement {
+    constructor() {
+      super();
+      this.state = "";
+      this.is = "";
+      this.attachShadow({ mode: "open" });
+      this.shadowRoot.innerHTML = "<slot></slot>";
+    }
+    connectedCallback() {
+      const state = this.getAttribute("state");
+      const is = this.getAttribute("is");
+      if (!state || !is)
+        return;
+      document.querySelector(`dx-state[name="${state}"]`).sub((state2) => {
+        this.style.display = state2 === is ? "inherit" : "none";
+      });
+    }
+  };
+  customElements.define("dx-state-if", DomxStateIf);
+})();
 //# sourceMappingURL=dx-state.js.map

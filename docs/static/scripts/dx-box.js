@@ -1,3 +1,61 @@
-"use strict";(()=>{var s=class extends HTMLElement{constructor(){super();this.baseStyles=":host { box-sizing: border-box; display: flex; }";this.psuedoStyles={};this.styleSheet=new CSSStyleSheet;this.attachShadow({mode:"open"}),this.shadowRoot.innerHTML="<slot></slot>",this.render=this.render.bind(this),this.renderCss=this.renderCss.bind(this),this.shadowRoot.adoptedStyleSheets=[this.styleSheet],new MutationObserver(r=>{r.forEach(o=>{o.type==="attributes"&&this.render()})}).observe(this,{attributes:!0})}connectedCallback(){this.render()}renderCss(){let n=[],r=this.getAttributeNames();for(let e=0;e<r.length;e++){let t=r[e],[d,i]=t.split(":"),[c,p="0"]=d.split("--"),u=this.getAttribute(t);n.push([p,c,u,i])}let o=n.sort((e,t)=>e[3]?1:-1).sort((e,t)=>Number(e[0])-Number(t[0])).map(([e,t,d,i])=>`@media (min-width: ${e}px) { :host${i?`:${i}`:""} { ${t}:${d}; }}`).join(`
-`);return this.baseStyles+o}render(){this.styleSheet.replace(this.renderCss())}};customElements.define("dx-box",s);var l=class extends s{constructor(){super(...arguments);this.baseStyles=":host { box-sizing: border-box; display: flex; flex-direction: column; }"}};customElements.define("dx-col",l);var h=class extends s{constructor(){super(...arguments);this.baseStyles=":host { box-sizing: border-box; display: flex; flex-direction: row; }"}};customElements.define("dx-row",h);})();
+"use strict";
+(() => {
+  // src/components/dx-box.ts
+  var DomxBox = class extends HTMLElement {
+    constructor() {
+      super();
+      this.baseStyles = `:host { box-sizing: border-box; display: flex; }`;
+      this.psuedoStyles = {};
+      this.styleSheet = new CSSStyleSheet();
+      this.attachShadow({ mode: "open" });
+      this.shadowRoot.innerHTML = "<slot></slot>";
+      this.render = this.render.bind(this);
+      this.renderCss = this.renderCss.bind(this);
+      this.shadowRoot.adoptedStyleSheets = [this.styleSheet];
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "attributes")
+            this.render();
+        });
+      });
+      observer.observe(this, { attributes: true });
+    }
+    connectedCallback() {
+      this.render();
+    }
+    renderCss() {
+      let styles = [];
+      const attributes = this.getAttributeNames();
+      for (let i = 0; i < attributes.length; i++) {
+        const attributeName = attributes[i];
+        const [attr, psuedo] = attributeName.split(":");
+        const [prop, bp = "0"] = attr.split("--");
+        const value = this.getAttribute(attributeName);
+        styles.push([bp, prop, value, psuedo]);
+      }
+      const renderedStyles = styles.sort((a, b) => a[3] ? 1 : -1).sort((a, b) => Number(a[0]) - Number(b[0])).map(
+        ([bp, prop, val, psuedo]) => `@media (min-width: ${bp}px) { :host${psuedo ? `:${psuedo}` : ""} { ${prop}:${val}; }}`
+      ).join("\n");
+      return this.baseStyles + renderedStyles;
+    }
+    render() {
+      this.styleSheet.replace(this.renderCss());
+    }
+  };
+  customElements.define("dx-box", DomxBox);
+  var DomxCol = class extends DomxBox {
+    constructor() {
+      super(...arguments);
+      this.baseStyles = `:host { box-sizing: border-box; display: flex; flex-direction: column; }`;
+    }
+  };
+  customElements.define("dx-col", DomxCol);
+  var DomxRow = class extends DomxBox {
+    constructor() {
+      super(...arguments);
+      this.baseStyles = `:host { box-sizing: border-box; display: flex; flex-direction: row; }`;
+    }
+  };
+  customElements.define("dx-row", DomxRow);
+})();
 //# sourceMappingURL=dx-box.js.map

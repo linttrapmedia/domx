@@ -1,3 +1,52 @@
-"use strict";(()=>{var o=class extends HTMLElement{constructor(){super();this.behaviorAttributeNames=["src","allowfullscreen","allow"];this.baseStyles=":host { box-sizing: border-box; display: flex; }";this.psuedoStyles={};this.styleSheet=new CSSStyleSheet;this.attachShadow({mode:"open"}),this.shadowRoot.innerHTML="<slot></slot>",this.render=this.render.bind(this),this.renderCss=this.renderCss.bind(this),this.shadowRoot.adoptedStyleSheets=[this.styleSheet]}connectedCallback(){this.render()}renderCss(t=[]){let r=[];for(let e=0;e<t.length;e++){let s=t[e],[l,i]=s.split(":"),[h,a="0"]=l.split("--"),d=this.getAttribute(s);r.push([a,h,d,i])}let n=r.sort((e,s)=>e[3]?1:-1).sort((e,s)=>Number(e[0])-Number(s[0])).map(([e,s,l,i])=>`@media (min-width: ${e}px) { :host ${i?`iframe:${i}`:"iframe"} { ${s}:${l}; }}`).join(`
-`);return this.baseStyles+n}render(){this.innerHTML="";let t=document.createElement("iframe");t.src=this.getAttribute("src"),t.width="100%",t.height="100%",t.frameBorder="0",t.allowFullscreen=this.hasAttribute("allowfullscreen"),t.allow=this.getAttribute("allow")||"",this.shadowRoot.appendChild(t);let r=this.getAttributeNames().filter(n=>!this.behaviorAttributeNames.includes(n));this.styleSheet.replace(this.renderCss(r))}};customElements.define("dx-frame",o);})();
+"use strict";
+(() => {
+  // src/components/dx-frame.ts
+  var DomxFrame = class extends HTMLElement {
+    constructor() {
+      super();
+      this.behaviorAttributeNames = ["src", "allowfullscreen", "allow"];
+      this.baseStyles = `:host { box-sizing: border-box; display: flex; }`;
+      this.psuedoStyles = {};
+      this.styleSheet = new CSSStyleSheet();
+      this.attachShadow({ mode: "open" });
+      this.shadowRoot.innerHTML = "<slot></slot>";
+      this.render = this.render.bind(this);
+      this.renderCss = this.renderCss.bind(this);
+      this.shadowRoot.adoptedStyleSheets = [this.styleSheet];
+    }
+    connectedCallback() {
+      this.render();
+    }
+    renderCss(attributes = []) {
+      let styles = [];
+      for (let i = 0; i < attributes.length; i++) {
+        const attributeName = attributes[i];
+        const [attr, psuedo] = attributeName.split(":");
+        const [prop, bp = "0"] = attr.split("--");
+        const value = this.getAttribute(attributeName);
+        styles.push([bp, prop, value, psuedo]);
+      }
+      const renderedStyles = styles.sort((a, b) => a[3] ? 1 : -1).sort((a, b) => Number(a[0]) - Number(b[0])).map(
+        ([bp, prop, val, psuedo]) => `@media (min-width: ${bp}px) { :host ${psuedo ? `iframe:${psuedo}` : "iframe"} { ${prop}:${val}; }}`
+      ).join("\n");
+      return this.baseStyles + renderedStyles;
+    }
+    render() {
+      this.innerHTML = "";
+      const iframe = document.createElement("iframe");
+      iframe.src = this.getAttribute("src");
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.frameBorder = "0";
+      iframe.allowFullscreen = this.hasAttribute("allowfullscreen");
+      iframe.allow = this.getAttribute("allow") || "";
+      this.shadowRoot.appendChild(iframe);
+      const styleAttributes = this.getAttributeNames().filter(
+        (attr) => !this.behaviorAttributeNames.includes(attr)
+      );
+      this.styleSheet.replace(this.renderCss(styleAttributes));
+    }
+  };
+  customElements.define("dx-frame", DomxFrame);
+})();
 //# sourceMappingURL=dx-frame.js.map

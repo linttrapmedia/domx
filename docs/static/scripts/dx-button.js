@@ -1,3 +1,93 @@
-"use strict";(()=>{var c=class extends HTMLElement{constructor(){super();this.baseStyles=[];this.props=[];this.rendered=!1;this.styleSheet=new CSSStyleSheet;this.attachShadow({mode:"open"}),this.shadowRoot.innerHTML="<slot></slot>",this.shadowRoot.adoptedStyleSheets=[this.styleSheet],this.render=this.render.bind(this),this.renderCss=this.renderCss.bind(this),this.getStylesFromEl=this.getStylesFromEl.bind(this)}connectedCallback(){this.render(),this.dispatchEvent(new CustomEvent("rendered")),this.rendered=!0}renderCss(r){return r.sort(t=>t[3]?1:-1).sort((t,s)=>Number(t[0])-Number(s[0])).map(([t="0",s,n,i,o=""])=>{let l=`${o!==""?`::slotted(${o})`:""}`;return`@media (min-width: ${t}px) { :host${i?`(:${i}) ${l}`:l} { ${s}:${n}; }}`}).join(`
-`)}getStylesFromEl(r,e){return r.getAttributeNames().filter(t=>!this.props.includes(t)&&!t.includes("onclick:")).map(t=>{let[s,n]=t.split(":"),[i,o]=s.split("--"),l=r.getAttribute(t)??"";return[o,i,l,n,e]})}async render(){}};var d=class extends c{constructor(){super();this.baseStyles=[["0","display","inline-flex"],["0","align-items","center"],["0","cursor","pointer"],["0","justify-content","center"],["0","width","max-content"]];this.props=["id","oclick"];this.registerEvents=this.registerEvents.bind(this)}registerEvents(){this.getAttributeNames().filter(e=>e.startsWith("onclick:")).forEach(e=>{let t=this.getAttribute(e)??"";this.addEventListener("click",()=>{let[s,n]=e.split(":"),i=t.split(","),o=document.querySelector(`dx-state[name=${n}]`),[l]=i;o.transform(l,i)})})}async render(){if(this.rendered)return;this.registerEvents();let r=this.renderCss(this.baseStyles),e=this.renderCss(this.getStylesFromEl(this)),t=this.querySelector("dx-button-label"),s="";if(t){await customElements.whenDefined("dx-button-label");let n=[...this.getStylesFromEl(t)];s=this.renderCss(n)}this.styleSheet.replace(r+e+s)}};customElements.define("dx-button",d);var a=class extends c{constructor(){super()}};customElements.define("dx-button-label",a);})();
+"use strict";
+(() => {
+  // src/components/dx-base.ts
+  var DomxBase = class extends HTMLElement {
+    constructor() {
+      super();
+      this.baseStyles = [];
+      this.props = [];
+      this.rendered = false;
+      this.styleSheet = new CSSStyleSheet();
+      this.attachShadow({ mode: "open" });
+      this.shadowRoot.innerHTML = "<slot></slot>";
+      this.shadowRoot.adoptedStyleSheets = [this.styleSheet];
+      this.render = this.render.bind(this);
+      this.renderCss = this.renderCss.bind(this);
+      this.getStylesFromEl = this.getStylesFromEl.bind(this);
+    }
+    connectedCallback() {
+      this.render();
+      this.dispatchEvent(new CustomEvent("rendered"));
+      this.rendered = true;
+    }
+    renderCss(styles) {
+      const renderedStyles = styles.sort((a) => a[3] ? 1 : -1).sort((a, b) => Number(a[0]) - Number(b[0])).map(([bp = "0", prop, val, psuedo, sub = ""]) => {
+        const subSelector = `${sub !== "" ? `::slotted(${sub})` : ""}`;
+        return `@media (min-width: ${bp}px) { :host${psuedo ? `(:${psuedo}) ${subSelector}` : subSelector} { ${prop}:${val}; }}`;
+      }).join("\n");
+      return renderedStyles;
+    }
+    getStylesFromEl(el, subSelector) {
+      return el.getAttributeNames().filter((attr) => !this.props.includes(attr) && !attr.includes("onclick:")).map((attributeName) => {
+        const [attr, psuedo] = attributeName.split(":");
+        const [prop, bp] = attr.split("--");
+        const value = el.getAttribute(attributeName) ?? "";
+        return [bp, prop, value, psuedo, subSelector];
+      });
+    }
+    async render() {
+    }
+  };
+
+  // src/components/dx-button.ts
+  var DomxButton = class extends DomxBase {
+    constructor() {
+      super();
+      this.baseStyles = [
+        ["0", "display", "inline-flex"],
+        ["0", "align-items", "center"],
+        ["0", "cursor", "pointer"],
+        ["0", "justify-content", "center"],
+        ["0", "width", "max-content"]
+      ];
+      this.props = ["id", "oclick"];
+      this.registerEvents = this.registerEvents.bind(this);
+    }
+    registerEvents() {
+      const DxStateOnClicks = this.getAttributeNames().filter((attr) => attr.startsWith("onclick:"));
+      DxStateOnClicks.forEach((attr) => {
+        const value = this.getAttribute(attr) ?? "";
+        this.addEventListener("click", () => {
+          const [_, state] = attr.split(":");
+          const transformation = value.split(",");
+          const stateEl = document.querySelector(`dx-state[name=${state}]`);
+          const [trait] = transformation;
+          stateEl.transform(trait, transformation);
+        });
+      });
+    }
+    async render() {
+      if (this.rendered)
+        return;
+      this.registerEvents();
+      const baseStyles = this.renderCss(this.baseStyles);
+      const buttonStyles = this.renderCss(this.getStylesFromEl(this));
+      const buttonLabel = this.querySelector("dx-button-label");
+      let buttonLabelStyles = "";
+      if (buttonLabel) {
+        await customElements.whenDefined("dx-button-label");
+        const buttonLabelStyleList = [...this.getStylesFromEl(buttonLabel)];
+        buttonLabelStyles = this.renderCss(buttonLabelStyleList);
+      }
+      this.styleSheet.replace(baseStyles + buttonStyles + buttonLabelStyles);
+    }
+  };
+  customElements.define("dx-button", DomxButton);
+  var DomxButtonLabel = class extends DomxBase {
+    constructor() {
+      super();
+    }
+  };
+  customElements.define("dx-button-label", DomxButtonLabel);
+})();
 //# sourceMappingURL=dx-button.js.map

@@ -29,10 +29,10 @@ export class DomxTabs extends HTMLElement {
     this.setActiveTab(this.getAttribute("value") || "");
   }
   async setActiveTab(value: string) {
-    const buttons = this.querySelectorAll("dx-tab-button");
+    const buttons = this.querySelectorAll(":scope > dx-tab-buttons > dx-tab-button");
     await customElements.whenDefined("dx-tab-button");
     buttons.forEach((button) => button.classList.remove("active"));
-    const panels = this?.querySelectorAll("dx-tab-panel");
+    const panels = this?.querySelectorAll(":scope > dx-tab-panels > dx-tab-panel");
     await customElements.whenDefined("dx-tab-panel");
     panels.forEach((panel) => panel.classList.remove("active"));
     const button = this.querySelector(`dx-tab-button[value="${value}"]`);
@@ -61,13 +61,15 @@ export class DomxTabButtons extends HTMLElement {
   }
   renderBaseCss() {
     const parent = this.closest("dx-tabs");
+    const accentColor = parent ? parent.getAttribute("accent-color") : "rgba(255,255,255,0.5)";
+
     return `:host {
       box-sizing: border-box;
       display: flex;
       flex-direction: row;
       overflow-x: auto;
       overflow-y: hidden;
-      margin-bottom: -3px;
+      background-image: linear-gradient(to bottom, transparent calc(100% - 3px), ${accentColor} calc(100% - 3px), ${accentColor} 100%);
     }`;
   }
   renderCss(styles: Style[]) {

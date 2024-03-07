@@ -1,3 +1,42 @@
-"use strict";(()=>{var d=class extends HTMLElement{constructor(){super();this.baseStyles=[];this.props=[];this.rendered=!1;this.styleSheet=new CSSStyleSheet;this.attachShadow({mode:"open"}),this.shadowRoot.innerHTML="<slot></slot>",this.shadowRoot.adoptedStyleSheets=[this.styleSheet],this.render=this.render.bind(this),this.renderCss=this.renderCss.bind(this),this.getStylesFromEl=this.getStylesFromEl.bind(this)}connectedCallback(){this.render(),this.dispatchEvent(new CustomEvent("rendered")),this.rendered=!0}renderCss(s){return s.sort(e=>e[3]?1:-1).sort((e,t)=>Number(e[0])-Number(t[0])).map(([e="0",t,o,r,n=""])=>{let i=`${n!==""?`::slotted(${n})`:""}`;return`@media (min-width: ${e}px) { :host${r?`(:${r}) ${i}`:i} { ${t}:${o}; }}`}).join(`
-`)}getStylesFromEl(s,l){return s.getAttributeNames().filter(e=>!this.props.includes(e)&&!e.includes("onclick:")).map(e=>{let[t,o]=e.split(":"),[r,n]=t.split("--"),i=s.getAttribute(e)??"";return[n,r,i,o,l]})}async render(){}};})();
+"use strict";
+(() => {
+  // src/components/dx-base.ts
+  var DomxBase = class extends HTMLElement {
+    constructor() {
+      super();
+      this.baseStyles = [];
+      this.props = [];
+      this.rendered = false;
+      this.styleSheet = new CSSStyleSheet();
+      this.attachShadow({ mode: "open" });
+      this.shadowRoot.innerHTML = "<slot></slot>";
+      this.shadowRoot.adoptedStyleSheets = [this.styleSheet];
+      this.render = this.render.bind(this);
+      this.renderCss = this.renderCss.bind(this);
+      this.getStylesFromEl = this.getStylesFromEl.bind(this);
+    }
+    connectedCallback() {
+      this.render();
+      this.dispatchEvent(new CustomEvent("rendered"));
+      this.rendered = true;
+    }
+    renderCss(styles) {
+      const renderedStyles = styles.sort((a) => a[3] ? 1 : -1).sort((a, b) => Number(a[0]) - Number(b[0])).map(([bp = "0", prop, val, psuedo, sub = ""]) => {
+        const subSelector = `${sub !== "" ? `::slotted(${sub})` : ""}`;
+        return `@media (min-width: ${bp}px) { :host${psuedo ? `(:${psuedo}) ${subSelector}` : subSelector} { ${prop}:${val}; }}`;
+      }).join("\n");
+      return renderedStyles;
+    }
+    getStylesFromEl(el, subSelector) {
+      return el.getAttributeNames().filter((attr) => !this.props.includes(attr) && !attr.includes("onclick:")).map((attributeName) => {
+        const [attr, psuedo] = attributeName.split(":");
+        const [prop, bp] = attr.split("--");
+        const value = el.getAttribute(attributeName) ?? "";
+        return [bp, prop, value, psuedo, subSelector];
+      });
+    }
+    async render() {
+    }
+  };
+})();
 //# sourceMappingURL=dx-base.js.map

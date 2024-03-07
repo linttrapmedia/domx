@@ -46,7 +46,7 @@ dev: ## Run the project in development mode
 
 dev-js: ## Run the js in development mode
 	@echo $(STATUS) Running js in development mode...
-	@npx esbuild ./src/components/*.ts --outdir=docs/static/scripts --watch --bundle --sourcemap --minify
+	@npx esbuild ./src/components/*.ts --outdir=docs/static/scripts --watch --bundle --sourcemap
 
 dev-docs: ## Run the docs in development mode
 	@echo $(STATUS) Running docs in development mode...
