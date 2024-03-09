@@ -11,11 +11,13 @@ export class DomxBase extends HTMLElement {
     this.shadowRoot!.innerHTML = "<slot></slot>";
     this.shadowRoot!.adoptedStyleSheets = [this.styleSheet];
     this.render = this.render.bind(this);
+    this.registerEvents = this.registerEvents.bind(this);
     this.renderCss = this.renderCss.bind(this);
     this.getStylesFromEl = this.getStylesFromEl.bind(this);
   }
-  connectedCallback() {
-    this.render();
+  async connectedCallback() {
+    await this.render();
+    await this.registerEvents();
     this.dispatchEvent(new CustomEvent("rendered"));
     this.rendered = true;
   }
@@ -23,8 +25,8 @@ export class DomxBase extends HTMLElement {
     const renderedStyles = styles
       .sort((a) => (a[3] ? 1 : -1)) // sort by psuedo
       .sort((a, b) => Number(a[0]) - Number(b[0])) // sort by breakpoint
-      .map(([bp = "0", prop, val, psuedo, sub = ""]) => {
-        const subSelector = `${sub !== "" ? `::slotted(${sub})` : ""}`;
+      .map(([bp = "0", prop, val, psuedo, sub]) => {
+        const subSelector = sub ?? "";
         return `@media (min-width: ${bp}px) { :host${
           psuedo ? `(:${psuedo}) ${subSelector}` : subSelector
         } { ${prop}:${val}; }}`;
@@ -32,10 +34,10 @@ export class DomxBase extends HTMLElement {
       .join("\n");
     return renderedStyles;
   }
-  getStylesFromEl(el: HTMLElement, subSelector?: string): DxStyle[] {
+  getStylesFromEl(el: HTMLElement, subSelector?: string, filterList: string[] = []): DxStyle[] {
     return el
       .getAttributeNames()
-      .filter((attr) => !this.props.includes(attr) && !attr.includes("onclick:"))
+      .filter((attr) => !this.props.includes(attr) && !attr.includes("onclick:") && !filterList.includes(attr))
       .map((attributeName) => {
         const [attr, psuedo] = attributeName.split(":");
         const [prop, bp] = attr.split("--");
@@ -43,5 +45,6 @@ export class DomxBase extends HTMLElement {
         return [bp, prop, value, psuedo, subSelector];
       });
   }
+  async registerEvents() {}
   async render() {}
 }

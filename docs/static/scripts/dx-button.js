@@ -12,28 +12,32 @@
       this.shadowRoot.innerHTML = "<slot></slot>";
       this.shadowRoot.adoptedStyleSheets = [this.styleSheet];
       this.render = this.render.bind(this);
+      this.registerEvents = this.registerEvents.bind(this);
       this.renderCss = this.renderCss.bind(this);
       this.getStylesFromEl = this.getStylesFromEl.bind(this);
     }
-    connectedCallback() {
-      this.render();
+    async connectedCallback() {
+      await this.render();
+      await this.registerEvents();
       this.dispatchEvent(new CustomEvent("rendered"));
       this.rendered = true;
     }
     renderCss(styles) {
-      const renderedStyles = styles.sort((a) => a[3] ? 1 : -1).sort((a, b) => Number(a[0]) - Number(b[0])).map(([bp = "0", prop, val, psuedo, sub = ""]) => {
-        const subSelector = `${sub !== "" ? `::slotted(${sub})` : ""}`;
+      const renderedStyles = styles.sort((a) => a[3] ? 1 : -1).sort((a, b) => Number(a[0]) - Number(b[0])).map(([bp = "0", prop, val, psuedo, sub]) => {
+        const subSelector = sub ?? "";
         return `@media (min-width: ${bp}px) { :host${psuedo ? `(:${psuedo}) ${subSelector}` : subSelector} { ${prop}:${val}; }}`;
       }).join("\n");
       return renderedStyles;
     }
-    getStylesFromEl(el, subSelector) {
-      return el.getAttributeNames().filter((attr) => !this.props.includes(attr) && !attr.includes("onclick:")).map((attributeName) => {
+    getStylesFromEl(el, subSelector, filterList = []) {
+      return el.getAttributeNames().filter((attr) => !this.props.includes(attr) && !attr.includes("onclick:") && !filterList.includes(attr)).map((attributeName) => {
         const [attr, psuedo] = attributeName.split(":");
         const [prop, bp] = attr.split("--");
         const value = el.getAttribute(attributeName) ?? "";
         return [bp, prop, value, psuedo, subSelector];
       });
+    }
+    async registerEvents() {
     }
     async render() {
     }
@@ -44,16 +48,22 @@
     constructor() {
       super();
       this.baseStyles = [
-        ["0", "display", "inline-flex"],
         ["0", "align-items", "center"],
+        ["0", "background-color", "black"],
+        ["0", "background-color", "white", "hover"],
+        ["0", "border", "1px solid white"],
+        ["0", "color", "white"],
+        ["0", "color", "black", "hover"],
         ["0", "cursor", "pointer"],
+        ["0", "display", "inline-flex"],
         ["0", "justify-content", "center"],
+        ["0", "padding", "0.5rem 1rem"],
         ["0", "width", "max-content"]
       ];
       this.props = ["id", "oclick"];
       this.registerEvents = this.registerEvents.bind(this);
     }
-    registerEvents() {
+    async registerEvents() {
       const DxStateOnClicks = this.getAttributeNames().filter((attr) => attr.startsWith("onclick:"));
       DxStateOnClicks.forEach((attr) => {
         const value = this.getAttribute(attr) ?? "";
@@ -67,9 +77,6 @@
       });
     }
     async render() {
-      if (this.rendered)
-        return;
-      this.registerEvents();
       const baseStyles = this.renderCss(this.baseStyles);
       const buttonStyles = this.renderCss(this.getStylesFromEl(this));
       const buttonLabel = this.querySelector("dx-button-label");
@@ -80,6 +87,7 @@
         buttonLabelStyles = this.renderCss(buttonLabelStyleList);
       }
       this.styleSheet.replace(baseStyles + buttonStyles + buttonLabelStyles);
+      await this.registerEvents();
     }
   };
   customElements.define("dx-button", DomxButton);
