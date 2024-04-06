@@ -1,3 +1,7 @@
+const win = window as any;
+if (!win.DX) win.DX = {};
+if (!win.DX.style) win.DX.style = {};
+
 class DomxStyleColors extends HTMLElement {
   private styleSheet: CSSStyleSheet = new CSSStyleSheet();
   static create() {
@@ -58,7 +62,4 @@ class DomxStyleColors extends HTMLElement {
 
 customElements.define("dx-style-colors", DomxStyleColors);
 
-const win = window as any;
-if (!win.DX) win.DX = {};
-if (!win.DX.style) win.DX.style = {};
 win.DX.style.colors = DomxStyleColors;

@@ -1,0 +1,103 @@
+<dx-col id="dx-style" gap="20px">
+  <dx-box
+    align-items="center"
+    align-items--960="flex-end"
+    flex-direction="column"
+    flex-direction--960="row"
+    gap="10px"
+    justify-content="center"
+    justify-content--960="space-between"
+  >
+    <dx-col>
+      <dx-text font-size="24px">dx-style</dx-text>
+      <dx-text font-size="18px" opacity="0.35">dx-style-color</dx-text>
+    </dx-col>
+    <dx-anchor
+      color="gold"
+      color:hover="black"
+      background-color:hover="gold"
+      border="1px solid gold"
+      border-radius="5px"
+      padding="5px 10px"
+      text-decoration="none"
+      href="https://unpkg.com/@linttrap/domx@latest/dist/dx-style.min.js"
+      target="_blank"
+      >dx-style.min.js &nbsp; (↓)</dx-anchor
+    >
+  </dx-box>
+  <dx-text opacity="0.35"
+    >The <code>dx-style</code> component will generate global and locally scoped tailwind-esque utility css classes
+    onload.
+  </dx-text>
+
+  <dx-tabs
+    value="preview"
+    bg-color="transparent"
+    bg-color:hover="transparent"
+    fg-color="white"
+    fg-color:hover="gold"
+    accent-color="#222222"
+    accent-color:hover="gold"
+  >
+    <dx-tab-buttons>
+      <dx-tab-button value="preview">Preview</dx-tab-button>
+      <dx-tab-button value="usage">Usage</dx-tab-button>
+      <dx-tab-button value="config">Configuration</dx-tab-button>
+      <dx-tab-button value="classes">Classes</dx-tab-button>
+    </dx-tab-buttons>
+    <dx-tab-panels>
+      <dx-tab-panel value="preview">
+        <dx-box gap="20px" padding="20px">
+          <dx-style-colors id="main" red="#FF0000" white="#FFFFFF"></dx-style-colors>
+          <button class="txt-red txt-white:hover bg-white bg-red:hover">Hover Me</button>
+          <dx-style-colors id="main" red="#660000" white="#FFFFFF">
+            <button class="txt-red txt-white:hover bg-white bg-red:hover">Hover Me</button>
+          </dx-style-colors>
+        </dx-box>
+      </dx-tab-panel>
+      <dx-tab-panel value="usage">
+        <!-- prettier-ignore -->
+        <dx-prismjs src="/static/scripts" language="markup">
+// Global Color Styles
+&lt;dx-style-colors id="main" red="#FF0000" white="#FFFFFF"&gt;&lt;/dx-style-colors&gt;
+&lt;button class="txt-red txt-white:hover bg-white bg-red:hover"&gt;Hover Me&lt;/button&gt;
+
+// Scoped Color Styles
+&lt;dx-style-colors id="main" red="#660000" white="#FFFFFF"&gt;
+    &lt;button class="txt-red txt-white:hover bg-white bg-red:hover"&gt;Hover Me&lt;/button&gt;
+&lt;/dx-style-colors&gt;
+        </dx-prismjs>
+      </dx-tab-panel>
+
+      <dx-tab-panel value="config">
+        <dx-box padding="10px">
+          <table>
+            <caption>
+              dx-style-colors
+            </caption>
+            <thead>
+              <tr>
+                <th>Attribute</th>
+                <th>Example</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>id</td>
+                <td>id="styles"</td>
+                <td>Unique id for the styles</td>
+              </tr>
+              <tr>
+                <td>[user-defined]</td>
+                <td>red="#FF0000"</td>
+                <td>color classes generated</td>
+              </tr>
+            </tbody>
+          </table>
+        </dx-box>
+      </dx-tab-panel>
+      <dx-tab-panel value="source">Source</dx-tab-panel>
+    </dx-tab-panels>
+  </dx-tabs>
+</dx-col>

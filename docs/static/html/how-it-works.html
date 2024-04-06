@@ -13,9 +13,9 @@
     <dx-text font-size="21px">Demos</dx-text>
   </dx-col>
 
-  <dx-tabs name="demo-tabs" value="basic">
+  <dx-tabs name="demo-tabs" value="stoplight">
     <dx-tab-buttons font-size="14px" gap="20px" justify-content="center">
-      <dx-tab-button
+      <!-- <dx-tab-button
         background-color:hover="white"
         background-color:checked="white"
         background-color="rgba(255, 255, 255, 0.2)"
@@ -25,7 +25,7 @@
         padding="10px 20px"
         value="basic"
         >Style & Layout</dx-tab-button
-      >
+      > -->
       <dx-tab-button
         background-color:hover="white"
         background-color:checked="white"
@@ -37,61 +37,21 @@
         value="stoplight"
         >Behavior & State</dx-tab-button
       >
+      <dx-tab-button
+        background-color:hover="white"
+        background-color:checked="white"
+        background-color="rgba(255, 255, 255, 0.2)"
+        border-radius="50px"
+        color:hover="black"
+        color="white"
+        padding="10px 20px"
+        opacity="0.5"
+        value="stoplight"
+        pointer-events="none"
+        >More Coming Soon...</dx-tab-button
+      >
     </dx-tab-buttons>
     <dx-tab-panels>
-      <dx-tab-panel value="basic">
-        <dx-col gap="30px" padding="40px 0px">
-          <dx-text opacity="0.35"
-            >The following Style & Layout demo is provided to give you a quick idea of what domx's markup looks like.
-          </dx-text>
-          <dx-tabs
-            value="demo"
-            bg-color="transparent"
-            bg-color:hover="transparent"
-            fg-color="white"
-            fg-color:hover="gold"
-            accent-color="#222222"
-            accent-color:hover="gold"
-          >
-            <dx-tab-buttons>
-              <dx-tab-button value="demo">demo</dx-tab-button>
-              <dx-tab-button value="index">index.html</dx-tab-button>
-            </dx-tab-buttons>
-            <dx-tab-panels>
-              <dx-tab-panel value="demo">
-                <dx-col gap="10px" justify-content="center" padding="20px 0" width="100%">
-                  <dx-button>I'm a Button</dx-button>
-                </dx-col>
-              </dx-tab-panel>
-              <dx-tab-panel value="index">
-                <dx-col gap="10px" justify-content="center" padding="20px 0" width="100%"
-                  ><dx-text>The Markup</dx-text>
-                  <!-- prettier-ignore -->
-                  <dx-prismjs src="/static/scripts" language="markup">
-&lt;dx-state src="/api/stoplight.json"&gt;
-  &lt;dx-text font-size="21px" font-size--960="28px"&gt;Click The Stoplight&lt;/dx-text&gt;
-  &lt;dx-row id="stoplight"&gt;
-    &lt;dx-box id="stoplight__red" background-color="red"&gt;&lt;/dx-box&gt;
-    &lt;dx-box id="stoplight__yellow" background-color="yellow"&gt;&lt;/dx-box&gt;
-    &lt;dx-box id="stoplight__green" background-color="green"&gt;&lt;/dx-box&gt;
-  &lt;/dx-row&gt;
-  &lt;dx-state-if state="stoplight" is="red"&gt;
-    &lt;dx-text font-size="14px"&gt;The stoplight is red&lt;/dx-text&gt;
-  &lt;/dx-state-if&gt;
-  &lt;dx-state-if state="stoplight" is="yellow"&gt;
-    &lt;dx-text font-size="14px"&gt;The stoplight is yellow&lt;/dx-text&gt;
-  &lt;/dx-state-if&gt;
-  &lt;dx-state-if state="stoplight" is="green"&gt;
-    &lt;dx-text font-size="14px"&gt;The stoplight is green&lt;/dx-text&gt;
-  &lt;/dx-state-if&gt;
-&lt;/dx-state&gt;
-       </dx-prismjs>
-                </dx-col>
-              </dx-tab-panel>
-            </dx-tab-panels>
-          </dx-tabs>
-        </dx-col>
-      </dx-tab-panel>
       <dx-tab-panel value="stoplight">
         <dx-col gap="30px" padding="40px 0px">
           <dx-text opacity="0.35"
