@@ -1,2 +1,231 @@
-"use strict";(()=>{function T(n,t,e){document.querySelectorAll(t).forEach(s=>s.classList.add(e))}function p(n,t,e,r){document.querySelectorAll(t).forEach(i=>{let a=o=>{o.preventDefault(),o.target===i&&n.dispatch(r)};i.removeEventListener(e,a),i.addEventListener(e,a)})}function v(n,t,e){let r=document.querySelector(t);if(!r)return;let s=document.createElement("template");s.innerHTML=decodeURIComponent(e),r.append(s.content)}function b(n,t,e=0){clearTimeout(n.timeouts[t]),n.timeouts[t]=setTimeout(()=>n.dispatch(t),e)}function L(n,t,e,r){window.history.pushState(t,e,r)}function y(n,t){fetch(t,{method:"GET"}).then(e=>e.json().then(r=>n.transform(r)))}function E(n,t,e){let r=document.querySelector(t);r&&(r.innerHTML=decodeURIComponent(e))}function S(n,t){window.location.href=t}function D(n,t){let e=document.querySelector(t),r=new FormData(e);fetch(e.action,{body:r,method:"POST"}).then(s=>s.json().then(i=>n.transform(i)))}function w(n,t,e){let r=document.querySelector(t);r&&(r.textContent=decodeURIComponent(e))}function x(n,t,e){document.querySelectorAll(t).forEach(s=>s.removeAttribute(e))}function M(n,t,e,r){document.querySelectorAll(t).forEach(i=>{let a=o=>{o.preventDefault(),o.target===i&&n.dispatch(r)};i.removeEventListener(e,a)})}function A(n,t,e){document.querySelectorAll(t).forEach(s=>s.classList.remove(e))}function q(n,t,e){let r=document.querySelector(t);if(!r)return;let s=document.createElement("template");s.innerHTML=decodeURIComponent(e),r.replaceWith(s.content)}function H(n,t,e,r){document.querySelectorAll(t).forEach(i=>{if(r===null)return i.removeAttribute(e);i.setAttribute(e,r)})}function C(n,t){let e=new Date().getTime();for(;new Date().getTime()-e<t;);}function _(n,t,...e){window[t](...e)}function R(n,t){n.state=t,n.fsm.states[t].entry&&n.dispatch("entry")}var d=class extends HTMLElement{state="";fsm={initialState:"",listeners:[],states:{}};subs=[];timeouts={};tranformers={};addTransformer(t,e){return this.tranformers[t]=e,this}constructor(){super(),this.dispatch=this.dispatch.bind(this),this.init=this.init.bind(this),this.sub=this.sub.bind(this),this.transform=this.transform.bind(this),this.addTransformer("addClass",T),this.addTransformer("addEventListener",p),this.addTransformer("append",v),this.addTransformer("dispatch",b),this.addTransformer("innerHTML",E),this.addTransformer("history",L),this.addTransformer("get",y),this.addTransformer("location",S),this.addTransformer("post",D),this.addTransformer("removeAttribute",x),this.addTransformer("removeClass",A),this.addTransformer("removeEventListener",M),this.addTransformer("replace",q),this.addTransformer("setAttribute",H),this.addTransformer("state",R),this.addTransformer("textContent",w),this.addTransformer("wait",C),this.addTransformer("window",_)}connectedCallback(){let t=this.getAttribute("src");if(t)return fetch(t).then(r=>r.json().then(this.init));let e=this.getAttribute("obj");if(e)return this.init(window[e])}dispatch(t){let e=this.fsm.states[this.state][t];if(!e)return;let r=this.state;this.transform(e,()=>{this.subs.forEach(s=>s(t,r,this.state))})}init(t){this.fsm=t;let e=this.fsm.listeners??[],r=()=>{for(let a=0;a<e.length;a++){let[o,f,g]=e[a],u=document.querySelectorAll(o);for(let c=0;c<u.length;c++){let m=u[c],h=l=>{l.preventDefault(),l.target===m&&this.dispatch(g)};m.removeEventListener(f,h),m.addEventListener(f,h)}}};new MutationObserver(a=>{a.forEach(o=>{o.type==="childList"&&o.addedNodes&&r()})}).observe(this,{attributes:!0,childList:!0,subtree:!0}),r();let i=t.states[t.initialState];this.state=t.initialState,i.entry&&this.dispatch("entry")}sub(t){return this.subs.push(t),()=>this.unsub(t)}transform(t=[],e){if(t){for(let r=0;r<t.length;r++){let s=t[r],[i,...a]=s,o=this.tranformers[i];if(!o)throw new Error(`Unknown transformer: ${i}`);o(this,...a)}e&&e()}}unsub=t=>{this.subs=this.subs.filter(e=>e!==t)}};customElements.define("dom-x",d);})();
+"use strict";
+(() => {
+  // src/components/dom-x.ts
+  function addClassTransformer(_, selector, className) {
+    const els = document.querySelectorAll(selector);
+    els.forEach((el) => el.classList.add(className));
+  }
+  function addEventListenerTransformer(domx, selector, event, fsmEvent) {
+    const els = document.querySelectorAll(selector);
+    els.forEach((el) => {
+      const cb = (e) => {
+        e.preventDefault();
+        if (e.target !== el)
+          return;
+        domx.dispatch(fsmEvent);
+      };
+      el.removeEventListener(event, cb);
+      el.addEventListener(event, cb);
+    });
+  }
+  function appendTransformer(_, selector, html) {
+    const el = document.querySelector(selector);
+    if (!el)
+      return;
+    const tmpl = document.createElement("template");
+    tmpl.innerHTML = decodeURIComponent(html);
+    el.append(tmpl.content);
+  }
+  function dispatchTransformer(domx, event, timeout = 0) {
+    clearTimeout(domx.timeouts[event]);
+    domx.timeouts[event] = setTimeout(() => domx.dispatch(event), timeout);
+  }
+  function historyTransformer(_, state, title, url) {
+    window.history.pushState(state, title, url);
+  }
+  function getRequestTransformer(domx, url) {
+    fetch(url, {
+      method: "GET"
+    }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+  }
+  function innerHTMLTransformer(_, selector, html) {
+    const el = document.querySelector(selector);
+    if (!el)
+      return;
+    el.innerHTML = decodeURIComponent(html);
+  }
+  function locationTransformer(_, url) {
+    window.location.href = url;
+  }
+  function postRequestTransformer(domx, formSelector) {
+    const form = document.querySelector(formSelector);
+    const formData = new FormData(form);
+    fetch(form.action, {
+      body: formData,
+      method: "POST"
+    }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+  }
+  function textContentTransformer(_, selector, text) {
+    const el = document.querySelector(selector);
+    if (!el)
+      return;
+    el.textContent = decodeURIComponent(text);
+  }
+  function removeAttributeTransformer(_, selector, attr) {
+    const els = document.querySelectorAll(selector);
+    els.forEach((el) => el.removeAttribute(attr));
+  }
+  function removeEventListenerTransformer(domx, selector, event, fsmEvent) {
+    const els = document.querySelectorAll(selector);
+    els.forEach((el) => {
+      const cb = (e) => {
+        e.preventDefault();
+        if (e.target !== el)
+          return;
+        domx.dispatch(fsmEvent);
+      };
+      el.removeEventListener(event, cb);
+    });
+  }
+  function removeClassTransformer(_, selector, className) {
+    const els = document.querySelectorAll(selector);
+    els.forEach((el) => el.classList.remove(className));
+  }
+  function replaceTransformer(_, selector, html) {
+    const el = document.querySelector(selector);
+    if (!el)
+      return;
+    const tmpl = document.createElement("template");
+    tmpl.innerHTML = decodeURIComponent(html);
+    el.replaceWith(tmpl.content);
+  }
+  function setAttributeTransformer(_, selector, attr, value) {
+    const els = document.querySelectorAll(selector);
+    els.forEach((el) => {
+      if (value === null)
+        return el.removeAttribute(attr);
+      el.setAttribute(attr, value);
+    });
+  }
+  function waitTransformer(_, timeout) {
+    const startTime = new Date().getTime();
+    while (new Date().getTime() - startTime < timeout) {
+    }
+  }
+  function windowTransformer(_, method, ...args) {
+    window[method](...args);
+  }
+  function stateTransformer(domx, state) {
+    domx.state = state;
+    if (domx.fsm.states[state].entry)
+      domx.dispatch("entry");
+  }
+  var Domx = class extends HTMLElement {
+    constructor() {
+      super();
+      this.state = "";
+      this.fsm = {
+        initialState: "",
+        listeners: [],
+        states: {}
+      };
+      this.subs = [];
+      this.timeouts = {};
+      this.tranformers = {};
+      this.unsub = (s) => {
+        this.subs = this.subs.filter((sub) => sub !== s);
+      };
+      this.dispatch = this.dispatch.bind(this);
+      this.init = this.init.bind(this);
+      this.sub = this.sub.bind(this);
+      this.transform = this.transform.bind(this);
+      this.addTransformer("addClass", addClassTransformer);
+      this.addTransformer("addEventListener", addEventListenerTransformer);
+      this.addTransformer("append", appendTransformer);
+      this.addTransformer("dispatch", dispatchTransformer);
+      this.addTransformer("innerHTML", innerHTMLTransformer);
+      this.addTransformer("history", historyTransformer);
+      this.addTransformer("get", getRequestTransformer);
+      this.addTransformer("location", locationTransformer);
+      this.addTransformer("post", postRequestTransformer);
+      this.addTransformer("removeAttribute", removeAttributeTransformer);
+      this.addTransformer("removeClass", removeClassTransformer);
+      this.addTransformer("removeEventListener", removeEventListenerTransformer);
+      this.addTransformer("replace", replaceTransformer);
+      this.addTransformer("setAttribute", setAttributeTransformer);
+      this.addTransformer("state", stateTransformer);
+      this.addTransformer("textContent", textContentTransformer);
+      this.addTransformer("wait", waitTransformer);
+      this.addTransformer("window", windowTransformer);
+    }
+    addTransformer(name, cb) {
+      this.tranformers[name] = cb;
+      return this;
+    }
+    connectedCallback() {
+      const src = this.getAttribute("src");
+      if (src)
+        return fetch(src).then((r) => r.json().then(this.init));
+      const obj = this.getAttribute("obj");
+      if (obj)
+        return this.init(window[obj]);
+      return;
+    }
+    dispatch(evt) {
+      const transformations = this.fsm.states[this.state][evt];
+      if (!transformations)
+        return;
+      const prevState = this.state;
+      this.transform(transformations, () => {
+        this.subs.forEach((s) => s(evt, prevState, this.state));
+      });
+    }
+    init(fsm) {
+      this.fsm = fsm;
+      const listeners = this.fsm.listeners ?? [];
+      const register = () => {
+        for (let i = 0; i < listeners.length; i++) {
+          const [selector, eventListener, fsmEvent] = listeners[i];
+          const els = document.querySelectorAll(selector);
+          for (let j = 0; j < els.length; j++) {
+            const el = els[j];
+            const cb = (e) => {
+              e.preventDefault();
+              if (e.target !== el)
+                return;
+              this.dispatch(fsmEvent);
+            };
+            el.removeEventListener(eventListener, cb);
+            el.addEventListener(eventListener, cb);
+          }
+        }
+      };
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "childList" && mutation.addedNodes)
+            register();
+        });
+      });
+      observer.observe(this, {
+        attributes: true,
+        childList: true,
+        subtree: true
+      });
+      register();
+      const initState = fsm.states[fsm.initialState];
+      this.state = fsm.initialState;
+      if (initState.entry)
+        this.dispatch("entry");
+    }
+    sub(s) {
+      this.subs.push(s);
+      return () => this.unsub(s);
+    }
+    transform(transformations = [], cb) {
+      if (!transformations)
+        return;
+      for (let i = 0; i < transformations.length; i++) {
+        const transformation = transformations[i];
+        const [transformer, ...transformerArgs] = transformation;
+        const transformerFn = this.tranformers[transformer];
+        if (!transformerFn)
+          throw new Error(`Unknown transformer: ${transformer}`);
+        transformerFn(this, ...transformerArgs);
+      }
+      if (cb)
+        cb();
+    }
+  };
+  customElements.define("dom-x", Domx);
+})();
 //# sourceMappingURL=dom-x.js.map
