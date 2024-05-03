@@ -8,7 +8,7 @@
     justify-content="center"
     justify-content--960="space-between"
   >
-    <dx-text font-size="24px">dx-state, dx-state-if</dx-text>
+    <dx-text font-size="24px">The <code>dom-x</code> component</dx-text>
     <dx-anchor
       color="gold"
       color:hover="black"
@@ -17,14 +17,14 @@
       border-radius="5px"
       padding="5px 10px"
       text-decoration="none"
-      href="https://unpkg.com/@linttrap/domx@latest/dist/dx-state.min.js"
+      href="https://unpkg.com/@linttrap/domx@latest/dist/dom-x.min.js"
       target="_blank"
-      >dx-state.min.js &nbsp; (↓)</dx-anchor
+      >dom-x.min.js &nbsp; (↓)</dx-anchor
     >
   </dx-box>
   <dx-text opacity="0.35"
-    >The state machine component is the core of domx. It makes a fetch to its
-    `src` onload and processes the state machine and exposes its API to the DOM.
+    >The <code>&lt;dom-x&gt;</code> component wraps whatever dom you want to control. On load it makes a fetch to its
+    `src` and processes the state machine, attaching event listeners and transformations to the dom.
   </dx-text>
   <!-- prettier-ignore -->
   <dx-prismjs src="/static/scripts" language="markup">
@@ -35,54 +35,35 @@
 &lt;dx-state id="todo-state" src="/todo-machine.json"&gt; 
 &lt;!-- DOM scope --&gt;
 &lt;/dx-state&gt; 
-
-&lt;!-- Alternatively you can set the state machine from the window object with [obj]=[window-scoped-variable] --&gt;
   </dx-prismjs>
-  <dx-text opacity="0.35"
-    >Checkout the state machine api for the stoplight machine. Run the following
-    in your development console:
-  </dx-text>
-  <!-- prettier-ignore -->
-  <dx-prismjs src="/static/scripts" language="typescript">const stoplight = document.getElementById('stoplight');
-console.log(Object.keys(stoplight));</dx-prismjs>
-  <dx-text opacity="0.35"
-    >Even though event binding is taken care of by the state machine and complex
-    functionality is to be delegated to web components it's still good to have
-    the ability to use the state machine's API directly when you need to like
-    so:
-  </dx-text>
-  <!-- prettier-ignore -->
-  <dx-prismjs src="/static/scripts" language="typescript">// get a reference to the state machine
-const stoplight = document.getElementById('stoplight');
-
-// dispatch an event
-stoplight.dispatch("changeState"); // try this above alongside the stoplight example
-
-// subscribe to state changeState
-stoplight.sub((state: string, action: string, dx: DX) => { ... })
-
-// run an ad-hoc transformation
-// try this in the console
-stoplight.transform(
-"name-of-your-adhoc-event",
-[
-  ["attr", "#stoplight__red", "background-color", "blue"],
-  ["win", "alert", "You changed the red stoplight to blue!"],
-]
-)
-
-// get current state
-console.log(stoplight.state)
-
-// get the state machine config
-console.log(stoplight.config)</dx-prismjs>
 
   <!-- state machine -->
   <dx-col gap="20px">
-    <dx-text font-size="18px">The State Machine</dx-text>
+    <dx-box
+      align-items="center"
+      align-items--960="flex-end"
+      flex-direction="column"
+      flex-direction--960="row"
+      gap="10px"
+      justify-content="center"
+      justify-content--960="space-between"
+    >
+      <dx-text font-size="24px">The State Machine (Schema)</dx-text>
+      <dx-anchor
+        color="gold"
+        color:hover="black"
+        background-color:hover="gold"
+        border="1px solid gold"
+        border-radius="5px"
+        padding="5px 10px"
+        text-decoration="none"
+        href="https://unpkg.com/@linttrap/domx@latest/dist/dom-x.json"
+        target="_blank"
+        >dom-x.json &nbsp; (↓)</dx-anchor
+      >
+    </dx-box>
     <dx-text opacity="0.35"
-      >The state machine is an XState inspired JSON configration object which
-      takes the following format:</dx-text
+      >The state machine is an XState inspired JSON configration object which takes the following format:</dx-text
     >
     <!-- prettier-ignore -->
     <dx-prismjs src="/static/scripts" language="typescript">
@@ -119,12 +100,11 @@ console.log(stoplight.config)</dx-prismjs>
 
   <!-- transformation object -->
   <dx-col gap="20px">
-    <dx-text font-size="18px">The Transformation Object</dx-text>
+    <dx-text font-size="24px">The Transformation Object</dx-text>
     <dx-text opacity="0.35"
-      >When a state machine event is triggered, the [current state] -> [event
-      name] transformation object is processed. Each item in the transformation
-      object is responsible for a specific transformation which is called a
-      "trait". Here are examples of all the traits:</dx-text
+      >When a state machine event is triggered, the [current state] -> [event name] transformation object is processed.
+      Each item in the transformation object is responsible for a specific transformation which is called a "trait".
+      Here are examples of all the traits:</dx-text
     >
     <!-- prettier-ignore -->
     <dx-prismjs src="/static/scripts" language="typescript">

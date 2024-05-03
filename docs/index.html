@@ -2,23 +2,19 @@
   <head>
     <title>domx</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="linttrapmedia" />
+    <meta name="keywords" content="web, development, simple, domx, dom, html, css, javascript" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#000000" />
+
     <meta name="description" content="Making Web Development Simple Again" />
     <meta name="favicon" content="/static/images/favicon.svg" />
     <link rel="stylesheet" href="/static/styles/styles.css" />
-    <script defer src="/static/scripts/dx-box.js"></script>
-    <script defer src="/static/scripts/dx-grid.js"></script>
-    <script defer src="/static/scripts/dx-state.js"></script>
-    <script defer src="/static/scripts/dx-text.js"></script>
-    <script defer src="/static/scripts/dx-include.js"></script>
-    <script defer src="/static/scripts/dx-prismjs.js"></script>
-    <script defer src="/static/scripts/dx-anchor.js"></script>
-    <script defer src="/static/scripts/dx-fab.js"></script>
-    <script defer src="/static/scripts/dx-tabs.js"></script>
-    <script defer src="/static/scripts/dx-style.js"></script>
-    <script defer src="/static/scripts/dx-frame.js"></script>
-    <script defer src="/static/scripts/dx-button.js"></script>
-    <script defer src="/static/scripts/dx-is.js"></script>
+    <link rel="stylesheet" href="/static/styles/prism.css" />
+    <script defer src="/static/scripts/dom-x.js"></script>
+    <script defer src="/static/scripts/prism.min.js"></script>
+    <script defer src="/static/scripts/prism-markup.min.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y0MV1R2QMP"></script>
     <script>
@@ -31,41 +27,273 @@
     </script>
   </head>
   <body>
-    <dx-box
-      align-items="flex-start"
-      background="linear-gradient(45deg,rgba(255, 255, 255, 0.1) 50%, gold 50%)"
-      display="flex"
-      height="75px"
-      justify-content="flex-end"
-      padding="5px"
-      position="absolute"
-      right="0px"
-      text-align="right"
-      top="0px"
-      width="75px"
-    >
+    <dom-x src="/api/stoplight.json"></dom-x>
+
+    <div class="github">
       <a href="https://github.com/linttrapmedia/domx" target="_blank"
         ><img src="static/images/github.svg" width="50%"
       /></a>
-    </dx-box>
-    <dx-col align-items="normal" align-items--960="center">
-      <dx-col gap="50px" padding="50px 20px" max-width="960px">
-        <dx-include src="/static/html/header.html"></dx-include>
-        <dx-include src="/static/html/get-started.html"></dx-include>
-        <dx-include src="/static/html/how-it-works.html"></dx-include>
-        <dx-include src="/static/html/components.html"></dx-include>
-        <dx-include src="/static/html/dx-box.html"></dx-include>
-        <dx-include src="/static/html/dx-grid.html"></dx-include>
-        <!-- <dx-include src="/static/html/dx-image.html"></dx-include> -->
-        <dx-include src="/static/html/dx-state.html"></dx-include>
-        <dx-include src="/static/html/dx-state-if.html"></dx-include>
-        <dx-include src="/static/html/dx-style.html"></dx-include>
-        <dx-include src="/static/html/dx-tabs.html"></dx-include>
-        <dx-include src="/static/html/dx-text.html"></dx-include>
-        <dx-include src="/static/html/coming-soon.html"></dx-include>
-        <dx-include src="/static/html/footer.html"></dx-include>
-        <dx-include src="/static/html/fab.html"></dx-include>
-      </dx-col>
-    </dx-col>
+    </div>
+    <div class="ui">
+      <!-- Header -->
+      <section>
+        <header class="header">
+          <div class="header__logo">
+            <h1 class="header__title">domx</h1>
+            <span class="header__version">0.0.10</span>
+          </div>
+          <p class="header__subtitle">Say Goodbye to 80% of Your Frontend</p>
+          <p class="header__description">
+            Transform the DOM with a simple state machine modeled in JSON and remove 80% of all the nonsense. No
+            javascript, no libraries, no transpilers, just simple, clean, efficient code.
+          </p>
+        </header>
+      </section>
+
+      <!-- Get Started -->
+      <section>
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">Download</h2>
+            <p class="title__sub">~1.7KB!</p>
+          </div>
+          <div class="flex">
+            <a href="https://unpkg.com/@linttrap/domx@latest/dist/dom-x.min.js" class="download"
+              >dom-x.min.js &nbsp; (↓)</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Include the script in your HTML file: -->
+      <section>
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">Include It</h2>
+            <p class="title__sub">Add It To Your Html</p>
+          </div>
+          <pre>
+            <code class="language-markup">&lt;!-- Include the script --&gt;
+&lt;script src="/static/scripts/dom-x.js"&gt;&lt;/script&gt;
+
+&lt;!-- Add the custom element to the body of HTML file --&gt;
+&lt;dom-x src="[YOUR-STATE-MACHINE-CONFIG].json"&gt;&lt;/dom-x&gt;
+</code>
+          </pre>
+        </div>
+      </section>
+
+      <!-- Demo -->
+
+      <section>
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">Write Some Markup</h2>
+            <p class="title__sub">Click The Stoplight</p>
+          </div>
+          <div class="flex mobile:flex--col">
+            <div class="stoplight">
+              <div class="stoplight__red"></div>
+              <div class="stoplight__yellow"></div>
+              <div class="stoplight__green"></div>
+            </div>
+            <pre>
+              <code class="language-markup">
+  &lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt;
+  &lt;div id="stoplight"&gt;
+    &lt;div id="stoplight__red"&gt;&lt;/div&gt;
+    &lt;div id="stoplight__yellow"&gt;&lt;/div&gt;
+    &lt;div id="stoplight__green"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  </code>
+            </pre>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="title">
+            <h3 class="title__main">Define A State Machine</h3>
+            <p class="title__sub">stoplight.json</p>
+          </div>
+          <pre>
+                <code class="language-javascript">{
+    // the initial state
+    "initialState": "red",
+
+    // attach listeners
+    "listeners": [["#stoplight", "click", "changeState"]],
+
+    // state definitions
+    "states": {
+      // the "red" state
+      "red": {
+        // on entry, run these "transformers"
+        "entry": [
+          // add the class "active" to the red light
+          ["addClass", "#stoplight__red", "active"],
+          // remove the class "active" from the green light
+          ["removeClass", "#stoplight__green", "active"],
+          // dispatch the "changeState" event in 2000ms
+          ["dispatch", "changeState", 2000]
+        ],
+        // when the "changeState" event is dispatched, change the state to "yellow"
+        "changeState": [["state", "yellow"]]
+      },
+      // the "yellow" state
+      "yellow": {
+        "entry": [
+          ["addClass", "#stoplight__yellow", "active"],
+          ["removeClass", "#stoplight__red", "active"],
+          ["dispatch", "changeState", 2000]
+        ],
+        "changeState": [["state", "green"]]
+      },
+      // the "green" state
+      "green": {
+        "entry": [
+          ["addClass", "#stoplight__green", "active"],
+          ["removeClass", "#stoplight__yellow", "active"],
+          ["dispatch", "changeState", 2000]
+        ],
+        "changeState": [["state", "red"]]
+      }
+    }
+  }</code></pre>
+        </div>
+      </section>
+
+      <section>
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">How Is That Better!?</h2>
+            <p class="title__sub">In Short:</p>
+          </div>
+          <p>
+            Behavior is local (no more following wires), the state is modeled (the only thing that's actually hard),
+            less client/server coupling (it's all backend) and it's toolable (you can write your own transformers). And
+            in the end, it's just a lot less code and complexity.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">Transformers</h2>
+            <p class="title__sub">All The Things You Can Do</p>
+          </div>
+          <pre><code class="language-javascript">
+// Name: Append
+// Desc: Append to element
+// Type: [transformer: "append", selector: string, html: string];
+["append", "#list", "&lt;li&gt;new item&lt;/li&gt;"],
+
+// Name: Attr
+// Desc: Set an attribute
+// Type: [transformer: "attr", selector: string, attr: string, value: string];
+["attr", "#dialog", "open", "true"],
+
+// Name: Add Event Listener
+// Desc: Attach an event handler to trigger an action
+// Type: [transformer: "addEventListener", selector: string, event: string, stateEvent:string];
+["addEventListener", "#btn", "click", "changeState"],
+
+// Name: Dispatch
+// Desc: Dispatch an action
+// Type: [transformer: "dispatch", action: string, delay?: number];
+["dispatch", "reset", 2000],
+
+// Name: Get
+// Desc: Trigger a get request and process the result (a transformation object)
+// Type: [transformer: "get", url: string, ...args: any[]];
+["get", "/some/endpoint"],
+
+// Name: History
+// Desc: Update the browser history
+// Type: [transformer: "history", method: string, ...args: (string | number)[]];
+["history", "pushState", {}, "Record List", "/records/list"],
+
+// Name: Location
+// Desc: Update the browser location
+// Type: [transformer: "location", url:string];
+["location", "/records/list"],
+
+// Name: Post
+// Desc: Post selected data to endpoint and process the result (a transformation object)
+// Type: [transformer: "post", url: string, ...data: [key: string, selector: string, val: "value" | "dataset" | "formData"][]];
+["post", "/some/endpoint", [
+  ["form-data", "#todoForm", "formData"]
+]],
+
+// Name: Remove attribute
+// Desc: Remove an attribute
+// Type: [transformer: "removeAttribute", selector: string, attr: string];
+["removeAttribute", "#dialog", "open"],
+
+// Name: Remove class
+// Desc: Remove a class
+// Type: [transformer: "removeClass", selector: string, className: string];
+["removeClass", "#dialog", "open"],
+
+// Name: RemoveEventListener
+// Desc: Remove an event listener
+// Type: [transformer: "removeEventListener", selector: string, event: string, stateEvent: string];
+["removeEventListener", "#btn", "click", "changeState"],
+
+// Name: Replace
+// Desc: Replace an element
+// Type: [transformer: "replace", selector: string, html: string];
+["replace", "#list", "&lt;li&gt;updated item&lt;/li&gt;"],
+
+// Name: SetAttribute
+// Desc: Set an attribute
+// Type: [transformer: "setAttribute", selector: string, attr: string, value: string];
+["setAttribute", "#dialog", "open", "true"],
+
+// Name: State
+// Desc: Change current state
+// Type: [transformer: "state", state: string];
+["state", "processing"],
+
+// Name: Text content
+// Desc: Set the text content of an element
+// Type: [transformer: "textContent", selector: string, text: string];
+["textContent", "#dialog", "Processing..."],
+
+// Name: Wait
+// Desc: Add a wait between transformations
+// Type: [transformer: "wait", ms: number];
+["wait", 2000],
+
+// Name: Window
+// Desc: Call a method on the window object
+// Type: [transformer: "win", method: string, ...args: any[]];
+["window", "alert", "Hello World!"],
+</code></pre>
+        </div>
+      </section>
+      <section>
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">What Else?</h2>
+            <p class="title__sub">
+              Couple domx with my other library,
+              <a href="https://linttrapmedia.github.io/capui/" target="_blank">cap ui</a>
+            </p>
+          </div>
+          <p>
+            cap ui is a set of cut and paste ui components. The state/behavior of the components are expressed via BEM
+            css syntax which makes Domx and cap ui a match made in heaven.
+          </p>
+        </div>
+      </section>
+      <section>
+        <p style="opacity: 0.5">
+          ©Copyright 2024 All rights reserved. Made in the USA 🇺🇸 by
+          <a href="https://kevinlint.com" target="_blank">Kevin Lint</a> as a product of
+          <a href="https://linttrap.media" target="_blank">Lint Trap Media</a>.
+        </p>
+      </section>
+    </div>
   </body>
 </html>

@@ -1,237 +1,151 @@
 <dx-col id="how-it-works" text-align="center" gap="20px">
-  <dx-col gap="30px">
-    <dx-col>
-      <dx-text color="gold" font-size="32px">How It Works</dx-text>
-      <dx-text font-size="21px">Less Glue, Less Mess</dx-text>
-    </dx-col>
-    <dx-text opacity="0.35"
-      >Most web application code is "glue code" introduced to keep everything in check. Over time, it has turned the
-      craft of web development into a sticky mess. Domx solves the problem by creating a set of cut-and-paste components
-      that make everything snap, not stick, together.
-    </dx-text>
-    <dx-box border-bottom="3px solid gold" opacity="0.15"></dx-box>
-    <dx-text font-size="21px">Demos</dx-text>
+  <dx-col>
+    <dx-text color="gold" font-size="32px">Demo</dx-text>
+    <dx-text font-size="24px">The Stoplight</dx-text>
   </dx-col>
-
-  <dx-tabs name="demo-tabs" value="stoplight">
-    <dx-tab-buttons font-size="14px" gap="20px" justify-content="center">
-      <!-- <dx-tab-button
-        background-color:hover="white"
-        background-color:checked="white"
-        background-color="rgba(255, 255, 255, 0.2)"
-        border-radius="50px"
-        color:hover="black"
-        color="white"
-        padding="10px 20px"
-        value="basic"
-        >Style & Layout</dx-tab-button
-      > -->
-      <dx-tab-button
-        background-color:hover="white"
-        background-color:checked="white"
-        background-color="rgba(255, 255, 255, 0.2)"
-        border-radius="50px"
-        color:hover="black"
-        color="white"
-        padding="10px 20px"
-        value="stoplight"
-        >Behavior & State</dx-tab-button
-      >
-      <dx-tab-button
-        background-color:hover="white"
-        background-color:checked="white"
-        background-color="rgba(255, 255, 255, 0.2)"
-        border-radius="50px"
-        color:hover="black"
-        color="white"
-        padding="10px 20px"
-        opacity="0.5"
-        value="stoplight"
-        pointer-events="none"
-        >More Coming Soon...</dx-tab-button
-      >
+  <dx-tabs
+    value="demo"
+    bg-color="transparent"
+    bg-color:hover="transparent"
+    fg-color="white"
+    fg-color:hover="gold"
+    accent-color="#222222"
+    accent-color:hover="gold"
+  >
+    <dx-tab-buttons>
+      <dx-tab-button value="demo">demo</dx-tab-button>
+      <dx-tab-button value="index">stoplight.html</dx-tab-button>
+      <dx-tab-button value="config">stoplight.json</dx-tab-button>
+      <dx-tab-button value="css">stoplight.css</dx-tab-button>
     </dx-tab-buttons>
     <dx-tab-panels>
-      <dx-tab-panel value="stoplight">
-        <dx-col gap="30px" padding="40px 0px">
-          <dx-text opacity="0.35"
-            >The following is a quick demo of what domx code looks like. It also features the
-            <code>dx-state</code> component which is a powerful state machine that can be used to control the frontend
-            from the backend. Click the stoplight to see it in action. Read more about the
-            <dx-anchor color="gold" href="#dx-state">dx-state</dx-anchor>
-            component below.
-          </dx-text>
-          <dx-tabs
-            value="demo"
-            bg-color="transparent"
-            bg-color:hover="transparent"
-            fg-color="white"
-            fg-color:hover="gold"
-            accent-color="#222222"
-            accent-color:hover="gold"
+      <dx-tab-panel value="demo">
+        <dx-state id="#stoplight" name="stoplight" src="/api/stoplight.json">
+          <dx-col
+            id="stoplight"
+            align-items="center"
+            background-color="rgba(255, 255, 255, 0.1)"
+            background-color:hover="rgba(255, 255, 255, 0.05)"
+            cursor="pointer"
+            border-radius="5px"
+            box-sizing="border-box"
+            gap="30px"
+            justify-content="center"
+            margin="20px 0"
+            padding="50px"
+            width="100%"
+            text-align="center"
+            transition="all 0.2s ease-in-out"
           >
-            <dx-tab-buttons>
-              <dx-tab-button value="demo">demo</dx-tab-button>
-              <dx-tab-button value="index">index.html</dx-tab-button>
-              <dx-tab-button value="config">stoplight.json</dx-tab-button>
-            </dx-tab-buttons>
-            <dx-tab-panels>
-              <dx-tab-panel value="demo">
-                <dx-state id="#stoplight" name="stoplight" src="/api/stoplight.json">
-                  <dx-col
-                    id="stoplight"
-                    align-items="center"
-                    background-color="rgba(255, 255, 255, 0.1)"
-                    background-color:hover="rgba(255, 255, 255, 0.05)"
-                    cursor="pointer"
-                    border-radius="5px"
-                    box-sizing="border-box"
-                    gap="30px"
-                    justify-content="center"
-                    margin="20px 0"
-                    padding="50px"
-                    width="100%"
-                    text-align="center"
-                    transition="all 0.2s ease-in-out"
-                  >
-                    <dx-text font-size="21px" font-size--960="28px"> Click The Stoplight </dx-text>
-                    <dx-row gap="20px" pointer-events="none">
-                      <dx-box
-                        id="stoplight__red"
-                        background-color="red"
-                        border="2px solid rgba(0,0,0,0.75)"
-                        border-radius="50%"
-                        height="50px"
-                        opacity="0.25"
-                        width="50px"
-                      ></dx-box>
-                      <dx-box
-                        id="stoplight__yellow"
-                        background-color="yellow"
-                        border="2px solid rgba(0,0,0,0.75)"
-                        border-radius="50%"
-                        height="50px"
-                        opacity="0.25"
-                        width="50px"
-                      ></dx-box>
-                      <dx-box
-                        id="stoplight__green"
-                        background-color="#07e407"
-                        border="2px solid rgba(0,0,0,0.75)"
-                        border-radius="50%"
-                        height="50px"
-                        opacity="0.25"
-                        width="50px"
-                      ></dx-box>
-                    </dx-row>
-                    <dx-state-if state="stoplight" is="red">
-                      <dx-text font-size="14px">The stoplight is red</dx-text>
-                    </dx-state-if>
-                    <dx-state-if state="stoplight" is="yellow">
-                      <dx-text font-size="14px">The stoplight is yellow</dx-text>
-                    </dx-state-if>
-                    <dx-state-if state="stoplight" is="green">
-                      <dx-text font-size="14px">The stoplight is green</dx-text>
-                    </dx-state-if>
-                  </dx-col>
-                </dx-state>
-              </dx-tab-panel>
-              <dx-tab-panel value="index">
-                <dx-col gap="10px" justify-content="center" padding="20px 0" width="100%"
-                  ><dx-text>The Markup</dx-text>
-                  <!-- prettier-ignore -->
-                  <dx-prismjs src="/static/scripts" language="markup">
-&lt;dx-state src="/api/stoplight.json"&gt;
-  &lt;dx-text font-size="21px" font-size--960="28px"&gt;Click The Stoplight&lt;/dx-text&gt;
-  &lt;dx-row id="stoplight"&gt;
-    &lt;dx-box id="stoplight__red" background-color="red"&gt;&lt;/dx-box&gt;
-    &lt;dx-box id="stoplight__yellow" background-color="yellow"&gt;&lt;/dx-box&gt;
-    &lt;dx-box id="stoplight__green" background-color="green"&gt;&lt;/dx-box&gt;
-  &lt;/dx-row&gt;
-  &lt;dx-state-if state="stoplight" is="red"&gt;
-    &lt;dx-text font-size="14px"&gt;The stoplight is red&lt;/dx-text&gt;
-  &lt;/dx-state-if&gt;
-  &lt;dx-state-if state="stoplight" is="yellow"&gt;
-    &lt;dx-text font-size="14px"&gt;The stoplight is yellow&lt;/dx-text&gt;
-  &lt;/dx-state-if&gt;
-  &lt;dx-state-if state="stoplight" is="green"&gt;
-    &lt;dx-text font-size="14px"&gt;The stoplight is green&lt;/dx-text&gt;
-  &lt;/dx-state-if&gt;
-&lt;/dx-state&gt;
+            <dx-text font-size="21px" font-size--960="28px"> Click The Stoplight </dx-text>
+            <dx-row gap="20px" pointer-events="none">
+              <dx-box
+                id="stoplight__red"
+                background-color="red"
+                border="2px solid rgba(0,0,0,0.75)"
+                border-radius="50%"
+                height="50px"
+                opacity="0.25"
+                width="50px"
+              ></dx-box>
+              <dx-box
+                id="stoplight__yellow"
+                background-color="yellow"
+                border="2px solid rgba(0,0,0,0.75)"
+                border-radius="50%"
+                height="50px"
+                opacity="0.25"
+                width="50px"
+              ></dx-box>
+              <dx-box
+                id="stoplight__green"
+                background-color="#07e407"
+                border="2px solid rgba(0,0,0,0.75)"
+                border-radius="50%"
+                height="50px"
+                opacity="0.25"
+                width="50px"
+              ></dx-box>
+            </dx-row>
+          </dx-col>
+        </dx-state>
+      </dx-tab-panel>
+      <dx-tab-panel value="index">
+        <dx-col gap="10px" justify-content="center" padding="20px 0" width="100%"
+          ><dx-text>The Markup</dx-text>
+          <!-- prettier-ignore -->
+          <dx-prismjs src="/static/scripts" language="markup">
+&lt;dom-x src="/api/stoplight.json"&gt;
+  &lt;div id="stoplight"&gt;
+    &lt;div id="stoplight__red"&gt;&lt;/div&gt;
+    &lt;div id="stoplight__yellow"&gt;&lt;/div&gt;
+    &lt;div id="stoplight__green"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/dom-x&gt;
        </dx-prismjs>
-                </dx-col>
-              </dx-tab-panel>
-              <dx-tab-panel value="config">
-                <dx-col gap="10px" justify-content="center" height="100%" padding="20px 0" width="100%"
-                  ><dx-text>The State Machine</dx-text>
-                  <!-- prettier-ignore -->
-                  <dx-prismjs src="/static/scripts" language="typescript">
-    {
-    "initialState": "red",
-    "listeners": [["#stoplight", "click", "changeState"]],
-    "actions": {
-      "reset": [
-        ["attr", "#stoplight__red", "opacity", "0.25"],
-        ["attr", "#stoplight__yellow", "opacity", "0.25"],
-        ["attr", "#stoplight__green", "opacity", "0.25"]
-      ]
-    },
-    "states": {
-      "red": {
-        "entry": [
-          ["action", "reset"],
-          ["attr", "#stoplight__red", "opacity", "1"],
-          ["dispatch", "changeState", 2000]
-        ],
-        "changeState": [["state", "yellow"]]
-      },
-      "yellow": {
-        "entry": [
-          ["action", "reset"],
-          ["attr", "#stoplight__yellow", "opacity", "1"],
-          ["dispatch", "changeState", 2000]
-        ],
-        "changeState": [["state", "green"]]
-      },
-      "green": {
-        "entry": [
-          ["action", "reset"],
-          ["attr", "#stoplight__green", "opacity", "1"],
-          ["dispatch", "changeState", 2000]
-        ],
-        "changeState": [["state", "red"]]
-      }
-    }
-    }</dx-prismjs>
-                </dx-col>
-              </dx-tab-panel>
-            </dx-tab-panels>
-          </dx-tabs>
         </dx-col>
       </dx-tab-panel>
-      <dx-tab-panel value="todo">Todo</dx-tab-panel>
+      <dx-tab-panel value="config">
+        <dx-col gap="10px" justify-content="center" height="100%" padding="20px 0" width="100%"
+          ><dx-text>The State Machine</dx-text>
+          <!-- prettier-ignore -->
+          <dx-prismjs src="/static/scripts" language="typescript">
+    {
+      "initialState": "red",
+      "listeners": [["#stoplight", "click", "changeState"]],
+      "actions": {
+        "reset": [
+          ["attr", "#stoplight__red", "opacity", "0.25"],
+          ["attr", "#stoplight__yellow", "opacity", "0.25"],
+          ["attr", "#stoplight__green", "opacity", "0.25"]
+        ]
+      },
+      "states": {
+        "red": {
+          "entry": [
+            ["action", "reset"],
+            ["attr", "#stoplight__red", "opacity", "1"],
+            ["dispatch", "changeState", 2000]
+          ],
+          "changeState": [["state", "yellow"]]
+        },
+        "yellow": {
+          "entry": [
+            ["action", "reset"],
+            ["attr", "#stoplight__yellow", "opacity", "1"],
+            ["dispatch", "changeState", 2000]
+          ],
+          "changeState": [["state", "green"]]
+        },
+        "green": {
+          "entry": [
+            ["action", "reset"],
+            ["attr", "#stoplight__green", "opacity", "1"],
+            ["dispatch", "changeState", 2000]
+          ],
+          "changeState": [["state", "red"]]
+        }
+      }
+    }</dx-prismjs>
+        </dx-col>
+      </dx-tab-panel>
+      <dx-tab-panel value="css">
+        <dx-col gap="10px" justify-content="center" padding="20px 0" width="100%"
+          ><dx-text>The Css</dx-text>
+          <!-- prettier-ignore -->
+          <dx-prismjs src="/static/scripts" language="css">
+#stoplight__red {
+  background-color: red;
+}
+#stoplight__yellow {
+  background-color: yellow;
+}
+#stoplight__green {
+  background-color: #07e407;
+}
+       </dx-prismjs>
+        </dx-col>
+      </dx-tab-panel>
     </dx-tab-panels>
   </dx-tabs>
-
-  <dx-col order-radius="10px" font-size="13px" font-size--960="15px" gap="20px" padding="20px">
-    <dx-col>
-      <dx-text color="gold" font-size="32px">Less Glue</dx-text>
-      <dx-text font-size="21px">No More Sticky Mess</dx-text>
-    </dx-col>
-    <dx-text
-      ><strong></strong>Most web application code is "glue code" we introduce to keep everything in check. We use a
-      disparate set of libraries to solve such things as manipulating the DOM (ui frameworks) in response to various
-      events and state changes (state management frameworks) and try to keep everything looking good (css frameworks)
-      while throwing things over the fence between the backend and frontend (api frameworks).
-    </dx-text>
-
-    <dx-text
-      >The <code>dx-state</code> component is not required to use domx, it's just one of many components you can cut and
-      paste into your app. However, it keeps all that glue code from becoming a sticky mess by solving it in a one
-      simple backend language-agnostic configuration object. This means the backend can control frontend state by
-      reading and reacting to events being emitted from the frontend. Learn more about all the things the
-      <dx-anchor color="gold" href="#dx-state">dx-state</dx-anchor>
-      component can do below.</dx-text
-    >
-  </dx-col>
 </dx-col>

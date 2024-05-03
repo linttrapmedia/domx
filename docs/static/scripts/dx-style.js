@@ -1,78 +1,46 @@
 "use strict";
 (() => {
   // src/components/dx-style.ts
-  var win = window;
-  if (!win.DX)
-    win.DX = {};
-  if (!win.DX.style)
-    win.DX.style = {};
-  var _DomxStyleColors = class extends HTMLElement {
-    constructor() {
-      super();
-      this.styleSheet = new CSSStyleSheet();
-      this.props = ["id"];
-      this.render = this.render.bind(this);
+  var styleSheet = new CSSStyleSheet();
+  var applyStyles = (el) => {
+    let dxStyleId = el.getAttribute("dx-style");
+    if (!dxStyleId) {
+      dxStyleId = Math.random().toString(36).substring(7);
+      el.setAttribute("dx-style", dxStyleId);
     }
-    static create() {
-      document.createElement("dx-style-colors");
-    }
-    static read(id) {
-      return _DomxStyleColors.instances.find((el) => el.id === id);
-    }
-    static update(id, props) {
-      for (const key in props)
-        _DomxStyleColors.read(id).setAttribute(key, props[key]);
-    }
-    static delete(el) {
-      el.remove();
-    }
-    static list(filter = void 0) {
-      if (!filter)
-        return _DomxStyleColors.instances;
-      return _DomxStyleColors.instances.filter((el) => el.matches(filter));
-    }
-    connectedCallback() {
-      if (this.hasChildNodes()) {
-        this.attachShadow({ mode: "open" });
-        this.shadowRoot.innerHTML = "<slot></slot>";
-        this.shadowRoot.adoptedStyleSheets = [this.styleSheet];
-      } else {
-        document.adoptedStyleSheets = [this.styleSheet];
-      }
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === "attributes")
-            this.render();
-        });
-      });
-      observer.observe(this, { attributes: true });
-      _DomxStyleColors.instances.push(this);
-      this.render();
-    }
-    render() {
-      const colorAttrs = this.getAttributeNames().filter((attr) => !this.props.includes(attr));
-      const wrapSelector = (sel) => this.hasChildNodes() ? `::slotted(${sel})` : sel;
-      let styles = ``;
-      for (const colorAttr of colorAttrs) {
-        const colorVal = this.getAttribute(colorAttr) || "";
-        const colorVar = `dx-style-color-${colorAttr}`;
-        styles += `${this.hasChildNodes() ? ":host" : ":root"} { --${colorVar}:${colorVal}; }
-`;
-        styles += `${wrapSelector(`.txt-${colorAttr}`)} { color: var(--${colorVar}); }
-`;
-        styles += `${wrapSelector(`.txt-${colorAttr}\\:hover:hover`)}  { color: var(--${colorVar}); }
-`;
-        styles += `${wrapSelector(`.bg-${colorAttr}`)}  { background-color: var(--${colorVar}); }
-`;
-        styles += `${wrapSelector(`.bg-${colorAttr}\\:hover:hover`)}  { background-color: var(--${colorVar}); }
-`;
-      }
-      this.styleSheet.replaceSync(styles);
-    }
+    const styles = el.getAttributeNames().filter((attr) => attr.startsWith("dx-style:")).map((attr) => {
+      const val = el.getAttribute(attr);
+      const [bpAttr, bp = 0] = attr.split("--");
+      const [_, prop, psuedo] = bpAttr.split(":");
+      const rule = `@media (min-width: ${bp}px) { [dx-style="${dxStyleId}"]${psuedo ? `:${psuedo}` : ""} { ${prop}: ${val}; } }`;
+      return rule;
+    }).sort().forEach((rule) => {
+      styleSheet.insertRule(rule);
+      console.log(rule);
+    });
+    console.log(el, styles);
   };
-  var DomxStyleColors = _DomxStyleColors;
-  DomxStyleColors.instances = [];
-  customElements.define("dx-style-colors", DomxStyleColors);
-  win.DX.style.colors = DomxStyleColors;
+  var clearStyles = (el) => {
+  };
+  document.addEventListener("DOMContentLoaded", () => {
+    const dxStyles = document.querySelectorAll("[dx-style]");
+    dxStyles.forEach(applyStyles);
+    document.adoptedStyleSheets = [styleSheet];
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "attributes" && mutation.attributeName === "dx-style") {
+          clearStyles(mutation.target);
+        }
+        if (mutation.type === "childList" && mutation.addedNodes.length) {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute("dx-style")) {
+              applyStyles(node);
+            }
+          });
+        }
+      }
+    });
+    observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+  });
 })();
 //# sourceMappingURL=dx-style.js.map

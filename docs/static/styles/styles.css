@@ -5,9 +5,8 @@
   font-weight: 400;
   font-display: swap;
   src: url(../fonts/PermanentMarker.woff2) format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
-    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
-    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 /* latin */
 @font-face {
@@ -16,9 +15,8 @@
   font-weight: 700;
   font-display: swap;
   src: url(../fonts/SpaceGrotesk.woff2) format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
-    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
-    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 /* latin */
@@ -28,38 +26,14 @@
   font-weight: 400;
   font-display: swap;
   src: url(../fonts/Splash.woff2) format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
-    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
-    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-html,
-body {
-  background-color: black;
-  box-sizing: border-box;
-  color: white;
-  font-family: "Space Grotesk", sans-serif;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-a,
-a:link {
-  color: white;
-}
-
-a:hover {
-  color: gold;
-}
-
-code {
-  font-family: monospace;
-  background-color: rgba(255, 255, 255, 0.2);
-  border: 2px;
-  display: inline-block;
-  padding: 0 3px;
+:root {
+  --text-color-title: gold;
+  --text-color-subtitle: white;
+  --text-color-text: rgba(255, 255, 255, 0.4);
 }
 
 *::-webkit-scrollbar {
@@ -74,4 +48,243 @@ code {
   background-color: black;
   border-radius: 20px;
   border: 1px solid gold;
+}
+
+html,
+body {
+  background-color: black;
+  box-sizing: border-box;
+  color: white;
+  font-family: "Space Grotesk", sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+a,
+a:link {
+  color: white;
+}
+
+a:hover {
+  color: gold;
+}
+
+code {
+  font-family: monospace;
+  display: inline-block;
+  padding: 10px;
+}
+
+pre {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  margin: 0;
+  width: 100%;
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.download {
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  text-decoration: none;
+  font-size: 21px;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.header__logo {
+  align-items: flex-start;
+  font-weight: normal;
+  display: flex;
+}
+
+.header__title {
+  font-family: Splash;
+  color: var(--text-color-title);
+  font-size: 64px;
+  line-height: 0.85;
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+.header__version {
+  color: var(--text-color-title);
+  font-family: monospace;
+  font-size: 10px;
+  padding-left: 10px;
+}
+
+.header__subtitle {
+  color: white;
+  text-align: center;
+  font-size: 32px;
+  margin: 0;
+  padding: 0;
+}
+
+.header__description {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px;
+  justify-content: center;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.flex {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex--col {
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .mobile\:flex--col {
+    flex-direction: column;
+  }
+}
+
+.github {
+  align-items: flex-start;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 50%, gold 50%);
+  display: flex;
+  height: 75px;
+  justify-content: flex-end;
+  padding: 5px;
+  position: absolute;
+  right: 0px;
+  text-align: right;
+  top: 0px;
+  width: 75px;
+}
+
+section {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  justify-content: center;
+  width: 100%;
+}
+
+section .subsection {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+.stoplight {
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+}
+
+.stoplight:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.stoplight div {
+  width: 30px;
+  height: 30px;
+  box-sizing: border-box;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.stoplight div.active {
+  opacity: 1;
+}
+
+.stoplight__red {
+  border-radius: 50%;
+  background-color: red;
+}
+
+.stoplight__yellow {
+  border-radius: 50%;
+  background-color: yellow;
+}
+
+.stoplight__green {
+  border-radius: 50%;
+  background-color: greenyellow;
+}
+
+.title {
+  align-items: center;
+  border-radius: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.title__main {
+  color: var(--text-color-title);
+  font-size: 26px;
+  margin: 0;
+  padding: 0;
+}
+
+.title__sub {
+  color: var(--text-color-subtitle);
+  font-size: 21px;
+  padding: 0;
+  margin: 0;
+}
+
+.ui {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  margin: 0 auto;
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  box-sizing: border-box;
 }

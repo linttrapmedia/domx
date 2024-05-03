@@ -67,14 +67,14 @@ pre[class*="language-"] {
   color: lightgrey;
 }
 .token.property {
-  color: gold;
+  color: grey;
 }
 .token.atrule,
 .token.builtin,
 .token.important,
 .token.keyword,
 .token.selector {
-  color: #cc99cd;
+  color: gold;
 }
 .token.attr-value,
 .token.char,

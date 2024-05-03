@@ -1,35 +1,28 @@
 {
-  "$schema": "domx.json",
+  "$schema": "stoplight.schema.json",
   "initialState": "red",
-  "listeners": [["#stoplight", "click", "changeState"]],
-  "actions": {
-    "reset": [
-      ["attr", "#stoplight__red", "opacity", "0.25"],
-      ["attr", "#stoplight__yellow", "opacity", "0.25"],
-      ["attr", "#stoplight__green", "opacity", "0.25"]
-    ]
-  },
+  "listeners": [[".stoplight", "click", "changeState"]],
   "states": {
     "red": {
       "entry": [
-        ["action", "reset"],
-        ["attr", "#stoplight__red", "opacity", "1"],
+        ["addClass", ".stoplight__red", "active"],
+        ["removeClass", ".stoplight__green", "active"],
         ["dispatch", "changeState", 2000]
       ],
       "changeState": [["state", "yellow"]]
     },
     "yellow": {
       "entry": [
-        ["action", "reset"],
-        ["attr", "#stoplight__yellow", "opacity", "1"],
+        ["addClass", ".stoplight__yellow", "active"],
+        ["removeClass", ".stoplight__red", "active"],
         ["dispatch", "changeState", 2000]
       ],
       "changeState": [["state", "green"]]
     },
     "green": {
       "entry": [
-        ["action", "reset"],
-        ["attr", "#stoplight__green", "opacity", "1"],
+        ["addClass", ".stoplight__green", "active"],
+        ["removeClass", ".stoplight__yellow", "active"],
         ["dispatch", "changeState", 2000]
       ],
       "changeState": [["state", "red"]]

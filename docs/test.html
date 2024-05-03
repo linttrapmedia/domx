@@ -9,11 +9,17 @@
     <script defer src="/static/scripts/dx-style.js"></script>
   </head>
   <body>
-    <dx-style-colors id="main" red="#FF0000" white="#FFFFFF"></dx-style-colors>
-    <button class="txt-red txt-white:hover bg-white bg-red:hover"><span>Testing</span><span>This</span></button>
-
-    <dx-style-colors id="custom" red="green" white="#FFFFFF">
-      <button class="txt-red txt-white:hover bg-white bg-red:hover"><span>Testing</span><span>This</span></button>
-    </dx-style-colors>
+    <button
+      dx-style="test"
+      dx-style:cursor="pointer"
+      dx-style:color="white"
+      dx-style:color--500="green"
+      dx-style:color:hover--500="pink"
+      dx-style:color:hover="black"
+      dx-style:background-color="black"
+      dx-style:background-color:hover="white"
+    >
+      <span>This</span>
+    </button>
   </body>
 </html>

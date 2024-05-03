@@ -31,7 +31,7 @@
   </dx-text>
 
   <dx-tabs
-    value="preview"
+    value="config"
     bg-color="transparent"
     bg-color:hover="transparent"
     fg-color="white"
@@ -48,9 +48,8 @@
     <dx-tab-panels>
       <dx-tab-panel value="preview">
         <dx-box gap="20px" padding="20px">
-          <dx-style-colors id="main" red="#FF0000" white="#FFFFFF"></dx-style-colors>
           <button class="txt-red txt-white:hover bg-white bg-red:hover">Hover Me</button>
-          <dx-style-colors id="main" red="#660000" white="#FFFFFF">
+          <dx-style-colors id="example-local" red="#660000" white="#FFFFFF">
             <button class="txt-red txt-white:hover bg-white bg-red:hover">Hover Me</button>
           </dx-style-colors>
         </dx-box>
@@ -68,11 +67,10 @@
 &lt;/dx-style-colors&gt;
         </dx-prismjs>
       </dx-tab-panel>
-
       <dx-tab-panel value="config">
-        <dx-box padding="10px">
+        <dx-box>
           <table>
-            <caption>
+            <caption class="txt-gold hover:txt-white bg-white-10 p-10">
               dx-style-colors
             </caption>
             <thead>

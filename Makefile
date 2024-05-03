@@ -58,7 +58,7 @@ dist: ## Build the project for distribution
 	@mkdir dist
 	@cp -v ./src/components/*.html dist/
 	@npx esbuild ./src/components/*.ts --outdir=dist --bundle --sourcemap --minify --out-extension:.js=.min.js
-	@zip -r dist/domx.zip dist
+	@zip -r dist/dom-x.zip dist
 
 docs: ## Build the project documentation
 	@npx esbuild ./src/components/*.ts --outdir=docs/static/scripts --bundle --sourcemap --minify
