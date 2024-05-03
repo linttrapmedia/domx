@@ -24,7 +24,6 @@ help:
 clean: ## Clean the project
 	@echo $(STATUS) Cleaning...
 	@rm -rf ./node_modules
-	@rm -rf ./docs/static/scripts/dx*
 	@rm -rf ./dist
 
 deploy: ## Deploy the project
@@ -56,7 +55,6 @@ dist: ## Build the project for distribution
 	@echo $(STATUS) Building...
 	@rm -rf dist
 	@mkdir dist
-	@cp -v ./src/components/*.html dist/
 	@npx esbuild ./src/components/*.ts --outdir=dist --bundle --sourcemap --minify --out-extension:.js=.min.js
 	@zip -r dist/dom-x.zip dist
 
