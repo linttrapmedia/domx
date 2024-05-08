@@ -72,16 +72,13 @@
             <h2 class="title__main">Include It</h2>
             <p class="title__sub">Add the script the head</p>
           </div>
-          <div class="flex mobile:flex--col">
-            <pre>
-            <code class="language-markup">&lt;!-- Include the script and your transformers --&gt;
-&lt;script src="/static/scripts/dom-x.js"&gt;&lt;/script&gt;</code>
+          <pre>
+            <code class="language-markup">&lt;script src="/static/scripts/dom-x.js"&gt;&lt;/script&gt;</code>
           </pre>
-          </div>
         </div>
       </section>
 
-      <!-- Demo -->
+      <!-- Custom Element -->
 
       <section>
         <div class="subsection">
@@ -89,11 +86,9 @@
             <h2 class="title__main">Add The Custom Element</h2>
             <p class="title__sub">This loads the state machine</p>
           </div>
-          <div class="flex mobile:flex--col">
-            <pre>
+          <pre>
               <code class="language-markup">&lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt;</code>
-            </pre>
-          </div>
+          </pre>
         </div>
 
         <div class="subsection">
@@ -101,17 +96,12 @@
             <h2 class="title__main">Add Markup</h2>
             <p class="title__sub">This is the markup the state machine will operate on.</p>
           </div>
-          <div class="flex mobile:flex--col">
-            <pre>
-              <code class="language-markup">
-  &lt;div id="stoplight"&gt;
-    &lt;div id="stoplight__red"&gt;&lt;/div&gt;
-    &lt;div id="stoplight__yellow"&gt;&lt;/div&gt;
-    &lt;div id="stoplight__green"&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  </code>
+          <pre><code class="language-markup">&lt;div id="stoplight"&gt;
+  &lt;div id="stoplight__red"&gt;&lt;/div&gt;
+  &lt;div id="stoplight__yellow"&gt;&lt;/div&gt;
+  &lt;div id="stoplight__green"&gt;&lt;/div&gt;
+&lt;/div&gt;</code>
             </pre>
-          </div>
         </div>
 
         <div class="subsection">
@@ -133,53 +123,40 @@
             <h3 class="title__main">Define A State Machine</h3>
             <p class="title__sub">stoplight.json</p>
           </div>
-          <pre>
-                <code class="language-javascript">{
-    // the initial state
-    "initialState": "red",
-
-    // attach listeners
-    "listeners": [["#stoplight", "click", "changeState"]],
-
-    // state definitions
-    "states": {
-      // the "red" state
-      "red": {
-        // on entry, run these "transformers"
-        "entry": [
-          // add the class "active" to the red light
-          ["addClass", "#stoplight__red", "active"],
-          // remove the class "active" from the green light
-          ["removeClass", "#stoplight__green", "active"],
-          // dispatch the "changeState" event in 2000ms
-          ["dispatch", "changeState", 2000]
-        ],
-        // when the "changeState" event is dispatched, change the state to "yellow"
-        "changeState": [["state", "yellow"]]
-      },
-      // the "yellow" state
-      "yellow": {
-        "entry": [
-          ["addClass", "#stoplight__yellow", "active"],
-          ["removeClass", "#stoplight__red", "active"],
-          ["dispatch", "changeState", 2000]
-        ],
-        "changeState": [["state", "green"]]
-      },
-      // the "green" state
-      "green": {
-        "entry": [
-          ["addClass", "#stoplight__green", "active"],
-          ["removeClass", "#stoplight__yellow", "active"],
-          ["dispatch", "changeState", 2000]
-        ],
-        "changeState": [["state", "red"]]
-      }
+          <pre><code class="language-javascript">{
+  "initialState": "red",
+  "listeners": [["#stoplight", "click", "changeState"]],
+  "states": {
+    "red": {
+      "entry": [
+        ["addClass", "#stoplight__red", "active"],
+        ["removeClass", "#stoplight__green", "active"],
+        ["dispatch", "changeState", 2000]
+      ],
+      "changeState": [["state", "yellow"]]
+    },
+    "yellow": {
+      "entry": [
+        ["addClass", "#stoplight__yellow", "active"],
+        ["removeClass", "#stoplight__red", "active"],
+        ["dispatch", "changeState", 2000]
+      ],
+      "changeState": [["state", "green"]]
+    },
+    "green": {
+      "entry": [
+        ["addClass", "#stoplight__green", "active"],
+        ["removeClass", "#stoplight__yellow", "active"],
+        ["dispatch", "changeState", 2000]
+      ],
+      "changeState": [["state", "red"]]
     }
+  }
   }</code></pre>
         </div>
       </section>
 
+      <!-- Justification -->
       <section>
         <div class="subsection">
           <div class="title">
@@ -290,6 +267,32 @@
 </code></pre>
         </div>
       </section>
+
+      <!-- Custom Transformer -->
+      <section>
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">Write Your Own Transformer</h2>
+            <p class="title__sub">Take a look at the "customTransformer" transformer</p>
+          </div>
+          <pre>
+      <code class="language-javascript">// first define the function
+function addCustomTransformer(domxInstance: Domx, arg1: string, arg2: string) {
+  // ...do your worst...
+}
+
+// then register it to a dom-x tag instance
+const domx = document.querySelector("dom-x") as Domx;
+domx.addTransformer("customTransformer", addCustomTransformer);
+
+// in your state machine you can now use it
+["customTransformer", "argument one", "argument two"]
+</code>
+    </pre>
+        </div>
+      </section>
+
+      <!-- What Next? -->
       <section>
         <div class="subsection">
           <div class="title">
@@ -301,7 +304,8 @@
           </div>
           <p>
             cap ui is a set of cut and paste ui components. The state/behavior of the components are expressed via BEM
-            css syntax which makes Domx and cap ui a match made in heaven.
+            syntax which means adding/removing classes pretty much controls everything. This makes domx and cap ui a
+            match made in heaven.
           </p>
         </div>
       </section>
