@@ -70,16 +70,14 @@
         <div class="subsection">
           <div class="title">
             <h2 class="title__main">Include It</h2>
-            <p class="title__sub">Add It To Your Html</p>
+            <p class="title__sub">Add the script the head</p>
           </div>
-          <pre>
-            <code class="language-markup">&lt;!-- Include the script --&gt;
-&lt;script src="/static/scripts/dom-x.js"&gt;&lt;/script&gt;
-
-&lt;!-- Add the custom element to the body of HTML file --&gt;
-&lt;dom-x src="[YOUR-STATE-MACHINE-CONFIG].json"&gt;&lt;/dom-x&gt;
-</code>
+          <div class="flex mobile:flex--col">
+            <pre>
+            <code class="language-markup">&lt;!-- Include the script and your transformers --&gt;
+&lt;script src="/static/scripts/dom-x.js"&gt;&lt;/script&gt;</code>
           </pre>
+          </div>
         </div>
       </section>
 
@@ -88,18 +86,24 @@
       <section>
         <div class="subsection">
           <div class="title">
-            <h2 class="title__main">Write Some Markup</h2>
-            <p class="title__sub">Click The Stoplight</p>
+            <h2 class="title__main">Add The Custom Element</h2>
+            <p class="title__sub">This loads the state machine</p>
           </div>
           <div class="flex mobile:flex--col">
-            <div class="stoplight">
-              <div class="stoplight__red"></div>
-              <div class="stoplight__yellow"></div>
-              <div class="stoplight__green"></div>
-            </div>
+            <pre>
+              <code class="language-markup">&lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt;</code>
+            </pre>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">Add Markup</h2>
+            <p class="title__sub">This is the markup the state machine will operate on.</p>
+          </div>
+          <div class="flex mobile:flex--col">
             <pre>
               <code class="language-markup">
-  &lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt;
   &lt;div id="stoplight"&gt;
     &lt;div id="stoplight__red"&gt;&lt;/div&gt;
     &lt;div id="stoplight__yellow"&gt;&lt;/div&gt;
@@ -107,6 +111,20 @@
   &lt;/div&gt;
   </code>
             </pre>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">Demo</h2>
+            <p class="title__sub">Click the stoplight</p>
+          </div>
+          <div class="flex mobile:flex--col">
+            <div class="stoplight">
+              <div class="stoplight__red"></div>
+              <div class="stoplight__yellow"></div>
+              <div class="stoplight__green"></div>
+            </div>
           </div>
         </div>
 

@@ -143,6 +143,7 @@ export class Domx extends HTMLElement {
     this.tranformers[name] = cb;
     return this;
   }
+
   constructor() {
     super();
     this.dispatch = this.dispatch.bind(this);
@@ -173,6 +174,7 @@ export class Domx extends HTMLElement {
     this.addTransformer("wait", waitTransformer);
     this.addTransformer("window", windowTransformer);
   }
+
   connectedCallback() {
     const src = this.getAttribute("src");
     if (src) return fetch(src).then((r) => r.json().then(this.init));
