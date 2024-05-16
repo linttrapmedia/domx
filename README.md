@@ -1,4 +1,4 @@
-<img src="docs/static/images/logo.jpeg" width="200">
+<img src="docs/static/images/domx.png" width="200">
 
 ## Say Goodbye to 80% of Your Frontend
 
