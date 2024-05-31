@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-  // src/components/dom-x.ts
+  // src/components/domx.ts
   function addClassTransformer(_, selector, className) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => el.classList.add(className));
@@ -125,6 +125,10 @@
       this.unsub = (s) => {
         this.subs = this.subs.filter((sub) => sub !== s);
       };
+      const shadow = this.attachShadow({ mode: "open" });
+      const style = document.createElement("style");
+      style.textContent = `:host { display: none; }`;
+      shadow.appendChild(style);
       this.dispatch = this.dispatch.bind(this);
       this.init = this.init.bind(this);
       this.sub = this.sub.bind(this);
@@ -153,12 +157,12 @@
       return this;
     }
     connectedCallback() {
-      const src = this.getAttribute("src");
-      if (src)
-        return fetch(src).then((r) => r.json().then(this.init));
-      const obj = this.getAttribute("obj");
-      if (obj)
-        return this.init(window[obj]);
+      const remote = this.getAttribute("src");
+      if (remote)
+        return fetch(remote).then((r) => r.json().then(this.init));
+      const local = this.textContent;
+      if (local)
+        return this.init(JSON.parse(local));
       return;
     }
     dispatch(evt) {
@@ -228,4 +232,4 @@
   };
   customElements.define("dom-x", Domx);
 })();
-//# sourceMappingURL=dom-x.js.map
+//# sourceMappingURL=domx.js.map

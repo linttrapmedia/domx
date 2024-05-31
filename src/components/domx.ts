@@ -146,6 +146,11 @@ export class Domx extends HTMLElement {
 
   constructor() {
     super();
+
+    const shadow = this.attachShadow({ mode: "open" });
+    const style = document.createElement("style");
+    style.textContent = `:host { display: none; }`;
+    shadow.appendChild(style);
     this.dispatch = this.dispatch.bind(this);
     this.init = this.init.bind(this);
     this.sub = this.sub.bind(this);
@@ -176,10 +181,10 @@ export class Domx extends HTMLElement {
   }
 
   connectedCallback() {
-    const src = this.getAttribute("src");
-    if (src) return fetch(src).then((r) => r.json().then(this.init));
-    const obj: any = this.getAttribute("obj");
-    if (obj) return this.init(window[obj] as any);
+    const remote = this.getAttribute("src");
+    if (remote) return fetch(remote).then((r) => r.json().then(this.init));
+    const local: any = this.textContent;
+    if (local) return this.init(JSON.parse(local));
     return;
   }
   /**

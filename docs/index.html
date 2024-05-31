@@ -12,7 +12,7 @@
     <meta name="favicon" content="/static/images/favicon.svg" />
     <link rel="stylesheet" href="/static/styles/styles.css" />
     <link rel="stylesheet" href="/static/styles/prism.css" />
-    <script defer src="/static/scripts/dom-x.js"></script>
+    <script defer src="/static/scripts/domx.js"></script>
     <script defer src="/static/scripts/prism.min.js"></script>
     <script defer src="/static/scripts/prism-markup.min.js"></script>
     <!-- Google tag (gtag.js) -->
@@ -27,7 +27,16 @@
     </script>
   </head>
   <body>
-    <dom-x src="/api/stoplight.json"></dom-x>
+    <!-- <dom-x src="/api/stoplight.json"></dom-x> -->
+    <dom-x>
+      { "$schema": "stoplight.schema.json", "initialState": "red", "listeners": [[".stoplight", "click",
+      "changeState"]], "states": { "red": { "entry": [ ["addClass", ".stoplight__red", "active"], ["removeClass",
+      ".stoplight__green", "active"], ["dispatch", "changeState", 2000] ], "changeState": [["state", "yellow"]] },
+      "yellow": { "entry": [ ["addClass", ".stoplight__yellow", "active"], ["removeClass", ".stoplight__red", "active"],
+      ["dispatch", "changeState", 2000] ], "changeState": [["state", "green"]] }, "green": { "entry": [ ["addClass",
+      ".stoplight__green", "active"], ["removeClass", ".stoplight__yellow", "active"], ["dispatch", "changeState", 2000]
+      ], "changeState": [["state", "red"]] } } }
+    </dom-x>
 
     <div class="github">
       <a href="https://github.com/linttrapmedia/domx" target="_blank"
@@ -58,8 +67,8 @@
             <p class="title__sub">~1.7KB!</p>
           </div>
           <div class="flex">
-            <a href="https://unpkg.com/@linttrap/domx@latest/dist/dom-x.min.js" class="download"
-              >dom-x.min.js &nbsp; (↓)</a
+            <a href="https://unpkg.com/@linttrap/domx@latest/dist/domx.min.js" class="download"
+              >domx.min.js &nbsp; (↓)</a
             >
           </div>
         </div>
@@ -69,11 +78,11 @@
       <section>
         <div class="subsection">
           <div class="title">
-            <h2 class="title__main">Include It</h2>
-            <p class="title__sub">Add the script the head</p>
+            <h2 class="title__main">Include</h2>
+            <p class="title__sub">Add the domx script</p>
           </div>
           <pre>
-            <code class="language-markup">&lt;script src="/static/scripts/dom-x.js"&gt;&lt;/script&gt;</code>
+            <code class="language-markup">&lt;script src="domx.js"&gt;&lt;/script&gt;</code>
           </pre>
         </div>
       </section>
@@ -83,47 +92,16 @@
       <section>
         <div class="subsection">
           <div class="title">
-            <h2 class="title__main">Add The Custom Element</h2>
-            <p class="title__sub">This loads the state machine</p>
+            <h2 class="title__main">Define</h2>
+            <p class="title__sub">Define your DOM transformations in a state machine</p>
           </div>
-          <pre>
+          <!-- <pre>
               <code class="language-markup">&lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt;</code>
-          </pre>
-        </div>
-
-        <div class="subsection">
-          <div class="title">
-            <h2 class="title__main">Add Markup</h2>
-            <p class="title__sub">This is the markup the state machine will operate on.</p>
-          </div>
-          <pre><code class="language-markup">&lt;div id="stoplight"&gt;
-  &lt;div id="stoplight__red"&gt;&lt;/div&gt;
-  &lt;div id="stoplight__yellow"&gt;&lt;/div&gt;
-  &lt;div id="stoplight__green"&gt;&lt;/div&gt;
-&lt;/div&gt;</code>
-            </pre>
-        </div>
-
-        <div class="subsection">
-          <div class="title">
-            <h2 class="title__main">Demo</h2>
-            <p class="title__sub">Click the stoplight</p>
-          </div>
-          <div class="flex mobile:flex--col">
-            <div class="stoplight">
-              <div class="stoplight__red"></div>
-              <div class="stoplight__yellow"></div>
-              <div class="stoplight__green"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="subsection">
-          <div class="title">
-            <h3 class="title__main">Define A State Machine</h3>
-            <p class="title__sub">stoplight.json</p>
-          </div>
-          <pre><code class="language-javascript">{
+          </pre> -->
+          <pre
+            style="display: flex; flex-direction: column"
+          ><code class="language-markup">&lt;!-- return this in your markup --&gt;
+&lt;dom-x&gt;</code><code class="language-javascript">{
   "initialState": "red",
   "listeners": [["#stoplight", "click", "changeState"]],
   "states": {
@@ -152,7 +130,44 @@
       "changeState": [["state", "red"]]
     }
   }
-  }</code></pre>
+}</code><code class="language-markup">&lt;/dom-x&gt;
+
+&lt;!-- or load it from a remote source --&gt;
+&lt;!-- &lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt; --&gt;
+
+</code>
+        </pre>
+        </div>
+      </section>
+
+      <section>
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">Markup</h2>
+            <p class="title__sub">Render the markup the state machine will operate on.</p>
+          </div>
+          <pre><code class="language-markup">&lt;div id="stoplight"&gt;
+  &lt;div id="stoplight__red"&gt;&lt;/div&gt;
+  &lt;div id="stoplight__yellow"&gt;&lt;/div&gt;
+  &lt;div id="stoplight__green"&gt;&lt;/div&gt;
+&lt;/div&gt;</code>
+          </pre>
+        </div>
+      </section>
+
+      <section>
+        <div class="subsection">
+          <div class="title">
+            <h2 class="title__main">Result</h2>
+            <p class="title__sub">Click the stoplight</p>
+          </div>
+          <div class="flex mobile:flex--col">
+            <div class="stoplight">
+              <div class="stoplight__red"></div>
+              <div class="stoplight__yellow"></div>
+              <div class="stoplight__green"></div>
+            </div>
+          </div>
         </div>
       </section>
 

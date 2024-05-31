@@ -2,7 +2,7 @@
   "name": "@linttrap/domx",
   "author": "@linttrapmedia",
   "title": "domx",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A novel UI library for managing the DOM without javascript",
   "type": "module",
   "exports": {
@@ -23,21 +23,14 @@
   "homepage": "https://github.com/linttrapmedia/domx#readme",
   "devDependencies": {
     "@playwright/test": "^1.41.2",
-    "@types/dompurify": "^3.0.5",
     "@types/node": "^20.11.19",
-    "@types/prismjs": "^1.26.3",
-    "dompurify": "^3.0.9",
     "esbuild": "^0.14.27",
-    "highlight.js": "^11.9.0",
     "http-server": "^14.1.1",
     "prettier": "2.7.1",
-    "prismjs": "^1.29.0",
     "serve": "^14.2.1"
   },
   "dependencies": {
-    "@dagrejs/dagre": "^1.0.4",
-    "@linttrap/oem": "^0.0.12",
-    "d3": "^7.8.5"
+    "@linttrap/oem": "^0.0.12"
   },
   "scripts": {}
 }

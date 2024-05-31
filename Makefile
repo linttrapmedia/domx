@@ -56,7 +56,7 @@ dist: ## Build the project for distribution
 	@rm -rf dist
 	@mkdir dist
 	@npx esbuild ./src/components/*.ts --outdir=dist --bundle --sourcemap --minify --out-extension:.js=.min.js
-	@zip -r dist/dom-x.zip dist
+	@zip -r dist/domx.zip dist
 
 docs: ## Build the project documentation
 	@npx esbuild ./src/components/*.ts --outdir=docs/static/scripts --bundle --sourcemap --minify
@@ -72,7 +72,3 @@ kill: ## Kill the project
 publish: ## Publish the project to npm
 	@echo $(STATUS) Publish package...
 	@npm publish --access public
-
-test: ## Run tests
-	@echo $(STATUS) Testing...
-	@npx playwright test
