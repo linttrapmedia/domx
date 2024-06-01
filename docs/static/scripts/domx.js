@@ -110,9 +110,8 @@
     if (domx.fsm.states[state].entry)
       domx.dispatch("entry");
   }
-  var Domx = class extends HTMLElement {
-    constructor() {
-      super();
+  var Domx = class {
+    constructor(fsm) {
       this.state = "";
       this.fsm = {
         initialState: "",
@@ -125,12 +124,9 @@
       this.unsub = (s) => {
         this.subs = this.subs.filter((sub) => sub !== s);
       };
-      const shadow = this.attachShadow({ mode: "open" });
-      const style = document.createElement("style");
-      style.textContent = `:host { display: none; }`;
-      shadow.appendChild(style);
       this.dispatch = this.dispatch.bind(this);
       this.init = this.init.bind(this);
+      this.registerEventListeners = this.registerEventListeners.bind(this);
       this.sub = this.sub.bind(this);
       this.transform = this.transform.bind(this);
       this.addTransformer("addClass", addClassTransformer);
@@ -151,19 +147,12 @@
       this.addTransformer("textContent", textContentTransformer);
       this.addTransformer("wait", waitTransformer);
       this.addTransformer("window", windowTransformer);
+      if (fsm)
+        document.addEventListener("DOMContentLoaded", () => this.init(fsm));
     }
     addTransformer(name, cb) {
       this.tranformers[name] = cb;
       return this;
-    }
-    connectedCallback() {
-      const remote = this.getAttribute("src");
-      if (remote)
-        return fetch(remote).then((r) => r.json().then(this.init));
-      const local = this.textContent;
-      if (local)
-        return this.init(JSON.parse(local));
-      return;
     }
     dispatch(evt) {
       const transformations = this.fsm.states[this.state][evt];
@@ -176,40 +165,29 @@
     }
     init(fsm) {
       this.fsm = fsm;
-      const listeners = this.fsm.listeners ?? [];
-      const register = () => {
-        for (let i = 0; i < listeners.length; i++) {
-          const [selector, eventListener, fsmEvent] = listeners[i];
-          const els = document.querySelectorAll(selector);
-          for (let j = 0; j < els.length; j++) {
-            const el = els[j];
-            const cb = (e) => {
-              e.preventDefault();
-              if (e.target !== el)
-                return;
-              this.dispatch(fsmEvent);
-            };
-            el.removeEventListener(eventListener, cb);
-            el.addEventListener(eventListener, cb);
-          }
-        }
-      };
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === "childList" && mutation.addedNodes)
-            register();
-        });
-      });
-      observer.observe(this, {
-        attributes: true,
-        childList: true,
-        subtree: true
-      });
-      register();
+      this.registerEventListeners();
       const initState = fsm.states[fsm.initialState];
       this.state = fsm.initialState;
       if (initState.entry)
         this.dispatch("entry");
+    }
+    registerEventListeners() {
+      const listeners = this.fsm.listeners ?? [];
+      for (let i = 0; i < listeners.length; i++) {
+        const [selector, eventListener, fsmEvent] = listeners[i];
+        const els = document.querySelectorAll(selector);
+        for (let j = 0; j < els.length; j++) {
+          const el = els[j];
+          const cb = (e) => {
+            e.preventDefault();
+            if (e.target !== el)
+              return;
+            this.dispatch(fsmEvent);
+          };
+          el.removeEventListener(eventListener, cb);
+          el.addEventListener(eventListener, cb);
+        }
+      }
     }
     sub(s) {
       this.subs.push(s);
@@ -230,6 +208,35 @@
         cb();
     }
   };
-  customElements.define("dom-x", Domx);
+  var DomxCustomElement = class extends HTMLElement {
+    constructor() {
+      super();
+      this.instance = new Domx();
+      this.registerLocalFSM = this.registerLocalFSM.bind(this);
+      this.registerRemoteFSM = this.registerRemoteFSM.bind(this);
+      let slot = document.createElement("slot");
+      slot.style.display = "none";
+      const shadowRoot = this.attachShadow({ mode: "open" });
+      shadowRoot.appendChild(slot);
+      slot.addEventListener("slotchange", () => this.registerLocalFSM(slot));
+    }
+    connectedCallback() {
+      if (this.getAttribute("src"))
+        this.registerRemoteFSM();
+    }
+    registerLocalFSM(slot) {
+      const nodes = slot.assignedNodes();
+      const local = nodes[0].nodeValue;
+      if (local)
+        return this.instance.init(JSON.parse(local));
+    }
+    registerRemoteFSM() {
+      const remote = this.getAttribute("src");
+      if (remote)
+        return fetch(remote).then((r) => r.json().then(this.instance.init));
+    }
+  };
+  customElements.define("dom-x", DomxCustomElement);
+  window.Domx = Domx;
 })();
 //# sourceMappingURL=domx.js.map

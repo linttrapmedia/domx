@@ -1,9 +1,3 @@
-type FSM = {
-  initialState: string;
-  listeners: [selector: string, event: string, evt: string][];
-  states: Record<string, Record<string | "entry", string[][]>>;
-};
-
 function addClassTransformer(_: Domx, selector: string, className: string) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => el.classList.add(className));
@@ -124,7 +118,35 @@ function stateTransformer(domx: Domx, state: string) {
   if (domx.fsm.states[state].entry) domx.dispatch("entry");
 }
 
-export class Domx extends HTMLElement {
+type Tail<T extends any[]> = T extends [any, ...infer Rest] ? Rest : never;
+type TxArgs<F extends (...args: any) => any> = Tail<Parameters<F>>;
+type TransformerList = (
+  | [operation: "addClass", ...TxArgs<typeof addClassTransformer>]
+  | [operation: "addEventListener", ...TxArgs<typeof addEventListenerTransformer>]
+  | [operation: "append", ...TxArgs<typeof appendTransformer>]
+  | [operation: "dispatch", ...TxArgs<typeof dispatchTransformer>]
+  | [operation: "innerHTML", ...TxArgs<typeof innerHTMLTransformer>]
+  | [operation: "history", ...TxArgs<typeof historyTransformer>]
+  | [operation: "get", ...TxArgs<typeof getRequestTransformer>]
+  | [operation: "location", ...TxArgs<typeof locationTransformer>]
+  | [operation: "post", ...TxArgs<typeof postRequestTransformer>]
+  | [operation: "removeAttribute", ...TxArgs<typeof removeAttributeTransformer>]
+  | [operation: "removeClass", ...TxArgs<typeof removeClassTransformer>]
+  | [operation: "removeEventListener", ...TxArgs<typeof removeEventListenerTransformer>]
+  | [operation: "replace", ...TxArgs<typeof replaceTransformer>]
+  | [operation: "setAttribute", ...TxArgs<typeof setAttributeTransformer>]
+  | [operation: "state", ...TxArgs<typeof stateTransformer>]
+  | [operation: "textContent", ...TxArgs<typeof textContentTransformer>]
+  | [operation: "wait", ...TxArgs<typeof waitTransformer>]
+  | [operation: "window", ...TxArgs<typeof windowTransformer>]
+)[];
+
+type FSM = {
+  initialState: string;
+  listeners: [selector: string, event: string, evt: string][];
+  states: Record<string, Record<string, TransformerList>>;
+};
+export class Domx {
   state: string = "";
   fsm: FSM = {
     initialState: "",
@@ -144,15 +166,10 @@ export class Domx extends HTMLElement {
     return this;
   }
 
-  constructor() {
-    super();
-
-    const shadow = this.attachShadow({ mode: "open" });
-    const style = document.createElement("style");
-    style.textContent = `:host { display: none; }`;
-    shadow.appendChild(style);
+  constructor(fsm?: FSM) {
     this.dispatch = this.dispatch.bind(this);
     this.init = this.init.bind(this);
+    this.registerEventListeners = this.registerEventListeners.bind(this);
     this.sub = this.sub.bind(this);
     this.transform = this.transform.bind(this);
 
@@ -178,15 +195,10 @@ export class Domx extends HTMLElement {
     this.addTransformer("textContent", textContentTransformer);
     this.addTransformer("wait", waitTransformer);
     this.addTransformer("window", windowTransformer);
+
+    if (fsm) document.addEventListener("DOMContentLoaded", () => this.init(fsm));
   }
 
-  connectedCallback() {
-    const remote = this.getAttribute("src");
-    if (remote) return fetch(remote).then((r) => r.json().then(this.init));
-    const local: any = this.textContent;
-    if (local) return this.init(JSON.parse(local));
-    return;
-  }
   /**
    * trigger an event
    * @param evt name of event
@@ -200,50 +212,17 @@ export class Domx extends HTMLElement {
       this.subs.forEach((s) => s(evt, prevState, this.state));
     });
   }
+
   /**
    * initialize the state machine
    * @param fsm state machine
    */
   init(fsm: FSM) {
+    // set fsm
     this.fsm = fsm;
-    const listeners = this.fsm.listeners ?? [];
 
-    // register event listeners
-    const register = () => {
-      for (let i = 0; i < listeners.length; i++) {
-        const [selector, eventListener, fsmEvent] = listeners[i];
-        const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
-        // add event listeners to all registered elements
-        for (let j = 0; j < els.length; j++) {
-          const el = els[j];
-          const cb = (e: any) => {
-            e.preventDefault();
-            if (e.target !== el) return;
-            // event listeners can only do one thing, dispatch an event
-            // all other transformations should be done in the state machine
-            this.dispatch(fsmEvent);
-          };
-          // prevent duplicate event listeners
-          el.removeEventListener(eventListener, cb);
-          el.addEventListener(eventListener, cb);
-        }
-      }
-    };
-    // register event listeners for new elements
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === "childList" && mutation.addedNodes) register();
-      });
-    });
-
-    // observe changes in the DOM
-    observer.observe(this, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-    });
-
-    register();
+    // Register event listeners
+    this.registerEventListeners();
 
     // Apply initial state
     const initState = fsm.states[fsm.initialState];
@@ -252,6 +231,33 @@ export class Domx extends HTMLElement {
     // run entry transformation if it exists
     if (initState.entry) this.dispatch("entry");
   }
+
+  /**
+   * register event listeners
+   */
+  registerEventListeners() {
+    const listeners = this.fsm.listeners ?? [];
+
+    for (let i = 0; i < listeners.length; i++) {
+      const [selector, eventListener, fsmEvent] = listeners[i];
+      const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+      // add event listeners to all registered elements
+      for (let j = 0; j < els.length; j++) {
+        const el = els[j];
+        const cb = (e: any) => {
+          e.preventDefault();
+          if (e.target !== el) return;
+          // event listeners can only do one thing, dispatch an event
+          // all other transformations should be done in the state machine
+          this.dispatch(fsmEvent);
+        };
+        // prevent duplicate event listeners
+        el.removeEventListener(eventListener, cb);
+        el.addEventListener(eventListener, cb);
+      }
+    }
+  }
+
   /**
    * subscribe to state changes
    * @param s callback
@@ -261,13 +267,14 @@ export class Domx extends HTMLElement {
     this.subs.push(s);
     return () => this.unsub(s);
   }
+
   /**
    * run list of transformations
    * @param tx transformation list
    * @param cb callback
    * @returns
    */
-  transform(transformations: string[][] = [], cb?: () => void) {
+  transform(transformations: TransformerList = [], cb?: () => void) {
     // get transformations from current state
     if (!transformations) return;
 
@@ -282,6 +289,7 @@ export class Domx extends HTMLElement {
 
     if (cb) cb();
   }
+
   /**
    * unsubscribe from state changes
    * @param s callback
@@ -291,4 +299,34 @@ export class Domx extends HTMLElement {
   };
 }
 
-customElements.define("dom-x", Domx);
+class DomxCustomElement extends HTMLElement {
+  instance: Domx = new Domx();
+  constructor() {
+    super();
+    this.registerLocalFSM = this.registerLocalFSM.bind(this);
+    this.registerRemoteFSM = this.registerRemoteFSM.bind(this);
+    let slot = document.createElement("slot");
+    slot.style.display = "none";
+    const shadowRoot = this.attachShadow({ mode: "open" });
+    shadowRoot.appendChild(slot);
+    slot.addEventListener("slotchange", () => this.registerLocalFSM(slot));
+  }
+
+  connectedCallback() {
+    if (this.getAttribute("src")) this.registerRemoteFSM();
+  }
+
+  registerLocalFSM(slot: HTMLSlotElement) {
+    const nodes = slot.assignedNodes();
+    const local: any = nodes[0].nodeValue;
+    if (local) return this.instance.init(JSON.parse(local));
+  }
+
+  registerRemoteFSM() {
+    const remote = this.getAttribute("src");
+    if (remote) return fetch(remote).then((r) => r.json().then(this.instance.init));
+  }
+}
+
+customElements.define("dom-x", DomxCustomElement);
+(window as any).Domx = Domx;

@@ -12,7 +12,7 @@
     <meta name="favicon" content="/static/images/favicon.svg" />
     <link rel="stylesheet" href="/static/styles/styles.css" />
     <link rel="stylesheet" href="/static/styles/prism.css" />
-    <script defer src="/static/scripts/domx.js"></script>
+    <script src="/static/scripts/domx.js"></script>
     <script defer src="/static/scripts/prism.min.js"></script>
     <script defer src="/static/scripts/prism-markup.min.js"></script>
     <!-- Google tag (gtag.js) -->
@@ -25,10 +25,42 @@
       gtag("js", new Date());
       gtag("config", "G-Y0MV1R2QMP");
     </script>
+    <script>
+      new Domx({
+        initialState: "red",
+        listeners: [[".stoplight", "click", "changeState"]],
+        states: {
+          red: {
+            entry: [
+              ["addClass", ".stoplight__red", "active"],
+              ["removeClass", ".stoplight__green", "active"],
+              ["dispatch", "changeState", 1000],
+            ],
+            changeState: [["state", "yellow"]],
+          },
+          yellow: {
+            entry: [
+              ["addClass", ".stoplight__yellow", "active"],
+              ["removeClass", ".stoplight__red", "active"],
+              ["dispatch", "changeState", 1000],
+            ],
+            changeState: [["state", "green"]],
+          },
+          green: {
+            entry: [
+              ["addClass", ".stoplight__green", "active"],
+              ["removeClass", ".stoplight__yellow", "active"],
+              ["dispatch", "changeState", 1000],
+            ],
+            changeState: [["state", "red"]],
+          },
+        },
+      });
+    </script>
   </head>
   <body>
     <!-- <dom-x src="/api/stoplight.json"></dom-x> -->
-    <dom-x>
+    <!-- <dom-x>
       { "$schema": "stoplight.schema.json", "initialState": "red", "listeners": [[".stoplight", "click",
       "changeState"]], "states": { "red": { "entry": [ ["addClass", ".stoplight__red", "active"], ["removeClass",
       ".stoplight__green", "active"], ["dispatch", "changeState", 2000] ], "changeState": [["state", "yellow"]] },
@@ -36,8 +68,7 @@
       ["dispatch", "changeState", 2000] ], "changeState": [["state", "green"]] }, "green": { "entry": [ ["addClass",
       ".stoplight__green", "active"], ["removeClass", ".stoplight__yellow", "active"], ["dispatch", "changeState", 2000]
       ], "changeState": [["state", "red"]] } } }
-    </dom-x>
-
+    </dom-x> -->
     <div class="github">
       <a href="https://github.com/linttrapmedia/domx" target="_blank"
         ><img src="static/images/github.svg" width="50%"
@@ -49,12 +80,12 @@
         <header class="header">
           <div class="header__logo">
             <h1 class="header__title">domx</h1>
-            <span class="header__version">0.1.2</span>
+            <span class="header__version">0.1.3</span>
           </div>
           <p class="header__subtitle">Say Goodbye to 80% of Your Frontend</p>
           <p class="header__description">
-            Transform the DOM with a simple state machine modeled in JSON and remove 80% of all the nonsense. No
-            javascript, no libraries, no transpilers, just simple, clean, efficient code.
+            Transform the DOM over-the-wire with a simple state machine and remove 80% of all that glue code that's making everything a sticky mess. No
+            javascript, no libraries, no transpilers required.
           </p>
         </header>
       </section>
@@ -64,7 +95,7 @@
         <div class="subsection">
           <div class="title">
             <h2 class="title__main">Download</h2>
-            <p class="title__sub">~1.7KB!</p>
+            <p class="title__sub">~1.47kb!</p>
           </div>
           <div class="flex">
             <a href="https://unpkg.com/@linttrap/domx@latest/dist/domx.min.js" class="download"
@@ -98,45 +129,46 @@
           <!-- <pre>
               <code class="language-markup">&lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt;</code>
           </pre> -->
-          <pre
-            style="display: flex; flex-direction: column"
-          ><code class="language-markup">&lt;!-- return this in your markup --&gt;
-&lt;dom-x&gt;</code><code class="language-javascript">{
-  "initialState": "red",
-  "listeners": [["#stoplight", "click", "changeState"]],
-  "states": {
-    "red": {
-      "entry": [
+          <pre style="display: flex; flex-direction: column"><code class="language-javascript">const fsm = new Domx({
+  initialState: "red",
+  listeners: [["#stoplight", "click", "changeState"]],
+  states: {
+    red: {
+      entry: [
         ["addClass", "#stoplight__red", "active"],
         ["removeClass", "#stoplight__green", "active"],
-        ["dispatch", "changeState", 2000]
+        ["dispatch", "changeState", 2000],
       ],
-      "changeState": [["state", "yellow"]]
+      changeState: [["state", "yellow"]],
     },
-    "yellow": {
-      "entry": [
+    yellow: {
+      entry: [
         ["addClass", "#stoplight__yellow", "active"],
         ["removeClass", "#stoplight__red", "active"],
-        ["dispatch", "changeState", 2000]
+        ["dispatch", "changeState", 2000],
       ],
-      "changeState": [["state", "green"]]
+      changeState: [["state", "green"]],
     },
-    "green": {
-      "entry": [
+    green: {
+      entry: [
         ["addClass", "#stoplight__green", "active"],
         ["removeClass", "#stoplight__yellow", "active"],
-        ["dispatch", "changeState", 2000]
+        ["dispatch", "changeState", 2000],
       ],
-      "changeState": [["state", "red"]]
-    }
-  }
-}</code><code class="language-markup">&lt;/dom-x&gt;
-
-&lt;!-- or load it from a remote source --&gt;
-&lt;!-- &lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt; --&gt;
-
-</code>
+      changeState: [["state", "red"]],
+    },
+  },
+});</code>
         </pre>
+          <p>
+            Alternatively you can also use the <span>dom-x</span> custom element to define your state machine like this:
+            <pre><code class="language-markup">&lt;!-- locally embedded in markup --&gt;
+&lt;dom-x&gt;...&lt;/dom-x&gt;
+
+&lt;!-- or loaded remotely --&gt;
+&lt;dom-x src="/my-fsm.json"&gt;...&lt;/dom-x&gt;
+            </code></pre>
+          </p>
         </div>
       </section>
 
@@ -296,9 +328,8 @@ function addCustomTransformer(domxInstance: Domx, arg1: string, arg2: string) {
   // ...do your worst...
 }
 
-// then register it to a dom-x tag instance
-const domx = document.querySelector("dom-x") as Domx;
-domx.addTransformer("customTransformer", addCustomTransformer);
+// then register it to your domx instance
+myfsm.addTransformer("customTransformer", addCustomTransformer);
 
 // in your state machine you can now use it
 ["customTransformer", "argument one", "argument two"]
