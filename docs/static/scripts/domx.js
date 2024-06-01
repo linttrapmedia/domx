@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-  // src/components/domx.ts
+  // src/domx.ts
   function addClassTransformer(_, selector, className) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => el.classList.add(className));

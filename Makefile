@@ -45,7 +45,7 @@ dev: ## Run the project in development mode
 
 dev-js: ## Run the js in development mode
 	@echo $(STATUS) Running js in development mode...
-	@npx esbuild ./src/components/*.ts --outdir=docs/static/scripts --watch --bundle --sourcemap
+	@npx esbuild ./src/domx.ts --outdir=docs/static/scripts --watch --bundle --sourcemap
 
 dev-docs: ## Run the docs in development mode
 	@echo $(STATUS) Running docs in development mode...
@@ -55,11 +55,11 @@ dist: ## Build the project for distribution
 	@echo $(STATUS) Building...
 	@rm -rf dist
 	@mkdir dist
-	@npx esbuild ./src/components/*.ts --outdir=dist --bundle --sourcemap --minify --out-extension:.js=.min.js
+	@npx esbuild ./src/domx.ts --outdir=dist --bundle --sourcemap --minify --out-extension:.js=.min.js
 	@zip -r dist/domx.zip dist
 
 docs: ## Build the project documentation
-	@npx esbuild ./src/components/*.ts --outdir=docs/static/scripts --bundle --sourcemap --minify
+	@npx esbuild ./src/domx.ts --outdir=docs/static/scripts --bundle --sourcemap --minify
 
 install: ## Install the project
 	@echo $(STATUS) Installing...

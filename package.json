@@ -7,11 +7,11 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./src/index.ts"
+      "import": "./src/domx.ts"
     }
   },
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
+  "main": "./src/domx.ts",
+  "module": "./src/domx.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/linttrapmedia/domx.git"

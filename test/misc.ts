@@ -1,4 +1,4 @@
-import { Domx } from "../src/components/domx";
+import { Domx } from "../src/domx";
 
 const domx = new Domx({
   initialState: "init",
