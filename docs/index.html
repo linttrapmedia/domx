@@ -116,11 +116,7 @@
           <!-- <pre>
               <code class="language-markup">&lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt;</code>
           </pre> -->
-          <pre
-            style="display: flex; flex-direction: column"
-          ><code class="language-javascript">import { Domx } from "@linttrap/domx";
-
-const fsm = new Domx({
+          <pre style="display: flex; flex-direction: column"><code class="language-javascript">const fsm = new Domx({
   initialState: "red",
   listeners: [["#stoplight", "click", "changeState"]],
   states: {
@@ -151,13 +147,9 @@ const fsm = new Domx({
   },
 });
 
-// Alternatively you can also use the domx.js file directly in the browser:
-// &lt;script src="domx.js"&gt;&lt;/script&gt; <== include the dist
-// &lt;script&gt;new Domx(...)&lt;/script&gt; <== create an instance
-// &lt;dom-x&gt;...&lt;/dom-x&gt; <== or use the custom element
-// &lt;dom-x src="/my-fsm.json"&gt;...&lt;/dom-x&gt; <== or load it remotely
-
-</code>
+// Alternatively you can use the custom element
+// &lt;dom-x&gt;...&lt;/dom-x&gt; <== locally defined fsm
+// &lt;dom-x src="/my-fsm.json"&gt;...&lt;/dom-x&gt; <== remotely defined fsm</code>
         </pre>
         </div>
       </section>
