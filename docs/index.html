@@ -84,8 +84,8 @@
           </div>
           <p class="header__subtitle">Say Goodbye to 80% of Your Frontend</p>
           <p class="header__description">
-            Transform the DOM over-the-wire with a simple state machine and remove 80% of all that glue code that's making everything a sticky mess. No
-            javascript, no libraries, no transpilers required.
+            Transform the DOM over-the-wire with a simple state machine and remove 80% of all that glue code that's
+            making everything a sticky mess. No javascript, no libraries, no transpilers required.
           </p>
         </header>
       </section>
@@ -105,31 +105,22 @@
         </div>
       </section>
 
-      <!-- Include the script in your HTML file: -->
-      <section>
-        <div class="subsection">
-          <div class="title">
-            <h2 class="title__main">Include</h2>
-            <p class="title__sub">Add the domx script</p>
-          </div>
-          <pre>
-            <code class="language-markup">&lt;script src="domx.js"&gt;&lt;/script&gt;</code>
-          </pre>
-        </div>
-      </section>
-
       <!-- Custom Element -->
 
       <section>
         <div class="subsection">
           <div class="title">
-            <h2 class="title__main">Define</h2>
+            <h2 class="title__main">Setup</h2>
             <p class="title__sub">Define your DOM transformations in a state machine</p>
           </div>
           <!-- <pre>
               <code class="language-markup">&lt;dom-x src="stoplight.json"&gt;&lt;/dom-x&gt;</code>
           </pre> -->
-          <pre style="display: flex; flex-direction: column"><code class="language-javascript">const fsm = new Domx({
+          <pre
+            style="display: flex; flex-direction: column"
+          ><code class="language-javascript">import { Domx } from "@linttrap/domx";
+
+const fsm = new Domx({
   initialState: "red",
   listeners: [["#stoplight", "click", "changeState"]],
   states: {
@@ -158,17 +149,16 @@
       changeState: [["state", "red"]],
     },
   },
-});</code>
-        </pre>
-          <p>
-            Alternatively you can also use the <span>dom-x</span> custom element to define your state machine like this:
-            <pre><code class="language-markup">&lt;!-- locally embedded in markup --&gt;
-&lt;dom-x&gt;...&lt;/dom-x&gt;
+});
 
-&lt;!-- or loaded remotely --&gt;
-&lt;dom-x src="/my-fsm.json"&gt;...&lt;/dom-x&gt;
-            </code></pre>
-          </p>
+// Alternatively you can also use the domx.js file directly in the browser:
+// &lt;script src="domx.js"&gt;&lt;/script&gt; <== include the dist
+// &lt;script&gt;new Domx(...)&lt;/script&gt; <== create an instance
+// &lt;dom-x&gt;...&lt;/dom-x&gt; <== or use the custom element
+// &lt;dom-x src="/my-fsm.json"&gt;...&lt;/dom-x&gt; <== or load it remotely
+
+</code>
+        </pre>
         </div>
       </section>
 
