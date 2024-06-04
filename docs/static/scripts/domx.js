@@ -1,11 +1,11 @@
 "use strict";
 (() => {
   // src/domx.ts
-  function addClassTransformer(_, selector, className) {
+  async function addClassTransformer(_, selector, className) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => el.classList.add(className));
   }
-  function addEventListenerTransformer(domx, selector, event, fsmEvent) {
+  async function addEventListenerTransformer(domx, selector, event, fsmEvent) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => {
       const cb = (e) => {
@@ -18,7 +18,7 @@
       el.addEventListener(event, cb);
     });
   }
-  function appendTransformer(_, selector, html) {
+  async function appendTransformer(_, selector, html) {
     const el = document.querySelector(selector);
     if (!el)
       return;
@@ -26,46 +26,97 @@
     tmpl.innerHTML = decodeURIComponent(html);
     el.append(tmpl.content);
   }
-  function dispatchTransformer(domx, event, timeout = 0) {
+  async function dispatchTransformer(domx, event, timeout = 0) {
     clearTimeout(domx.timeouts[event]);
     domx.timeouts[event] = setTimeout(() => domx.dispatch(event), timeout);
   }
-  function historyTransformer(_, state, title, url) {
+  async function historyTransformer(_, state, title, url) {
     window.history.pushState(state, title, url);
   }
-  function getRequestTransformer(domx, url) {
-    fetch(url, {
-      method: "GET"
+  async function getRequestTransformer(domx, url, ...data) {
+    const urlSearchParams = new URLSearchParams();
+    data.forEach(([key, selector, prop, propKey]) => {
+      switch (prop) {
+        case "attribute":
+          const el1 = document.querySelector(selector);
+          if (!el1)
+            return;
+          urlSearchParams.append(key, el1.getAttribute(propKey));
+          break;
+        case "dataset":
+          const el2 = document.querySelector(selector);
+          if (!el2)
+            return;
+          urlSearchParams.append(key, el2.dataset[prop][propKey]);
+          break;
+        case "value":
+          const el = document.querySelector(selector);
+          if (!el)
+            return;
+          urlSearchParams.append(key, el.value);
+          break;
+      }
+    });
+    const _url = url + "?" + urlSearchParams.toString();
+    fetch(_url, {
+      method: "GET",
+      headers: {
+        domx: domx.getHeaderData()
+      }
     }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
   }
-  function innerHTMLTransformer(_, selector, html) {
+  async function innerHTMLTransformer(_, selector, html) {
     const el = document.querySelector(selector);
     if (!el)
       return;
     el.innerHTML = decodeURIComponent(html);
   }
-  function locationTransformer(_, url) {
+  async function locationTransformer(_, url) {
     window.location.href = url;
   }
-  function postRequestTransformer(domx, formSelector) {
-    const form = document.querySelector(formSelector);
-    const formData = new FormData(form);
-    fetch(form.action, {
+  async function postRequestTransformer(domx, url, ...data) {
+    const formData = new FormData();
+    data.forEach(([key, selector, prop, propKey]) => {
+      switch (prop) {
+        case "attribute":
+          const el1 = document.querySelector(selector);
+          if (!el1)
+            return;
+          formData.append(key, el1.getAttribute(propKey));
+          break;
+        case "dataset":
+          const el2 = document.querySelector(selector);
+          if (!el2)
+            return;
+          formData.append(key, el2.dataset[prop][propKey]);
+          break;
+        case "value":
+          const el = document.querySelector(selector);
+          if (!el)
+            return;
+          formData.append(key, el.value);
+          break;
+      }
+    });
+    fetch(url, {
       body: formData,
-      method: "POST"
+      method: "POST",
+      headers: {
+        domx: domx.getHeaderData()
+      }
     }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
   }
-  function textContentTransformer(_, selector, text) {
+  async function textContentTransformer(_, selector, text) {
     const el = document.querySelector(selector);
     if (!el)
       return;
     el.textContent = decodeURIComponent(text);
   }
-  function removeAttributeTransformer(_, selector, attr) {
+  async function removeAttributeTransformer(_, selector, attr) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => el.removeAttribute(attr));
   }
-  function removeEventListenerTransformer(domx, selector, event, fsmEvent) {
+  async function removeEventListenerTransformer(domx, selector, event, fsmEvent) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => {
       const cb = (e) => {
@@ -77,11 +128,11 @@
       el.removeEventListener(event, cb);
     });
   }
-  function removeClassTransformer(_, selector, className) {
+  async function removeClassTransformer(_, selector, className) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => el.classList.remove(className));
   }
-  function replaceTransformer(_, selector, html) {
+  async function replaceTransformer(_, selector, html) {
     const el = document.querySelector(selector);
     if (!el)
       return;
@@ -89,7 +140,7 @@
     tmpl.innerHTML = decodeURIComponent(html);
     el.replaceWith(tmpl.content);
   }
-  function setAttributeTransformer(_, selector, attr, value) {
+  async function setAttributeTransformer(_, selector, attr, value) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => {
       if (value === null)
@@ -97,27 +148,40 @@
       el.setAttribute(attr, value);
     });
   }
-  function waitTransformer(_, timeout) {
-    const startTime = new Date().getTime();
-    while (new Date().getTime() - startTime < timeout) {
-    }
-  }
-  function windowTransformer(_, method, ...args) {
-    window[method](...args);
-  }
-  function stateTransformer(domx, state) {
+  async function stateTransformer(domx, state) {
     domx.state = state;
     if (domx.fsm.states[state].entry)
       domx.dispatch("entry");
   }
+  async function submitFormTransformer(domx, formSelector) {
+    const form = document.querySelector(formSelector);
+    const method = (form.method ?? "POST").toUpperCase();
+    const enctype = form.enctype ?? "application/x-www-form-urlencoded";
+    const formData = new FormData(form);
+    fetch(form.action, {
+      body: formData,
+      method,
+      headers: {
+        domx: domx.getHeaderData(),
+        contentType: enctype
+      }
+    }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+  }
+  async function waitTransformer(_, timeout) {
+    return new Promise((resolve) => setTimeout(resolve, timeout));
+  }
+  async function windowTransformer(_, method, ...args) {
+    window[method](...args);
+  }
   var Domx = class {
     constructor(fsm) {
-      this.state = "";
       this.fsm = {
+        id: "",
         initialState: "",
         listeners: [],
         states: {}
       };
+      this.state = "";
       this.subs = [];
       this.timeouts = {};
       this.tranformers = {};
@@ -144,6 +208,7 @@
       this.addTransformer("replace", replaceTransformer);
       this.addTransformer("setAttribute", setAttributeTransformer);
       this.addTransformer("state", stateTransformer);
+      this.addTransformer("submit", submitFormTransformer);
       this.addTransformer("textContent", textContentTransformer);
       this.addTransformer("wait", waitTransformer);
       this.addTransformer("window", windowTransformer);
@@ -162,6 +227,9 @@
       this.transform(transformations, () => {
         this.subs.forEach((s) => s(evt, prevState, this.state));
       });
+    }
+    getHeaderData() {
+      return JSON.stringify({ id: this.fsm.id, state: this.state });
     }
     init(fsm) {
       this.fsm = fsm;
@@ -193,7 +261,7 @@
       this.subs.push(s);
       return () => this.unsub(s);
     }
-    transform(transformations = [], cb) {
+    async transform(transformations = [], cb) {
       if (!transformations)
         return;
       for (let i = 0; i < transformations.length; i++) {
@@ -202,7 +270,7 @@
         const transformerFn = this.tranformers[transformer];
         if (!transformerFn)
           throw new Error(`Unknown transformer: ${transformer}`);
-        transformerFn(this, ...transformerArgs);
+        await transformerFn(this, ...transformerArgs);
       }
       if (cb)
         cb();

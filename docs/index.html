@@ -80,7 +80,7 @@
         <header class="header">
           <div class="header__logo">
             <h1 class="header__title">domx</h1>
-            <span class="header__version">0.1.3</span>
+            <span class="header__version">0.1.4</span>
           </div>
           <p class="header__subtitle">Say Goodbye to 80% of Your Frontend</p>
           <p class="header__description">
@@ -228,9 +228,15 @@
 ["dispatch", "reset", 2000],
 
 // Name: Get
-// Desc: Trigger a get request and process the result (a transformation object)
-// Type: [transformer: "get", url: string, ...args: any[]];
-["get", "/some/endpoint"],
+// Desc: Send a get request with the selected data to and endpoint and process the result (a transformation object)
+// Type: [transformer: "get", url: string, ...data: 
+//   | [key: string, selector: string, prop: "value"]
+//   | [key: string, selector: string, prop: "attribute", propKey: string]
+//   | [key: string, selector: string, prop: "dataset", propKey: string]]
+// []];
+["get", "/some/endpoint", [
+  ["first-name", "#first-name-field", "value"],
+]],
 
 // Name: History
 // Desc: Update the browser history
@@ -244,9 +250,13 @@
 
 // Name: Post
 // Desc: Post selected data to endpoint and process the result (a transformation object)
-// Type: [transformer: "post", url: string, ...data: [key: string, selector: string, val: "value" | "dataset" | "formData"][]];
+// Type: [transformer: "post", url: string, ...data: 
+//   | [key: string, selector: string, prop: "value"]
+//   | [key: string, selector: string, prop: "attribute", propKey: string]
+//   | [key: string, selector: string, prop: "dataset", propKey: string]]
+// []];
 ["post", "/some/endpoint", [
-  ["form-data", "#todoForm", "formData"]
+  ["first-name", "#first-name-field", "value"],
 ]],
 
 // Name: Remove attribute
@@ -278,6 +288,11 @@
 // Desc: Change current state
 // Type: [transformer: "state", state: string];
 ["state", "processing"],
+
+// Name: Submit
+// Desc: Submit a form and process the result (a transformation object)
+// Type: [transformer: "submit", formSelector: string];
+["submit", "#form-id"],
 
 // Name: Text content
 // Desc: Set the text content of an element

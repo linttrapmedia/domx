@@ -1,9 +1,9 @@
-function addClassTransformer(_: Domx, selector: string, className: string) {
+async function addClassTransformer(_: Domx, selector: string, className: string) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => el.classList.add(className));
 }
 
-function addEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
+async function addEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => {
     const cb = (e: any) => {
@@ -16,7 +16,7 @@ function addEventListenerTransformer(domx: Domx, selector: string, event: string
   });
 }
 
-function appendTransformer(_: Domx, selector: string, html: string) {
+async function appendTransformer(_: Domx, selector: string, html: string) {
   const el = document.querySelector(selector);
   if (!el) return;
   const tmpl = document.createElement("template");
@@ -24,52 +24,108 @@ function appendTransformer(_: Domx, selector: string, html: string) {
   el.append(tmpl.content);
 }
 
-function dispatchTransformer(domx: Domx, event: string, timeout: number = 0) {
+async function dispatchTransformer(domx: Domx, event: string, timeout: number = 0) {
   clearTimeout(domx.timeouts[event]);
   domx.timeouts[event] = setTimeout(() => domx.dispatch(event), timeout);
 }
 
-function historyTransformer(_: Domx, state: string, title: string, url: string) {
+async function historyTransformer(_: Domx, state: string, title: string, url: string) {
   window.history.pushState(state, title, url);
 }
 
-function getRequestTransformer(domx: Domx, url: string) {
-  fetch(url, {
+type GetRequestTransformer =
+  | [key: string, selector: string, prop: "value"]
+  | [key: string, selector: string, prop: "attribute", propKey: string]
+  | [key: string, selector: string, prop: "dataset", propKey: string];
+
+async function getRequestTransformer(domx: Domx, url: string, ...data: GetRequestTransformer[]) {
+  const urlSearchParams = new URLSearchParams();
+  data.forEach(([key, selector, prop, propKey]) => {
+    switch (prop) {
+      case "attribute":
+        const el1 = document.querySelector(selector) as any;
+        if (!el1) return;
+        urlSearchParams.append(key, el1.getAttribute(propKey));
+        break;
+      case "dataset":
+        const el2 = document.querySelector(selector) as any;
+        if (!el2) return;
+        urlSearchParams.append(key, el2.dataset[prop][propKey]);
+        break;
+      case "value":
+        const el = document.querySelector(selector) as any;
+        if (!el) return;
+        urlSearchParams.append(key, el.value);
+        break;
+    }
+  });
+
+  const _url = url + "?" + urlSearchParams.toString();
+  fetch(_url, {
     method: "GET",
+    headers: {
+      domx: domx.getHeaderData(),
+    },
   }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
 }
 
-function innerHTMLTransformer(_: Domx, selector: string, html: string) {
+async function innerHTMLTransformer(_: Domx, selector: string, html: string) {
   const el = document.querySelector(selector);
   if (!el) return;
   el.innerHTML = decodeURIComponent(html);
 }
 
-function locationTransformer(_: Domx, url: string) {
+async function locationTransformer(_: Domx, url: string) {
   window.location.href = url;
 }
 
-function postRequestTransformer(domx: Domx, formSelector: string) {
-  const form = document.querySelector(formSelector) as HTMLFormElement;
-  const formData = new FormData(form);
-  fetch(form.action, {
+type PostRequestTransformerData =
+  | [key: string, selector: string, prop: "value"]
+  | [key: string, selector: string, prop: "attribute", propKey: string]
+  | [key: string, selector: string, prop: "dataset", propKey: string];
+
+async function postRequestTransformer(domx: Domx, url: string, ...data: PostRequestTransformerData[]) {
+  const formData = new FormData();
+  data.forEach(([key, selector, prop, propKey]) => {
+    switch (prop) {
+      case "attribute":
+        const el1 = document.querySelector(selector) as any;
+        if (!el1) return;
+        formData.append(key, el1.getAttribute(propKey));
+        break;
+      case "dataset":
+        const el2 = document.querySelector(selector) as any;
+        if (!el2) return;
+        formData.append(key, el2.dataset[prop][propKey]);
+        break;
+      case "value":
+        const el = document.querySelector(selector) as any;
+        if (!el) return;
+        formData.append(key, el.value);
+        break;
+    }
+  });
+  fetch(url, {
     body: formData,
     method: "POST",
+    headers: {
+      domx: domx.getHeaderData(),
+    },
   }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
 }
 
-function textContentTransformer(_: Domx, selector: string, text: string) {
+async function textContentTransformer(_: Domx, selector: string, text: string) {
   const el = document.querySelector(selector);
   if (!el) return;
   el.textContent = decodeURIComponent(text);
 }
 
-function removeAttributeTransformer(_: Domx, selector: string, attr: string) {
+async function removeAttributeTransformer(_: Domx, selector: string, attr: string) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => el.removeAttribute(attr));
 }
 
-function removeEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
+async function removeEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => {
     const cb = (e: any) => {
@@ -81,12 +137,12 @@ function removeEventListenerTransformer(domx: Domx, selector: string, event: str
   });
 }
 
-function removeClassTransformer(_: Domx, selector: string, className: string) {
+async function removeClassTransformer(_: Domx, selector: string, className: string) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => el.classList.remove(className));
 }
 
-function replaceTransformer(_: Domx, selector: string, html: string) {
+async function replaceTransformer(_: Domx, selector: string, html: string) {
   const el = document.querySelector(selector);
   if (!el) return;
   const tmpl = document.createElement("template");
@@ -94,7 +150,7 @@ function replaceTransformer(_: Domx, selector: string, html: string) {
   el.replaceWith(tmpl.content);
 }
 
-function setAttributeTransformer(_: Domx, selector: string, attr: string, value: string) {
+async function setAttributeTransformer(_: Domx, selector: string, attr: string, value: string) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => {
     if (value === null) return el.removeAttribute(attr);
@@ -102,25 +158,38 @@ function setAttributeTransformer(_: Domx, selector: string, attr: string, value:
   });
 }
 
-function waitTransformer(_: Domx, timeout: number) {
-  const startTime = new Date().getTime();
-  while (new Date().getTime() - startTime < timeout) {
-    // Do nothing
-  }
-}
-
-function windowTransformer(_: Domx, method: string, ...args: any) {
-  (window as any)[method](...args);
-}
-
-function stateTransformer(domx: Domx, state: string) {
+async function stateTransformer(domx: Domx, state: string) {
   domx.state = state;
   if (domx.fsm.states[state].entry) domx.dispatch("entry");
 }
 
+async function submitFormTransformer(domx: Domx, formSelector: string) {
+  const form = document.querySelector(formSelector) as HTMLFormElement;
+  const method = (form.method ?? "POST").toUpperCase();
+  const enctype = form.enctype ?? "application/x-www-form-urlencoded";
+  const formData = new FormData(form);
+  fetch(form.action, {
+    body: formData,
+    method: method,
+    headers: {
+      domx: domx.getHeaderData(),
+      contentType: enctype,
+    },
+  }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+}
+
+async function waitTransformer(_: Domx, timeout: number) {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+}
+
+async function windowTransformer(_: Domx, method: string, ...args: any) {
+  (window as any)[method](...args);
+}
+
 type Tail<T extends any[]> = T extends [any, ...infer Rest] ? Rest : never;
 type TxArgs<F extends (...args: any) => any> = Tail<Parameters<F>>;
-type TransformerList = (
+
+export type TransformerList = (
   | [operation: "addClass", ...TxArgs<typeof addClassTransformer>]
   | [operation: "addEventListener", ...TxArgs<typeof addEventListenerTransformer>]
   | [operation: "append", ...TxArgs<typeof appendTransformer>]
@@ -136,23 +205,27 @@ type TransformerList = (
   | [operation: "replace", ...TxArgs<typeof replaceTransformer>]
   | [operation: "setAttribute", ...TxArgs<typeof setAttributeTransformer>]
   | [operation: "state", ...TxArgs<typeof stateTransformer>]
+  | [operation: "submit", ...TxArgs<typeof submitFormTransformer>]
   | [operation: "textContent", ...TxArgs<typeof textContentTransformer>]
   | [operation: "wait", ...TxArgs<typeof waitTransformer>]
   | [operation: "window", ...TxArgs<typeof windowTransformer>]
 )[];
 
 type FSM = {
+  id: string;
   initialState: string;
-  listeners: [selector: string, event: string, evt: string][];
+  listeners?: [selector: string, event: string, evt: string][];
   states: Record<string, Record<string, TransformerList>>;
 };
+
 export class Domx {
-  state: string = "";
   fsm: FSM = {
+    id: "",
     initialState: "",
     listeners: [],
     states: {},
   };
+  state: string = "";
   subs: ((evt: string, prevState: string, nextState: string) => void)[] = [];
   timeouts: Record<string, NodeJS.Timeout> = {};
   tranformers: Record<string, (instance: Domx, ...args: any) => void> = {};
@@ -192,6 +265,7 @@ export class Domx {
     this.addTransformer("replace", replaceTransformer);
     this.addTransformer("setAttribute", setAttributeTransformer);
     this.addTransformer("state", stateTransformer);
+    this.addTransformer("submit", submitFormTransformer);
     this.addTransformer("textContent", textContentTransformer);
     this.addTransformer("wait", waitTransformer);
     this.addTransformer("window", windowTransformer);
@@ -211,6 +285,14 @@ export class Domx {
     this.transform(transformations, () => {
       this.subs.forEach((s) => s(evt, prevState, this.state));
     });
+  }
+
+  /**
+   * get header data
+   * @returns header data
+   */
+  getHeaderData() {
+    return JSON.stringify({ id: this.fsm.id, state: this.state });
   }
 
   /**
@@ -274,7 +356,7 @@ export class Domx {
    * @param cb callback
    * @returns
    */
-  transform(transformations: TransformerList = [], cb?: () => void) {
+  async transform(transformations: TransformerList = [], cb?: () => void) {
     // get transformations from current state
     if (!transformations) return;
 
@@ -284,7 +366,7 @@ export class Domx {
       const [transformer, ...transformerArgs] = transformation;
       const transformerFn = this.tranformers[transformer];
       if (!transformerFn) throw new Error(`Unknown transformer: ${transformer}`);
-      transformerFn(this, ...transformerArgs);
+      await transformerFn(this, ...transformerArgs);
     }
 
     if (cb) cb();
