@@ -159,9 +159,9 @@ async function setAttributeTransformer(_: Domx, selector: string, attr: string, 
 }
 
 async function stateTransformer(domx: Domx, state: string) {
+  if (domx.fsm.states[state].exit) domx.dispatch("exit");
   domx.state = state;
   if (domx.fsm.states[state].entry) domx.dispatch("entry");
-  if (domx.fsm.states[state].exit) domx.dispatch("exit");
 }
 
 async function submitFormTransformer(domx: Domx, formSelector: string) {
