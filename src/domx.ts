@@ -114,15 +114,15 @@ async function postRequestTransformer(domx: Domx, url: string, ...data: PostRequ
   }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
 }
 
-async function textContentTransformer(_: Domx, selector: string, text: string) {
-  const el = document.querySelector(selector);
-  if (!el) return;
-  el.textContent = decodeURIComponent(text);
-}
-
 async function removeAttributeTransformer(_: Domx, selector: string, attr: string) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => el.removeAttribute(attr));
+}
+
+async function removeTransformer(_: Domx, selector: string) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  el.remove();
 }
 
 async function removeEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
@@ -178,6 +178,12 @@ async function submitFormTransformer(domx: Domx, formSelector: string) {
   }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
 }
 
+async function textContentTransformer(_: Domx, selector: string, text: string) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  el.textContent = decodeURIComponent(text);
+}
+
 async function waitTransformer(_: Domx, timeout: number) {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 }
@@ -199,6 +205,7 @@ export type TransformerList = (
   | [operation: "get", ...TxArgs<typeof getRequestTransformer>]
   | [operation: "location", ...TxArgs<typeof locationTransformer>]
   | [operation: "post", ...TxArgs<typeof postRequestTransformer>]
+  | [operation: "remove", ...TxArgs<typeof removeTransformer>]
   | [operation: "removeAttribute", ...TxArgs<typeof removeAttributeTransformer>]
   | [operation: "removeClass", ...TxArgs<typeof removeClassTransformer>]
   | [operation: "removeEventListener", ...TxArgs<typeof removeEventListenerTransformer>]

@@ -106,12 +106,6 @@
       }
     }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
   }
-  async function textContentTransformer(_, selector, text) {
-    const el = document.querySelector(selector);
-    if (!el)
-      return;
-    el.textContent = decodeURIComponent(text);
-  }
   async function removeAttributeTransformer(_, selector, attr) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => el.removeAttribute(attr));
@@ -166,6 +160,12 @@
         contentType: enctype
       }
     }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+  }
+  async function textContentTransformer(_, selector, text) {
+    const el = document.querySelector(selector);
+    if (!el)
+      return;
+    el.textContent = decodeURIComponent(text);
   }
   async function waitTransformer(_, timeout) {
     return new Promise((resolve) => setTimeout(resolve, timeout));
