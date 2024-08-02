@@ -224,7 +224,7 @@ export type TransformerList = (
   | [operation: "window", ...TxArgs<typeof windowTransformer>]
 )[];
 
-type FSM = {
+export type FSM = {
   id: string;
   initialState: string;
   listeners?: [selector: string, event: string, evt: string][];
