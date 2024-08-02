@@ -266,6 +266,7 @@ export class Domx {
     this.addTransformer("get", getRequestTransformer);
     this.addTransformer("location", locationTransformer);
     this.addTransformer("post", postRequestTransformer);
+    this.addTransformer("remove", removeTransformer);
     this.addTransformer("removeAttribute", removeAttributeTransformer);
     this.addTransformer("removeClass", removeClassTransformer);
     this.addTransformer("removeEventListener", removeEventListenerTransformer);
