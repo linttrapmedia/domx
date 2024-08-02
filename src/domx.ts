@@ -24,6 +24,10 @@ async function appendTransformer(_: Domx, selector: string, html: string) {
   el.append(tmpl.content);
 }
 
+async function consoleTransformer(_: Domx, ...args: any) {
+  console.log(...args);
+}
+
 async function dispatchTransformer(domx: Domx, event: string, timeout: number = 0) {
   clearTimeout(domx.timeouts[event]);
   domx.timeouts[event] = setTimeout(() => domx.dispatch(event), timeout);
@@ -200,6 +204,7 @@ export type TransformerList = (
   | [operation: "addClass", ...TxArgs<typeof addClassTransformer>]
   | [operation: "addEventListener", ...TxArgs<typeof addEventListenerTransformer>]
   | [operation: "append", ...TxArgs<typeof appendTransformer>]
+  | [operation: "console", ...TxArgs<typeof consoleTransformer>]
   | [operation: "dispatch", ...TxArgs<typeof dispatchTransformer>]
   | [operation: "innerHTML", ...TxArgs<typeof innerHTMLTransformer>]
   | [operation: "history", ...TxArgs<typeof historyTransformer>]
@@ -261,6 +266,7 @@ export class Domx {
     this.addTransformer("addClass", addClassTransformer);
     this.addTransformer("addEventListener", addEventListenerTransformer);
     this.addTransformer("append", appendTransformer);
+    this.addTransformer("console", consoleTransformer);
     this.addTransformer("dispatch", dispatchTransformer);
     this.addTransformer("innerHTML", innerHTMLTransformer);
     this.addTransformer("history", historyTransformer);
