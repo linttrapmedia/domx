@@ -1,0 +1,11 @@
+<html>
+    <head>
+      <title>DOMX Unit Tests</title>
+      <script>"use strict";var OEM=(()=>{var o=["/Users/kevinlint/.nvm/versions/node/v18.14.0/bin/node","/Users/kevinlint/LintTrap/domx/cmd/test.js","FILTER="];var p=o.slice(2).map(t=>t.split("=")).reduce((t,[n,s])=>({...t,[n]:s}),{});var E=p.FILTER;function u(t){let n=document.querySelector("#test-sandbox"),s=document.querySelector("#test-results");s.style.display="grid",s.style.columnGap="10px",s.style.rowGap="2px",s.style.gridTemplateColumns="auto auto auto 1fr",t.forEach(([m,...g])=>{g.filter(a=>(m+a[0].split(" ").join("")).search(E)>-1).forEach(([a,d])=>{let e;try{e=d(n)}catch(y){e={pass:!1,message:y.message}}let r=document.createElement("div");r.style.fontFamily="monospace",r.style.fontSize="14px",r.style.color=e.pass?"green":"red",r.innerText=e.pass?"\u2714":"\u2718",r.className=e.pass?"pass":"fail";let l=document.createElement("div");l.innerText=m,l.style.color=e.pass?"green":"red";let c=document.createElement("div");c.innerText=a,c.style.color=e.pass?"green":"red";let i=document.createElement("div");i.innerText=e.message||"",i.style.color=e.pass?"green":"red",s.append(r,l,c,i)})})}var f=()=>{let t=document.createElement("div");return t.outerHTML="<div></div>",{pass:t.outerHTML==="<div></div>"}};window.addEventListener("DOMContentLoaded",()=>{u([["DOMX",["tests are working",f]]])});})();
+</script>
+    </head>
+    <body>
+      <div id="test-results"></div>
+      <div id="test-sandbox"></div>
+    </body>
+  </html>

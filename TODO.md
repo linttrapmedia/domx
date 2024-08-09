@@ -1,0 +1,2 @@
+- Add delay/debounce options to most txs
+- Add "guards" 

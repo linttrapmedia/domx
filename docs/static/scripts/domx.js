@@ -1,11 +1,20 @@
 "use strict";
 (() => {
   // src/domx.ts
+  function debounce(func, timeout = 300) {
+    let timer;
+    return function(...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.apply(this, args);
+      }, timeout);
+    };
+  }
   async function addClassTransformer(_, selector, className) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => el.classList.add(className));
   }
-  async function addEventListenerTransformer(domx, selector, event, fsmEvent) {
+  async function addEventListenerTransformer(domx, selector, event, fsmEvent, opts) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => {
       const cb = (e) => {
@@ -14,8 +23,13 @@
           return;
         domx.dispatch(fsmEvent);
       };
-      el.removeEventListener(event, cb);
-      el.addEventListener(event, cb);
+      if (opts?.debounce) {
+        el.removeEventListener(event, debounce(cb, opts?.debounce));
+        el.addEventListener(event, debounce(cb, opts?.debounce));
+      } else {
+        el.removeEventListener(event, cb);
+        el.addEventListener(event, cb);
+      }
     });
   }
   async function appendTransformer(_, selector, html) {
@@ -26,6 +40,9 @@
     tmpl.innerHTML = decodeURIComponent(html);
     el.append(tmpl.content);
   }
+  async function consoleTransformer(_, ...args) {
+    console.log(...args);
+  }
   async function dispatchTransformer(domx, event, timeout = 0) {
     clearTimeout(domx.timeouts[event]);
     domx.timeouts[event] = setTimeout(() => domx.dispatch(event), timeout);
@@ -33,37 +50,45 @@
   async function historyTransformer(_, state, title, url) {
     window.history.pushState(state, title, url);
   }
-  async function getRequestTransformer(domx, url, ...data) {
-    const urlSearchParams = new URLSearchParams();
-    data.forEach(([key, selector, prop, propKey]) => {
-      switch (prop) {
-        case "attribute":
-          const el1 = document.querySelector(selector);
-          if (!el1)
-            return;
-          urlSearchParams.append(key, el1.getAttribute(propKey));
-          break;
-        case "dataset":
-          const el2 = document.querySelector(selector);
-          if (!el2)
-            return;
-          urlSearchParams.append(key, el2.dataset[prop][propKey]);
-          break;
-        case "value":
-          const el = document.querySelector(selector);
-          if (!el)
-            return;
-          urlSearchParams.append(key, el.value);
-          break;
-      }
-    });
-    const _url = url + "?" + urlSearchParams.toString();
-    fetch(_url, {
-      method: "GET",
-      headers: {
-        domx: domx.getHeaderData()
-      }
-    }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+  async function getRequestTransformer(domx, url, data, opts) {
+    const run = () => {
+      const urlSearchParams = new URLSearchParams();
+      data.forEach(([key, selector, prop, propKey]) => {
+        switch (prop) {
+          case "attribute":
+            const el1 = document.querySelector(selector);
+            if (!el1)
+              return;
+            urlSearchParams.append(key, el1.getAttribute(propKey));
+            break;
+          case "dataset":
+            const el2 = document.querySelector(selector);
+            if (!el2)
+              return;
+            urlSearchParams.append(key, el2.dataset[prop][propKey]);
+            break;
+          case "value":
+            const el = document.querySelector(selector);
+            if (!el)
+              return;
+            urlSearchParams.append(key, el.value);
+            break;
+        }
+      });
+      const _url = url + "?" + urlSearchParams.toString();
+      fetch(_url, {
+        method: "GET",
+        headers: {
+          domx: domx.getHeaderData()
+        }
+      }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+    };
+    const debouncedRun = debounce(run, opts?.debounce);
+    if (opts?.debounce) {
+      debouncedRun();
+    } else {
+      run();
+    }
   }
   async function innerHTMLTransformer(_, selector, html) {
     const el = document.querySelector(selector);
@@ -74,41 +99,55 @@
   async function locationTransformer(_, url) {
     window.location.href = url;
   }
-  async function postRequestTransformer(domx, url, ...data) {
-    const formData = new FormData();
-    data.forEach(([key, selector, prop, propKey]) => {
-      switch (prop) {
-        case "attribute":
-          const el1 = document.querySelector(selector);
-          if (!el1)
-            return;
-          formData.append(key, el1.getAttribute(propKey));
-          break;
-        case "dataset":
-          const el2 = document.querySelector(selector);
-          if (!el2)
-            return;
-          formData.append(key, el2.dataset[prop][propKey]);
-          break;
-        case "value":
-          const el = document.querySelector(selector);
-          if (!el)
-            return;
-          formData.append(key, el.value);
-          break;
-      }
-    });
-    fetch(url, {
-      body: formData,
-      method: "POST",
-      headers: {
-        domx: domx.getHeaderData()
-      }
-    }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+  async function postRequestTransformer(domx, url, data, opts) {
+    const run = () => {
+      const formData = new FormData();
+      data.forEach(([key, selector, prop, propKey]) => {
+        switch (prop) {
+          case "attribute":
+            const el1 = document.querySelector(selector);
+            if (!el1)
+              return;
+            formData.append(key, el1.getAttribute(propKey));
+            break;
+          case "dataset":
+            const el2 = document.querySelector(selector);
+            if (!el2)
+              return;
+            formData.append(key, el2.dataset[prop][propKey]);
+            break;
+          case "value":
+            const el = document.querySelector(selector);
+            if (!el)
+              return;
+            formData.append(key, el.value);
+            break;
+        }
+      });
+      fetch(url, {
+        body: formData,
+        method: "POST",
+        headers: {
+          domx: domx.getHeaderData()
+        }
+      }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+    };
+    const debouncedRun = debounce(run, opts?.debounce);
+    if (opts?.debounce) {
+      debouncedRun();
+    } else {
+      run();
+    }
   }
   async function removeAttributeTransformer(_, selector, attr) {
     const els = document.querySelectorAll(selector);
     els.forEach((el) => el.removeAttribute(attr));
+  }
+  async function removeTransformer(_, selector) {
+    const el = document.querySelector(selector);
+    if (!el)
+      return;
+    el.remove();
   }
   async function removeEventListenerTransformer(domx, selector, event, fsmEvent) {
     const els = document.querySelectorAll(selector);
@@ -143,6 +182,8 @@
     });
   }
   async function stateTransformer(domx, state) {
+    if (domx.fsm.states[state].exit)
+      domx.dispatch("exit");
     domx.state = state;
     if (domx.fsm.states[state].entry)
       domx.dispatch("entry");
@@ -196,12 +237,14 @@
       this.addTransformer("addClass", addClassTransformer);
       this.addTransformer("addEventListener", addEventListenerTransformer);
       this.addTransformer("append", appendTransformer);
+      this.addTransformer("console", consoleTransformer);
       this.addTransformer("dispatch", dispatchTransformer);
       this.addTransformer("innerHTML", innerHTMLTransformer);
       this.addTransformer("history", historyTransformer);
       this.addTransformer("get", getRequestTransformer);
       this.addTransformer("location", locationTransformer);
       this.addTransformer("post", postRequestTransformer);
+      this.addTransformer("remove", removeTransformer);
       this.addTransformer("removeAttribute", removeAttributeTransformer);
       this.addTransformer("removeClass", removeClassTransformer);
       this.addTransformer("removeEventListener", removeEventListenerTransformer);

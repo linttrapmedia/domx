@@ -72,3 +72,7 @@ kill: ## Kill the project
 publish: ## Publish the project to npm
 	@echo $(STATUS) Publish package...
 	@npm publish --access public
+
+test: ## Run tests
+	@echo $(STATUS) Testing...
+	@node ./cmd/test.js FILTER=$(FILTER)

@@ -1,9 +1,25 @@
+function debounce(func: any, timeout = 300) {
+  let timer: NodeJS.Timeout;
+  return function (this: any, ...args: any[]) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
+
 async function addClassTransformer(_: Domx, selector: string, className: string) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => el.classList.add(className));
 }
 
-async function addEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
+async function addEventListenerTransformer(
+  domx: Domx,
+  selector: string,
+  event: string,
+  fsmEvent: string,
+  opts?: { debounce?: number }
+) {
   const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
   els.forEach((el) => {
     const cb = (e: any) => {
@@ -11,8 +27,13 @@ async function addEventListenerTransformer(domx: Domx, selector: string, event: 
       if (e.target !== el) return;
       domx.dispatch(fsmEvent);
     };
-    el.removeEventListener(event, cb);
-    el.addEventListener(event, cb);
+    if (opts?.debounce) {
+      el.removeEventListener(event, debounce(cb, opts?.debounce));
+      el.addEventListener(event, debounce(cb, opts?.debounce));
+    } else {
+      el.removeEventListener(event, cb);
+      el.addEventListener(event, cb);
+    }
   });
 }
 
@@ -42,35 +63,50 @@ type GetRequestTransformer =
   | [key: string, selector: string, prop: "attribute", propKey: string]
   | [key: string, selector: string, prop: "dataset", propKey: string];
 
-async function getRequestTransformer(domx: Domx, url: string, ...data: GetRequestTransformer[]) {
-  const urlSearchParams = new URLSearchParams();
-  data.forEach(([key, selector, prop, propKey]) => {
-    switch (prop) {
-      case "attribute":
-        const el1 = document.querySelector(selector) as any;
-        if (!el1) return;
-        urlSearchParams.append(key, el1.getAttribute(propKey));
-        break;
-      case "dataset":
-        const el2 = document.querySelector(selector) as any;
-        if (!el2) return;
-        urlSearchParams.append(key, el2.dataset[prop][propKey]);
-        break;
-      case "value":
-        const el = document.querySelector(selector) as any;
-        if (!el) return;
-        urlSearchParams.append(key, el.value);
-        break;
-    }
-  });
+async function getRequestTransformer(
+  domx: Domx,
+  url: string,
+  data: GetRequestTransformer[],
+  opts: { debounce?: number }
+) {
+  const run = () => {
+    const urlSearchParams = new URLSearchParams();
+    data.forEach(([key, selector, prop, propKey]) => {
+      switch (prop) {
+        case "attribute":
+          const el1 = document.querySelector(selector) as any;
+          if (!el1) return;
+          urlSearchParams.append(key, el1.getAttribute(propKey));
+          break;
+        case "dataset":
+          const el2 = document.querySelector(selector) as any;
+          if (!el2) return;
+          urlSearchParams.append(key, el2.dataset[prop][propKey]);
+          break;
+        case "value":
+          const el = document.querySelector(selector) as any;
+          if (!el) return;
+          urlSearchParams.append(key, el.value);
+          break;
+      }
+    });
 
-  const _url = url + "?" + urlSearchParams.toString();
-  fetch(_url, {
-    method: "GET",
-    headers: {
-      domx: domx.getHeaderData(),
-    },
-  }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+    const _url = url + "?" + urlSearchParams.toString();
+    fetch(_url, {
+      method: "GET",
+      headers: {
+        domx: domx.getHeaderData(),
+      },
+    }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+  };
+
+  const debouncedRun = debounce(run, opts?.debounce);
+
+  if (opts?.debounce) {
+    debouncedRun();
+  } else {
+    run();
+  }
 }
 
 async function innerHTMLTransformer(_: Domx, selector: string, html: string) {
@@ -88,34 +124,49 @@ type PostRequestTransformerData =
   | [key: string, selector: string, prop: "attribute", propKey: string]
   | [key: string, selector: string, prop: "dataset", propKey: string];
 
-async function postRequestTransformer(domx: Domx, url: string, ...data: PostRequestTransformerData[]) {
-  const formData = new FormData();
-  data.forEach(([key, selector, prop, propKey]) => {
-    switch (prop) {
-      case "attribute":
-        const el1 = document.querySelector(selector) as any;
-        if (!el1) return;
-        formData.append(key, el1.getAttribute(propKey));
-        break;
-      case "dataset":
-        const el2 = document.querySelector(selector) as any;
-        if (!el2) return;
-        formData.append(key, el2.dataset[prop][propKey]);
-        break;
-      case "value":
-        const el = document.querySelector(selector) as any;
-        if (!el) return;
-        formData.append(key, el.value);
-        break;
-    }
-  });
-  fetch(url, {
-    body: formData,
-    method: "POST",
-    headers: {
-      domx: domx.getHeaderData(),
-    },
-  }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+async function postRequestTransformer(
+  domx: Domx,
+  url: string,
+  data: PostRequestTransformerData[],
+  opts?: { debounce?: number }
+) {
+  const run = () => {
+    const formData = new FormData();
+    data.forEach(([key, selector, prop, propKey]) => {
+      switch (prop) {
+        case "attribute":
+          const el1 = document.querySelector(selector) as any;
+          if (!el1) return;
+          formData.append(key, el1.getAttribute(propKey));
+          break;
+        case "dataset":
+          const el2 = document.querySelector(selector) as any;
+          if (!el2) return;
+          formData.append(key, el2.dataset[prop][propKey]);
+          break;
+        case "value":
+          const el = document.querySelector(selector) as any;
+          if (!el) return;
+          formData.append(key, el.value);
+          break;
+      }
+    });
+    fetch(url, {
+      body: formData,
+      method: "POST",
+      headers: {
+        domx: domx.getHeaderData(),
+      },
+    }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
+  };
+
+  const debouncedRun = debounce(run, opts?.debounce);
+
+  if (opts?.debounce) {
+    debouncedRun();
+  } else {
+    run();
+  }
 }
 
 async function removeAttributeTransformer(_: Domx, selector: string, attr: string) {

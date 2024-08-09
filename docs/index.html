@@ -26,7 +26,7 @@
       gtag("config", "G-Y0MV1R2QMP");
     </script>
     <script>
-      new Domx({
+      const client = new Domx({
         initialState: "red",
         listeners: [[".stoplight", "click", "changeState"]],
         states: {
@@ -56,6 +56,7 @@
           },
         },
       });
+      console.log(client);
     </script>
   </head>
   <body>
