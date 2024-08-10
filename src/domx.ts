@@ -8,8 +8,21 @@ function debounce(func: any, timeout = 300) {
   };
 }
 
+function getNodeListBySelector(selector: string): NodeListOf<HTMLElement> {
+  if (selector.startsWith("#")) {
+    const el = document.querySelector(selector);
+    if (el) {
+      return [el] as any;
+    } else {
+      return document.querySelectorAll(selector);
+    }
+  } else {
+    return document.querySelectorAll(selector);
+  }
+}
+
 async function addClassTransformer(_: Domx, selector: string, className: string) {
-  const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+  const els = getNodeListBySelector(selector);
   els.forEach((el) => el.classList.add(className));
 }
 
@@ -20,7 +33,7 @@ async function addEventListenerTransformer(
   fsmEvent: string,
   opts?: { debounce?: number }
 ) {
-  const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+  const els = getNodeListBySelector(selector);
   els.forEach((el) => {
     const cb = (e: any) => {
       e.preventDefault();
@@ -170,7 +183,7 @@ async function postRequestTransformer(
 }
 
 async function removeAttributeTransformer(_: Domx, selector: string, attr: string) {
-  const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+  const els = getNodeListBySelector(selector);
   els.forEach((el) => el.removeAttribute(attr));
 }
 
@@ -181,7 +194,7 @@ async function removeTransformer(_: Domx, selector: string) {
 }
 
 async function removeEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
-  const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+  const els = getNodeListBySelector(selector);
   els.forEach((el) => {
     const cb = (e: any) => {
       e.preventDefault();
@@ -193,7 +206,7 @@ async function removeEventListenerTransformer(domx: Domx, selector: string, even
 }
 
 async function removeClassTransformer(_: Domx, selector: string, className: string) {
-  const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+  const els = getNodeListBySelector(selector);
   els.forEach((el) => el.classList.remove(className));
 }
 
@@ -206,7 +219,7 @@ async function replaceTransformer(_: Domx, selector: string, html: string) {
 }
 
 async function setAttributeTransformer(_: Domx, selector: string, attr: string, value: string) {
-  const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+  const els = getNodeListBySelector(selector);
   els.forEach((el) => {
     if (value === null) return el.removeAttribute(attr);
     el.setAttribute(attr, value);
@@ -240,6 +253,12 @@ async function textContentTransformer(_: Domx, selector: string, text: string) {
   el.textContent = decodeURIComponent(text);
 }
 
+async function triggerTransformer(_: Domx, selector: string, event: string) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  el.dispatchEvent(new Event(event));
+}
+
 async function waitTransformer(_: Domx, timeout: number) {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 }
@@ -271,6 +290,7 @@ export type TransformerList = (
   | [operation: "state", ...TxArgs<typeof stateTransformer>]
   | [operation: "submit", ...TxArgs<typeof submitFormTransformer>]
   | [operation: "textContent", ...TxArgs<typeof textContentTransformer>]
+  | [operation: "trigger", ...TxArgs<typeof triggerTransformer>]
   | [operation: "wait", ...TxArgs<typeof waitTransformer>]
   | [operation: "window", ...TxArgs<typeof windowTransformer>]
 )[];
@@ -333,10 +353,11 @@ export class Domx {
     this.addTransformer("state", stateTransformer);
     this.addTransformer("submit", submitFormTransformer);
     this.addTransformer("textContent", textContentTransformer);
+    this.addTransformer("trigger", triggerTransformer);
     this.addTransformer("wait", waitTransformer);
     this.addTransformer("window", windowTransformer);
 
-    if (fsm) document.addEventListener("DOMContentLoaded", () => this.init(fsm));
+    if (fsm) this.init(fsm);
   }
 
   /**
@@ -388,7 +409,7 @@ export class Domx {
 
     for (let i = 0; i < listeners.length; i++) {
       const [selector, eventListener, fsmEvent] = listeners[i];
-      const els = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+      const els = getNodeListBySelector(selector);
       // add event listeners to all registered elements
       for (let j = 0; j < els.length; j++) {
         const el = els[j];

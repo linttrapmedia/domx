@@ -1,6 +1,6 @@
 import { runner } from "./runner";
-import * as domx from "./unit-tests/DOMX.test";
+import { AddEventListenerTest, AppendTest, AttrTest, SmokeTest } from "./unit-tests/DOMX.test";
 
-window.addEventListener("DOMContentLoaded", () => {
-  runner([["DOMX", ["tests are working", domx.SmokeTest]]]);
+window.addEventListener("DOMContentLoaded", async () => {
+  await runner([SmokeTest, AppendTest, AttrTest, AddEventListenerTest]);
 });

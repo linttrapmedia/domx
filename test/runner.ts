@@ -1,50 +1,53 @@
-import args from '../cmd/util/args';
-import { Test } from '../src';
+import { Test, TestResult } from "../src/types";
 
-const filter = args.FILTER;
-
-export function runner(tests: [string, ...[string, Test][]][]) {
-  const sandbox = document.querySelector('#test-sandbox') as HTMLElement;
-  const results = document.querySelector('#test-results') as HTMLElement;
-  results.style.display = 'grid';
-  results.style.columnGap = '10px';
-  results.style.rowGap = '2px';
-  results.style.gridTemplateColumns = 'auto auto auto 1fr';
-
-  tests.forEach(([module, ...assertions]) => {
-    assertions
-      .filter((t) => {
-        const filterString = module + t[0].split(' ').join('');
-        const filterSearch = filterString.search(filter);
-        return filterSearch > -1;
-      })
-      .forEach(([desc, test]) => {
-        let testResult;
-        try {
-          testResult = test(sandbox);
-        } catch (err: any) {
-          testResult = { pass: false, message: err.message };
-        }
-        const statusEl = document.createElement('div');
-        statusEl.style.fontFamily = 'monospace';
-        statusEl.style.fontSize = '14px';
-        statusEl.style.color = testResult.pass ? 'green' : 'red';
-        statusEl.innerText = testResult.pass ? '✔' : '✘';
-        statusEl.className = testResult.pass ? 'pass' : 'fail';
-
-        const moduleEl = document.createElement('div');
-        moduleEl.innerText = module;
-        moduleEl.style.color = testResult.pass ? 'green' : 'red';
-
-        const descEl = document.createElement('div');
-        descEl.innerText = desc;
-        descEl.style.color = testResult.pass ? 'green' : 'red';
-
-        const messageEl = document.createElement('div');
-        messageEl.innerText = testResult.message || '';
-        messageEl.style.color = testResult.pass ? 'green' : 'red';
-
-        results.append(statusEl, moduleEl, descEl, messageEl);
+async function* testRunner(tests: Test[]): AsyncGenerator<TestResult, void, unknown> {
+  for (const test of tests) {
+    yield new Promise<TestResult>((resolve) => {
+      test.done((result: TestResult) => {
+        resolve(result);
       });
+    });
+  }
+}
+
+async function runTests(tests: Test[]): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+
+  for await (const result of testRunner(tests)) {
+    results.push(result);
+  }
+
+  return results;
+}
+
+export async function runner(tests: Test[]) {
+  return await runTests(tests).then((results) => {
+    // console.log("All results:", results);
+
+    const sandbox = document.querySelector("#test-sandbox") as HTMLElement;
+    const resultOutput = document.querySelector("#test-results") as HTMLElement;
+    resultOutput.style.display = "grid";
+    resultOutput.style.columnGap = "10px";
+    resultOutput.style.rowGap = "2px";
+    resultOutput.style.gridTemplateColumns = "auto auto 1fr";
+
+    results.forEach((result) => {
+      const statusEl = document.createElement("div");
+      statusEl.style.fontFamily = "monospace";
+      statusEl.style.fontSize = "14px";
+      statusEl.style.color = result.pass ? "green" : "red";
+      statusEl.innerText = result.pass ? "✔" : "✘";
+      statusEl.className = result.pass ? "pass" : "fail";
+      const labelEl = document.createElement("div");
+      labelEl.innerText = result.label + ": ";
+      labelEl.style.color = result.pass ? "green" : "red";
+      const messageEl = document.createElement("div");
+      messageEl.innerText = result.message || "";
+      messageEl.style.color = result.pass ? "green" : "red";
+      resultOutput.append(statusEl, labelEl, messageEl);
+      sandbox.innerHTML = "";
+    });
+
+    resultOutput.dataset.status = "done";
   });
 }

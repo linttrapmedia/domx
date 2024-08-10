@@ -23,6 +23,7 @@
   "homepage": "https://github.com/linttrapmedia/domx#readme",
   "devDependencies": {
     "@playwright/test": "^1.41.2",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^20.11.19",
     "esbuild": "^0.14.27",
     "http-server": "^14.1.1",
