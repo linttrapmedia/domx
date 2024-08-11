@@ -1,13 +1,3 @@
-function debounce(func: any, timeout = 300) {
-  let timer: NodeJS.Timeout;
-  return function (this: any, ...args: any[]) {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func.apply(this, args);
-    }, timeout);
-  };
-}
-
 function getNodeListBySelector(selector: string): NodeListOf<HTMLElement> {
   if (selector.startsWith("#")) {
     const el = document.querySelector(selector);
@@ -26,28 +16,13 @@ async function addClassTransformer(_: Domx, selector: string, className: string)
   els.forEach((el) => el.classList.add(className));
 }
 
-async function addEventListenerTransformer(
-  domx: Domx,
-  selector: string,
-  event: string,
-  fsmEvent: string,
-  opts?: { debounce?: number }
-) {
-  const els = getNodeListBySelector(selector);
-  els.forEach((el) => {
-    const cb = (e: any) => {
-      e.preventDefault();
-      if (e.target !== el) return;
-      domx.dispatch(fsmEvent);
-    };
-    if (opts?.debounce) {
-      el.removeEventListener(event, debounce(cb, opts?.debounce));
-      el.addEventListener(event, debounce(cb, opts?.debounce));
-    } else {
-      el.removeEventListener(event, cb);
-      el.addEventListener(event, cb);
-    }
-  });
+async function addEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
+  domx.removeEventListenersForSelector(selector, event);
+  const cb = (e: any) => {
+    e.preventDefault();
+    domx.dispatch(fsmEvent);
+  };
+  domx.addEventListenerToElement(selector, event, cb);
 }
 
 async function appendTransformer(_: Domx, selector: string, html: string) {
@@ -67,21 +42,16 @@ async function dispatchTransformer(domx: Domx, event: string, timeout: number = 
   domx.timeouts[event] = setTimeout(() => domx.dispatch(event), timeout);
 }
 
-async function historyTransformer(_: Domx, state: string, title: string, url: string) {
-  window.history.pushState(state, title, url);
+async function historyTransformer(_: Domx, method: string, ...args: any) {
+  (window.history as { [key: string]: any })[method](...args);
 }
 
-type GetRequestTransformer =
+export type GetRequestTransformer =
   | [key: string, selector: string, prop: "value"]
   | [key: string, selector: string, prop: "attribute", propKey: string]
   | [key: string, selector: string, prop: "dataset", propKey: string];
 
-async function getRequestTransformer(
-  domx: Domx,
-  url: string,
-  data: GetRequestTransformer[],
-  opts: { debounce?: number }
-) {
+async function getRequestTransformer(domx: Domx, url: string, data: GetRequestTransformer[]) {
   const run = () => {
     const urlSearchParams = new URLSearchParams();
     data.forEach(([key, selector, prop, propKey]) => {
@@ -113,13 +83,7 @@ async function getRequestTransformer(
     }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
   };
 
-  const debouncedRun = debounce(run, opts?.debounce);
-
-  if (opts?.debounce) {
-    debouncedRun();
-  } else {
-    run();
-  }
+  run();
 }
 
 async function innerHTMLTransformer(_: Domx, selector: string, html: string) {
@@ -137,12 +101,7 @@ type PostRequestTransformerData =
   | [key: string, selector: string, prop: "attribute", propKey: string]
   | [key: string, selector: string, prop: "dataset", propKey: string];
 
-async function postRequestTransformer(
-  domx: Domx,
-  url: string,
-  data: PostRequestTransformerData[],
-  opts?: { debounce?: number }
-) {
+async function postRequestTransformer(domx: Domx, url: string, data: PostRequestTransformerData[]) {
   const run = () => {
     const formData = new FormData();
     data.forEach(([key, selector, prop, propKey]) => {
@@ -173,13 +132,7 @@ async function postRequestTransformer(
     }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
   };
 
-  const debouncedRun = debounce(run, opts?.debounce);
-
-  if (opts?.debounce) {
-    debouncedRun();
-  } else {
-    run();
-  }
+  run();
 }
 
 async function removeAttributeTransformer(_: Domx, selector: string, attr: string) {
@@ -193,16 +146,8 @@ async function removeTransformer(_: Domx, selector: string) {
   el.remove();
 }
 
-async function removeEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
-  const els = getNodeListBySelector(selector);
-  els.forEach((el) => {
-    const cb = (e: any) => {
-      e.preventDefault();
-      if (e.target !== el) return;
-      domx.dispatch(fsmEvent);
-    };
-    el.removeEventListener(event, cb);
-  });
+async function removeEventListenerTransformer(domx: Domx, selector: string, event: string) {
+  domx.removeEventListenersForSelector(selector, event);
 }
 
 async function removeClassTransformer(_: Domx, selector: string, className: string) {
@@ -213,9 +158,8 @@ async function removeClassTransformer(_: Domx, selector: string, className: stri
 async function replaceTransformer(_: Domx, selector: string, html: string) {
   const el = document.querySelector(selector);
   if (!el) return;
-  const tmpl = document.createElement("template");
-  tmpl.innerHTML = decodeURIComponent(html);
-  el.replaceWith(tmpl.content);
+  const newElement = document.createRange().createContextualFragment(html);
+  el.replaceWith(newElement);
 }
 
 async function setAttributeTransformer(_: Domx, selector: string, attr: string, value: string) {
@@ -303,6 +247,11 @@ export type FSM = {
 };
 
 export class Domx {
+  eventRegistry: {
+    selector: string;
+    event: string;
+    handler: EventListener;
+  }[] = [];
   fsm: FSM = {
     id: "",
     initialState: "",
@@ -313,19 +262,13 @@ export class Domx {
   subs: ((evt: string, prevState: string, nextState: string) => void)[] = [];
   timeouts: Record<string, NodeJS.Timeout> = {};
   tranformers: Record<string, (instance: Domx, ...args: any) => void> = {};
-  /**
-   * dynamically add a transformer
-   * @param name name of transformer
-   * @param cb callback
-   */
-  addTransformer(name: string, cb: (...args: any) => void) {
-    this.tranformers[name] = cb;
-    return this;
-  }
 
   constructor(fsm?: FSM) {
+    this.addEventListenerToElement = this.addEventListenerToElement.bind(this);
     this.dispatch = this.dispatch.bind(this);
     this.init = this.init.bind(this);
+    this.removeAllEventListeners = this.removeAllEventListeners.bind(this);
+    this.removeEventListenersForSelector = this.removeEventListenersForSelector.bind(this);
     this.registerEventListeners = this.registerEventListeners.bind(this);
     this.sub = this.sub.bind(this);
     this.transform = this.transform.bind(this);
@@ -358,6 +301,29 @@ export class Domx {
     this.addTransformer("window", windowTransformer);
 
     if (fsm) this.init(fsm);
+  }
+
+  addEventListenerToElement(selector: string, event: string, handler: EventListener) {
+    // Register the listener
+    this.eventRegistry.push({ selector, event, handler });
+
+    // Add the event listener to the document with delegation
+    document.addEventListener(event, (e: Event) => {
+      const target = e.target as Element;
+      if (target && target.matches(selector)) {
+        handler(e);
+      }
+    });
+  }
+
+  /**
+   * dynamically add a transformer
+   * @param name name of transformer
+   * @param cb callback
+   */
+  addTransformer(name: string, cb: (...args: any) => void) {
+    this.tranformers[name] = cb;
+    return this;
   }
 
   /**
@@ -401,6 +367,30 @@ export class Domx {
     if (initState.entry) this.dispatch("entry");
   }
 
+  removeEventListenersForSelector(selector: string, event: string) {
+    // Filter out the registry entries matching the selector and event
+    const listenersToRemove = this.eventRegistry.filter(
+      (entry) => entry.selector === selector && entry.event === event
+    );
+
+    // Remove these listeners from the document and the registry
+    listenersToRemove.forEach((entry) => {
+      document.removeEventListener(entry.event, entry.handler);
+    });
+
+    // Update the registry to exclude the removed listeners
+    this.eventRegistry = this.eventRegistry.filter((entry) => !(entry.selector === selector && entry.event === event));
+  }
+
+  removeAllEventListeners() {
+    // Remove all registered listeners
+    this.eventRegistry.forEach((entry) => {
+      document.removeEventListener(entry.event, entry.handler);
+    });
+    // Clear the registry
+    this.eventRegistry = [];
+  }
+
   /**
    * register event listeners
    */
@@ -421,8 +411,8 @@ export class Domx {
           this.dispatch(fsmEvent);
         };
         // prevent duplicate event listeners
-        el.removeEventListener(eventListener, cb);
-        el.addEventListener(eventListener, cb);
+        this.removeEventListenersForSelector(selector, eventListener);
+        this.addEventListenerToElement(selector, eventListener, cb);
       }
     }
   }

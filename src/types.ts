@@ -4,6 +4,4 @@ export type TestResult = {
   message?: string;
 };
 
-export type Test = {
-  done: (callback: (result: TestResult) => void) => void;
-};
+export type Test = (callback: (result: TestResult) => void) => void;

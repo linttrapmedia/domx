@@ -49,7 +49,7 @@ function waitForElement(document, selector, timeout = 3000) {
       if (element) {
         resolve(element);
       } else if (Date.now() > endTime) {
-        reject(new Error(`Element with selector "${selector}" did not appear within ${timeout}ms`));
+        reject(new Error(`Test suite timed out: ${timeout}ms`));
       } else {
         setTimeout(checkExistence, interval);
       }

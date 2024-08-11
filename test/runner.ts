@@ -3,7 +3,7 @@ import { Test, TestResult } from "../src/types";
 async function* testRunner(tests: Test[]): AsyncGenerator<TestResult, void, unknown> {
   for (const test of tests) {
     yield new Promise<TestResult>((resolve) => {
-      test.done((result: TestResult) => {
+      test((result: TestResult) => {
         resolve(result);
       });
     });
