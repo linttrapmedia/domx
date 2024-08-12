@@ -132,7 +132,6 @@ export const GetRequestTest: Test = (callback) => {
   fsm.addTransformer("get", mockGetRequestTransformer);
   fsm.dispatch("test");
   fsm.sub((evt, prevState, nextState) => {
-    console.log(evt, prevState, nextState, formValue);
     if (nextState === "TESTED" && formValue === "test")
       callback({ label: "Get", pass: true, message: "can fetch a url" });
   });
@@ -180,7 +179,6 @@ export const PostRequestTest: Test = (callback) => {
   fsm.addTransformer("post", mockPostRequestTransformer);
   fsm.dispatch("test");
   fsm.sub((evt, prevState, nextState) => {
-    console.log(evt, prevState, nextState, formValue);
     if (nextState === "TESTED" && formValue === "test")
       callback({ label: "Post", pass: true, message: "can post a form" });
   });
@@ -320,5 +318,111 @@ export const StateTest: Test = (callback) => {
   });
   fsm.sub((evt, prevState, nextState) => {
     if (nextState === "TESTED") callback({ label: "State", pass: true, message: "can change state" });
+  });
+};
+
+// submit: skipped, tested in AddTransformerTest
+
+export const TextContentTest: Test = (callback) => {
+  const sandbox = document.querySelector("#test-sandbox") as HTMLElement;
+  const uuid = getUniqueElId();
+  const el = document.createElement("div");
+  el.id = uuid;
+  el.textContent = "test";
+  sandbox.appendChild(el);
+  new Domx({
+    id: "fsm",
+    initialState: "TEST",
+    states: {
+      TEST: {
+        test: [["textContent", `#${uuid}`, "tested"]],
+      },
+    },
+  }).dispatch("test");
+  const t1 = document.getElementById(uuid)?.outerHTML === `<div id="${uuid}">tested</div>`;
+  callback({ label: "TextContent", pass: t1, message: "can set textContent" });
+};
+
+export const WaitTest: Test = (callback) => {
+  const start = Date.now();
+  const fsm = new Domx({
+    id: "fsm",
+    initialState: "TEST",
+    states: {
+      TEST: {
+        entry: [
+          ["wait", 100],
+          ["state", "TESTED"],
+        ],
+      },
+      TESTED: {},
+    },
+  });
+  fsm.sub((evt, prevState, nextState) => {
+    if (nextState === "TESTED" && Date.now() - start > 100) {
+      callback({ label: "Wait", pass: true, message: "can wait" });
+    }
+  });
+};
+
+export const WaitAsDebouncerTest: Test = (callback) => {
+  const sandbox = document.querySelector("#test-sandbox") as HTMLElement;
+  const uuid = getUniqueElId();
+  const el = document.createElement("button");
+  el.id = uuid;
+  sandbox.appendChild(el);
+
+  const start = Date.now();
+  let eventCount = 0;
+
+  function eventCounterTransformer() {
+    eventCount++;
+  }
+
+  const fsm = new Domx({
+    id: "fsm",
+    initialState: "TEST",
+    listeners: [[`#${uuid}`, "click", "test"]],
+    states: {
+      TEST: {
+        // @ts-ignore
+        test: [["debounce", 100], ["count"]],
+      },
+      TESTED: {},
+    },
+  });
+
+  fsm.addTransformer("count", eventCounterTransformer);
+  el.click();
+  el.click();
+  el.click();
+
+  fsm.sub((evt, prevState, nextState) => {
+    if (eventCount === 1 && Date.now() - start > 100)
+      callback({ label: "WaitAsDebouncer", pass: true, message: "can debounce events" });
+  });
+};
+
+export const WindowMethodsTest: Test = (callback) => {
+  const sandbox = document.querySelector("#test-sandbox") as HTMLElement;
+  const uuid = getUniqueElId();
+  const el = document.createElement("div");
+  el.id = uuid;
+  sandbox.appendChild(el);
+  let alertCalled = false;
+  window.alert = (message: string) => {
+    if (message === "test") alertCalled = true;
+  };
+  const fsm = new Domx({
+    id: "fsm",
+    initialState: "TEST",
+    states: {
+      TEST: {
+        entry: [["window", "alert", "test"]],
+      },
+    },
+  });
+  fsm.sub((evt, prevState, nextState) => {
+    if (alertCalled) callback({ label: "WindowMethods", pass: true, message: "can call window methods" });
   });
 };

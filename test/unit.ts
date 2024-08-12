@@ -18,5 +18,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     tests.ReplaceTest,
     tests.SetAttributeTest,
     tests.StateTest,
+    tests.TextContentTest,
+    tests.WindowMethodsTest,
+    tests.WaitTest,
+    tests.WaitAsDebouncerTest,
   ]);
 });
