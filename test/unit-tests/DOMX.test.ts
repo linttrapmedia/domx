@@ -386,7 +386,7 @@ export const WaitAsDebouncerTest: Test = (callback) => {
     states: {
       TEST: {
         // @ts-ignore
-        test: [["debounce", 100], ["count"]],
+        test: [["wait", 100], ["count"]],
       },
       TESTED: {},
     },
@@ -399,7 +399,7 @@ export const WaitAsDebouncerTest: Test = (callback) => {
 
   fsm.sub((evt, prevState, nextState) => {
     if (eventCount === 1 && Date.now() - start > 100)
-      callback({ label: "WaitAsDebouncer", pass: true, message: "can debounce events" });
+      callback({ label: "WaitAsDebouncer", pass: true, message: "wait can debounce events" });
   });
 };
 

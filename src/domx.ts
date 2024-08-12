@@ -37,11 +37,6 @@ async function consoleTransformer(_: Domx, ...args: any) {
   console.log(...args);
 }
 
-async function debounceTransformer(domx: Domx, timeout: number) {
-  domx.debouncing = true;
-  return new Promise((resolve) => setTimeout(resolve, timeout)).then(() => (domx.debouncing = false));
-}
-
 async function dispatchTransformer(domx: Domx, event: string, timeout: number = 0) {
   clearTimeout(domx.timeouts[event]);
   domx.timeouts[event] = setTimeout(() => domx.dispatch(event), timeout);
@@ -208,8 +203,9 @@ async function triggerTransformer(_: Domx, selector: string, event: string) {
   el.dispatchEvent(new Event(event));
 }
 
-async function waitTransformer(_: Domx, timeout: number) {
-  return new Promise((resolve) => setTimeout(resolve, timeout));
+async function waitTransformer(domx: Domx, timeout: number) {
+  domx.debouncing = true;
+  return new Promise((resolve) => setTimeout(resolve, timeout)).then(() => (domx.debouncing = false));
 }
 
 async function windowTransformer(_: Domx, method: string, ...args: any) {
@@ -224,7 +220,6 @@ export type TransformerList = (
   | [operation: "addEventListener", ...TxArgs<typeof addEventListenerTransformer>]
   | [operation: "append", ...TxArgs<typeof appendTransformer>]
   | [operation: "console", ...TxArgs<typeof consoleTransformer>]
-  | [operation: "debounce", ...TxArgs<typeof debounceTransformer>]
   | [operation: "dispatch", ...TxArgs<typeof dispatchTransformer>]
   | [operation: "innerHTML", ...TxArgs<typeof innerHTMLTransformer>]
   | [operation: "history", ...TxArgs<typeof historyTransformer>]
@@ -288,7 +283,6 @@ export class Domx {
     this.addTransformer("addEventListener", addEventListenerTransformer);
     this.addTransformer("append", appendTransformer);
     this.addTransformer("console", consoleTransformer);
-    this.addTransformer("debounce", debounceTransformer);
     this.addTransformer("dispatch", dispatchTransformer);
     this.addTransformer("innerHTML", innerHTMLTransformer);
     this.addTransformer("history", historyTransformer);
