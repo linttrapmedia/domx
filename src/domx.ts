@@ -204,8 +204,10 @@ async function triggerTransformer(_: Domx, selector: string, event: string) {
 }
 
 async function waitTransformer(domx: Domx, timeout: number) {
-  domx.debouncing = true;
-  return new Promise((resolve) => setTimeout(resolve, timeout)).then(() => (domx.debouncing = false));
+  clearTimeout(domx.debouncing);
+  return new Promise((resolve) => (domx.debouncing = setTimeout(resolve, timeout))).then(() =>
+    clearTimeout(domx.debouncing)
+  );
 }
 
 async function windowTransformer(_: Domx, method: string, ...args: any) {
@@ -253,7 +255,7 @@ export class Domx {
     event: string;
     handler: EventListener;
   }[] = [];
-  debouncing: boolean = false;
+  debouncing: any = 0;
   fsm: FSM = {
     id: "",
     initialState: "",
