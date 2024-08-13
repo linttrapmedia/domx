@@ -1,36 +1,29 @@
 "use strict";
 (() => {
   // src/domx.ts
-  function debounce(func, timeout = 300) {
-    let timer;
-    return function(...args) {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func.apply(this, args);
-      }, timeout);
-    };
+  function getNodeListBySelector(selector) {
+    if (selector.startsWith("#")) {
+      const el = document.querySelector(selector);
+      if (el) {
+        return [el];
+      } else {
+        return document.querySelectorAll(selector);
+      }
+    } else {
+      return document.querySelectorAll(selector);
+    }
   }
   async function addClassTransformer(_, selector, className) {
-    const els = document.querySelectorAll(selector);
+    const els = getNodeListBySelector(selector);
     els.forEach((el) => el.classList.add(className));
   }
-  async function addEventListenerTransformer(domx, selector, event, fsmEvent, opts) {
-    const els = document.querySelectorAll(selector);
-    els.forEach((el) => {
-      const cb = (e) => {
-        e.preventDefault();
-        if (e.target !== el)
-          return;
-        domx.dispatch(fsmEvent);
-      };
-      if (opts?.debounce) {
-        el.removeEventListener(event, debounce(cb, opts?.debounce));
-        el.addEventListener(event, debounce(cb, opts?.debounce));
-      } else {
-        el.removeEventListener(event, cb);
-        el.addEventListener(event, cb);
-      }
-    });
+  async function addEventListenerTransformer(domx, selector, event, fsmEvent) {
+    domx.removeEventListenersForSelector(selector, event);
+    const cb = (e) => {
+      e.preventDefault();
+      domx.dispatch(fsmEvent);
+    };
+    domx.addEventListenerToElement(selector, event, cb);
   }
   async function appendTransformer(_, selector, html) {
     const el = document.querySelector(selector);
@@ -47,10 +40,10 @@
     clearTimeout(domx.timeouts[event]);
     domx.timeouts[event] = setTimeout(() => domx.dispatch(event), timeout);
   }
-  async function historyTransformer(_, state, title, url) {
-    window.history.pushState(state, title, url);
+  async function historyTransformer(_, method, ...args) {
+    window.history[method](...args);
   }
-  async function getRequestTransformer(domx, url, data, opts) {
+  async function getRequestTransformer(domx, url, data) {
     const run = () => {
       const urlSearchParams = new URLSearchParams();
       data.forEach(([key, selector, prop, propKey]) => {
@@ -83,12 +76,7 @@
         }
       }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
     };
-    const debouncedRun = debounce(run, opts?.debounce);
-    if (opts?.debounce) {
-      debouncedRun();
-    } else {
-      run();
-    }
+    run();
   }
   async function innerHTMLTransformer(_, selector, html) {
     const el = document.querySelector(selector);
@@ -99,7 +87,7 @@
   async function locationTransformer(_, url) {
     window.location.href = url;
   }
-  async function postRequestTransformer(domx, url, data, opts) {
+  async function postRequestTransformer(domx, url, data) {
     const run = () => {
       const formData = new FormData();
       data.forEach(([key, selector, prop, propKey]) => {
@@ -132,15 +120,10 @@
         }
       }).then((r) => r.json().then((transformations) => domx.transform(transformations)));
     };
-    const debouncedRun = debounce(run, opts?.debounce);
-    if (opts?.debounce) {
-      debouncedRun();
-    } else {
-      run();
-    }
+    run();
   }
   async function removeAttributeTransformer(_, selector, attr) {
-    const els = document.querySelectorAll(selector);
+    const els = getNodeListBySelector(selector);
     els.forEach((el) => el.removeAttribute(attr));
   }
   async function removeTransformer(_, selector) {
@@ -149,32 +132,22 @@
       return;
     el.remove();
   }
-  async function removeEventListenerTransformer(domx, selector, event, fsmEvent) {
-    const els = document.querySelectorAll(selector);
-    els.forEach((el) => {
-      const cb = (e) => {
-        e.preventDefault();
-        if (e.target !== el)
-          return;
-        domx.dispatch(fsmEvent);
-      };
-      el.removeEventListener(event, cb);
-    });
+  async function removeEventListenerTransformer(domx, selector, event) {
+    domx.removeEventListenersForSelector(selector, event);
   }
   async function removeClassTransformer(_, selector, className) {
-    const els = document.querySelectorAll(selector);
+    const els = getNodeListBySelector(selector);
     els.forEach((el) => el.classList.remove(className));
   }
   async function replaceTransformer(_, selector, html) {
     const el = document.querySelector(selector);
     if (!el)
       return;
-    const tmpl = document.createElement("template");
-    tmpl.innerHTML = decodeURIComponent(html);
-    el.replaceWith(tmpl.content);
+    const newElement = document.createRange().createContextualFragment(html);
+    el.replaceWith(newElement);
   }
   async function setAttributeTransformer(_, selector, attr, value) {
-    const els = document.querySelectorAll(selector);
+    const els = getNodeListBySelector(selector);
     els.forEach((el) => {
       if (value === null)
         return el.removeAttribute(attr);
@@ -208,14 +181,23 @@
       return;
     el.textContent = decodeURIComponent(text);
   }
-  async function waitTransformer(_, timeout) {
-    return new Promise((resolve) => setTimeout(resolve, timeout));
+  async function triggerTransformer(_, selector, event) {
+    const el = document.querySelector(selector);
+    if (!el)
+      return;
+    el.dispatchEvent(new Event(event));
+  }
+  async function waitTransformer(domx, timeout) {
+    clearTimeout(domx.debouncing);
+    return new Promise((resolve) => domx.debouncing = setTimeout(resolve, timeout));
   }
   async function windowTransformer(_, method, ...args) {
     window[method](...args);
   }
   var Domx = class {
     constructor(fsm) {
+      this.eventRegistry = [];
+      this.debouncing = 0;
       this.fsm = {
         id: "",
         initialState: "",
@@ -229,8 +211,11 @@
       this.unsub = (s) => {
         this.subs = this.subs.filter((sub) => sub !== s);
       };
+      this.addEventListenerToElement = this.addEventListenerToElement.bind(this);
       this.dispatch = this.dispatch.bind(this);
       this.init = this.init.bind(this);
+      this.removeAllEventListeners = this.removeAllEventListeners.bind(this);
+      this.removeEventListenersForSelector = this.removeEventListenersForSelector.bind(this);
       this.registerEventListeners = this.registerEventListeners.bind(this);
       this.sub = this.sub.bind(this);
       this.transform = this.transform.bind(this);
@@ -253,10 +238,20 @@
       this.addTransformer("state", stateTransformer);
       this.addTransformer("submit", submitFormTransformer);
       this.addTransformer("textContent", textContentTransformer);
+      this.addTransformer("trigger", triggerTransformer);
       this.addTransformer("wait", waitTransformer);
       this.addTransformer("window", windowTransformer);
       if (fsm)
-        document.addEventListener("DOMContentLoaded", () => this.init(fsm));
+        this.init(fsm);
+    }
+    addEventListenerToElement(selector, event, handler) {
+      this.eventRegistry.push({ selector, event, handler });
+      document.addEventListener(event, (e) => {
+        const target = e.target;
+        if (target && target.matches(selector)) {
+          handler(e);
+        }
+      });
     }
     addTransformer(name, cb) {
       this.tranformers[name] = cb;
@@ -282,11 +277,26 @@
       if (initState.entry)
         this.dispatch("entry");
     }
+    removeEventListenersForSelector(selector, event) {
+      const listenersToRemove = this.eventRegistry.filter(
+        (entry) => entry.selector === selector && entry.event === event
+      );
+      listenersToRemove.forEach((entry) => {
+        document.removeEventListener(entry.event, entry.handler);
+      });
+      this.eventRegistry = this.eventRegistry.filter((entry) => !(entry.selector === selector && entry.event === event));
+    }
+    removeAllEventListeners() {
+      this.eventRegistry.forEach((entry) => {
+        document.removeEventListener(entry.event, entry.handler);
+      });
+      this.eventRegistry = [];
+    }
     registerEventListeners() {
       const listeners = this.fsm.listeners ?? [];
       for (let i = 0; i < listeners.length; i++) {
         const [selector, eventListener, fsmEvent] = listeners[i];
-        const els = document.querySelectorAll(selector);
+        const els = getNodeListBySelector(selector);
         for (let j = 0; j < els.length; j++) {
           const el = els[j];
           const cb = (e) => {
@@ -295,8 +305,8 @@
               return;
             this.dispatch(fsmEvent);
           };
-          el.removeEventListener(eventListener, cb);
-          el.addEventListener(eventListener, cb);
+          this.removeEventListenersForSelector(selector, eventListener);
+          this.addEventListenerToElement(selector, eventListener, cb);
         }
       }
     }
@@ -306,6 +316,8 @@
     }
     async transform(transformations = [], cb) {
       if (!transformations)
+        return;
+      if (this.debouncing)
         return;
       for (let i = 0; i < transformations.length; i++) {
         const transformation = transformations[i];

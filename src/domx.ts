@@ -11,18 +11,33 @@ function getNodeListBySelector(selector: string): NodeListOf<HTMLElement> {
   }
 }
 
+function debounce(fn: (...args: any) => void, ms: number) {
+  let timeout: NodeJS.Timeout;
+  return (...args: any) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), ms);
+  };
+}
+
 async function addClassTransformer(_: Domx, selector: string, className: string) {
   const els = getNodeListBySelector(selector);
   els.forEach((el) => el.classList.add(className));
 }
 
-async function addEventListenerTransformer(domx: Domx, selector: string, event: string, fsmEvent: string) {
+async function addEventListenerTransformer(
+  domx: Domx,
+  selector: string,
+  event: string,
+  fsmEvent: string,
+  debounceTime: number = 0
+) {
   domx.removeEventListenersForSelector(selector, event);
   const cb = (e: any) => {
     e.preventDefault();
     domx.dispatch(fsmEvent);
   };
-  domx.addEventListenerToElement(selector, event, cb);
+  const debounced = debounce(cb, debounceTime);
+  domx.addEventListenerToElement(selector, event, debounced);
 }
 
 async function appendTransformer(_: Domx, selector: string, html: string) {
@@ -204,10 +219,7 @@ async function triggerTransformer(_: Domx, selector: string, event: string) {
 }
 
 async function waitTransformer(domx: Domx, timeout: number) {
-  clearTimeout(domx.debouncing);
-  return new Promise((resolve) => (domx.debouncing = setTimeout(resolve, timeout))).then(() =>
-    clearTimeout(domx.debouncing)
-  );
+  return new Promise((resolve) => setTimeout(resolve, timeout));
 }
 
 async function windowTransformer(_: Domx, method: string, ...args: any) {
@@ -245,7 +257,7 @@ export type TransformerList = (
 export type FSM = {
   id: string;
   initialState: string;
-  listeners?: [selector: string, event: string, evt: string][];
+  listeners?: [selector: string, event: string, evt: string, debounceTime?: number][];
   states: Record<string, Record<string, TransformerList>>;
 };
 
@@ -255,7 +267,7 @@ export class Domx {
     event: string;
     handler: EventListener;
   }[] = [];
-  debouncing: any = 0;
+  debouncing: Record<string, boolean> = {};
   fsm: FSM = {
     id: "",
     initialState: "",
@@ -337,6 +349,7 @@ export class Domx {
   dispatch(evt: string) {
     const transformations = this.fsm.states[this.state][evt];
     if (!transformations) return;
+    if (this.debouncing[evt]) return;
     const prevState = this.state;
     // run transformations
     this.transform(transformations, () => {
@@ -402,7 +415,7 @@ export class Domx {
     const listeners = this.fsm.listeners ?? [];
 
     for (let i = 0; i < listeners.length; i++) {
-      const [selector, eventListener, fsmEvent] = listeners[i];
+      const [selector, eventListener, fsmEvent, debouncedTime = 0] = listeners[i];
       const els = getNodeListBySelector(selector);
       // add event listeners to all registered elements
       for (let j = 0; j < els.length; j++) {
@@ -414,9 +427,10 @@ export class Domx {
           // all other transformations should be done in the state machine
           this.dispatch(fsmEvent);
         };
+        const debounced = debounce(cb, debouncedTime);
         // prevent duplicate event listeners
         this.removeEventListenersForSelector(selector, eventListener);
-        this.addEventListenerToElement(selector, eventListener, cb);
+        this.addEventListenerToElement(selector, eventListener, debounced);
       }
     }
   }
@@ -440,7 +454,6 @@ export class Domx {
   async transform(transformations: TransformerList = [], cb?: () => void) {
     // get transformations from current state
     if (!transformations) return;
-    if (this.debouncing) return;
 
     // apply each transformation
     for (let i = 0; i < transformations.length; i++) {

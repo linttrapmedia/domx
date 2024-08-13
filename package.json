@@ -2,7 +2,7 @@
   "name": "@linttrap/domx",
   "author": "@linttrapmedia",
   "title": "domx",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "A novel UI library for managing the DOM without javascript",
   "type": "module",
   "exports": {

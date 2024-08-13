@@ -8,6 +8,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     tests.AppendTest,
     tests.AttrTest,
     tests.AddEventListenerTest,
+    tests.AddEventListenerWithDebounce,
     tests.DispatchTest,
     tests.GetRequestTest,
     tests.HistoryTest,
@@ -21,6 +22,5 @@ window.addEventListener("DOMContentLoaded", async () => {
     tests.TextContentTest,
     tests.WindowMethodsTest,
     tests.WaitTest,
-    tests.WaitAsDebouncerTest,
   ]);
 });

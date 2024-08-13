@@ -88,6 +88,55 @@ export const AddEventListenerTest: Test = (callback) => {
   });
 };
 
+export const AddEventListenerWithDebounce: Test = (callback) => {
+  const sandbox = document.querySelector("#test-sandbox") as HTMLElement;
+  const uuid = getUniqueElId();
+  const el = document.createElement("button");
+  el.id = uuid;
+  sandbox.appendChild(el);
+
+  let eventCount = 0;
+
+  function eventCounterTransformer() {
+    console.log("eventCounterTransformer");
+    eventCount++;
+  }
+
+  const fsm = new Domx({
+    id: "fsm",
+    initialState: "TEST",
+    listeners: [[`#${uuid}`, "click", "test", 200]],
+    states: {
+      TEST: {
+        // @ts-ignore
+        test: [["count"]],
+      },
+      TESTED: {},
+    },
+  });
+
+  fsm.addTransformer("count", eventCounterTransformer);
+  const start = Date.now();
+  el.click();
+  el.click();
+  el.click();
+  while (Date.now() - start < 50) {}
+  el.click();
+  el.click();
+  el.click();
+  while (Date.now() - start < 50) {}
+  el.click();
+  while (Date.now() - start < 50) {}
+  el.click();
+  while (Date.now() - start < 50) {}
+  el.click();
+
+  fsm.sub((evt, prevState, nextState) => {
+    if (eventCount === 1 && Date.now() - start > 250)
+      callback({ label: "AddEventListenerWithDebounce", pass: true, message: "can debounce event listener" });
+  });
+};
+
 export const DispatchTest: Test = (callback) => {
   const fsm = new Domx({
     id: "fsm",
@@ -362,44 +411,6 @@ export const WaitTest: Test = (callback) => {
     if (nextState === "TESTED" && Date.now() - start > 100) {
       callback({ label: "Wait", pass: true, message: "can wait" });
     }
-  });
-};
-
-export const WaitAsDebouncerTest: Test = (callback) => {
-  const sandbox = document.querySelector("#test-sandbox") as HTMLElement;
-  const uuid = getUniqueElId();
-  const el = document.createElement("button");
-  el.id = uuid;
-  sandbox.appendChild(el);
-
-  const start = Date.now();
-  let eventCount = 0;
-
-  function eventCounterTransformer() {
-    eventCount++;
-  }
-
-  const fsm = new Domx({
-    id: "fsm",
-    initialState: "TEST",
-    listeners: [[`#${uuid}`, "click", "test"]],
-    states: {
-      TEST: {
-        // @ts-ignore
-        test: [["wait", 100], ["count"]],
-      },
-      TESTED: {},
-    },
-  });
-
-  fsm.addTransformer("count", eventCounterTransformer);
-  el.click();
-  el.click();
-  el.click();
-
-  fsm.sub((evt, prevState, nextState) => {
-    if (eventCount === 1 && Date.now() - start > 100)
-      callback({ label: "WaitAsDebouncer", pass: true, message: "wait can debounce events" });
   });
 };
 
